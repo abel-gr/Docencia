@@ -8,7 +8,7 @@ Created on Thu Feb  1 18:07:39 2024
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
-from sklearn.datasets import load_breast_cancer
+from sklearn.datasets import load_breast_cancer, load_digits
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -17,7 +17,7 @@ from pyscript import display
 
 def learning_rate_button(event):
     
-    learning_rate = float(document.querySelector("#learning_rate_text"))
+    learning_rate = float(document.querySelector("#learning_rate_text").value)
     
     # dataset = load_breast_cancer()
     dataset = load_digits()
