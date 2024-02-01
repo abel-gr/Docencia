@@ -37,8 +37,8 @@ def learning_rate_button(event):
     cm = confusion_matrix(y_test, y_pred)
     
     
-    fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=150)
-    ax.set_title("Confusion matrix\n with learning\n rate = " + str(learning_rate))
+    fig, ax = plt.subplots(1, 1, figsize=(5,5), dpi=250)
+    ax.set_title("Confusion matrix with\n learning rate = " + str(learning_rate))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=dataset.target_names)
     disp.plot(ax=ax, cmap="Blues", values_format="d")
         
@@ -48,11 +48,11 @@ def learning_rate_button(event):
     document.querySelector("#accuracy").innerText = round(accuracy, 6)
     
     
-    fig2, ax2 = plt.subplots(1, 1, figsize=(5,5), dpi=150)
+    fig2, ax2 = plt.subplots(1, 1, figsize=(5,5), dpi=250)
     ax2.plot(model.loss_curve_)
     ax2.set_xlabel("Iteration")
     ax2.set_ylabel("Loss")
-    ax2.set_title("Loss curve")
+    ax2.set_title("Loss curve with\n learning rate = " + str(learning_rate))
     
     document.querySelector("#output_loss_curve").innerHTML = ""
     display(fig2, target="output_loss_curve")
