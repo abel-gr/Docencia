@@ -41,12 +41,12 @@ def load_image(event):
         # display(fig1, target="output_original_image")
         
          
-    	image = document.getElementById("image");
-    	image.src = event.target.result
+        image = document.getElementById("image");
+        image.src = event.target.result
 
     onload_event = create_proxy(onload)
     reader.onload = onload_event
-	reader.readAsDataURL(file)
+    reader.readAsDataURL(file)
 
 
 file_input = document.getElementById('imagefile')
