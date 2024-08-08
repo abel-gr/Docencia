@@ -16,7 +16,7 @@ from pyodide.ffi import create_proxy
 from js import URL
 
 def load_image(event):
-    file = event.target.files[0]
+    file = event.target.files.item(0)
     if not file:
         return
 
