@@ -16,6 +16,7 @@ from pyodide.ffi import create_proxy
 from js import FileReader
 
 import io
+import base64
 
 def load_image(event):
     file = event.target.files.item(0)
