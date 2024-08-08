@@ -22,26 +22,31 @@ def load_image(event):
     if not file:
         return
     
-    reader = document.createElement('FileReader')
+    reader = js.FileReader.new()
 
     def onload(event):
-        data_url = event.target.result
+        # data_url = event.target.result
 
-        base64_data = data_url.split(',')[1]
+        # base64_data = data_url.split(',')[1]
 
-        img_data = io.BytesIO(base64.b64decode(base64_data))
+        # img_data = io.BytesIO(base64.b64decode(base64_data))
 
-        img = plt.imread(img_data, format='png')
+        # img = plt.imread(img_data, format='png')
 
-        fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
-        ax1.imshow(img, cmap='gray')
-        ax1.axis("off")
+        # fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
+        # ax1.imshow(img, cmap='gray')
+        # ax1.axis("off")
 
-        document.querySelector("#output_original_image").innerHTML = ""
-        display(fig1, target="output_original_image")
+        # document.querySelector("#output_original_image").innerHTML = ""
+        # display(fig1, target="output_original_image")
+        
+         
+    	image = document.getElementById("image");
+    	image.src = event.target.result
 
-    reader.onload = create_proxy(onload)
-    reader.readAsDataURL(file)
+    onload_event = create_proxy(onload)
+    reader.onload = onload_event
+	reader.readAsDataURL(file)
 
 
 file_input = document.getElementById('imagefile')
