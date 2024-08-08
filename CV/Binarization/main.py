@@ -34,6 +34,7 @@ def load_image(event):
 
         img = plt.imread(img_data, format='png')
         
+        global original_img
         original_img = img
 
         fig1, ax1 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
