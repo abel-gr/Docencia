@@ -39,7 +39,7 @@ def load_image(event):
         fig1, ax1 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
         ax1.imshow(img, cmap='gray')
         ax1.axis("off")
-        ax1.set_title("Original image", size=10)
+        ax1.set_title("Original image", size=5)
 
         document.querySelector("#output_original_image").innerHTML = ""
         display(fig1, target="output_original_image")
@@ -85,7 +85,7 @@ def button(event):
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
     ax2.imshow(th_img, cmap='gray')
     ax2.axis("off")
-    ax2.set_title("Image after binarization \n" + "(threshold = " + str(th) + ")", size=10)
+    ax2.set_title("Image after binarization \n" + "(threshold = " + str(th) + ")", size=5)
 
     document.querySelector("#output_binarization_result").innerHTML = ""
     display(fig2, target="output_binarization_result")
