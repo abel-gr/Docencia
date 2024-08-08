@@ -5,13 +5,9 @@ Created on Thu Feb  1 18:07:39 2024
 @author: abelg
 """
 
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
-from sklearn.datasets import load_breast_cancer, load_digits
 import matplotlib.pyplot as plt
 import numpy as np
-import cv2
+
 
 from pyscript import document
 from pyscript import display
