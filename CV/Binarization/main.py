@@ -23,10 +23,11 @@ fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
 ax1.imshow(image, cmap='gray')
 ax1.axis("off")
 
+document.querySelector("#output_original_image").innerHTML = ""
+display(fig1, target="output_original_image")
+
 def learning_rate_button(event):
 
-            
-    document.querySelector("#output_hidden_layer_sizes").innerHTML = ""
-    display(fig1, target="output_hidden_layer_sizes")
+
     
     learning_rate = float(document.querySelector("#learning_rate_text").value)
