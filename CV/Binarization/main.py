@@ -33,6 +33,8 @@ def load_image(event):
         img_data = io.BytesIO(base64.b64decode(base64_data))
 
         img = plt.imread(img_data, format='png')
+        
+        original_img = img
 
         fig1, ax1 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
         ax1.imshow(img, cmap='gray')
@@ -49,12 +51,39 @@ def load_image(event):
     reader.readAsDataURL(file)
 
 
+original_img = None
+
 file_input = document.getElementById('imagefile')
 file_input.addEventListener('change', create_proxy(load_image))
 
 
+def button(event):
+    
+    
+    th = document.querySelector("#threshold_text").value
+    
+    if th is None:
+        return
+    
+    if type(th) == str:
+        if th == '' or th == ' ':
+            return
+    
+    th = int(th)
+    
+    if original_img is None:
+        return
+    
+    th_img = np.copy(original_img)
+    
+    th_img[th_img < th] = 0
+    th_img[th_img >= th] = 1
+    
+    fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
+    ax2.imshow(th_img, cmap='gray')
+    ax2.axis("off")
 
-def learning_rate_button(event):
+    document.querySelector("#output_binarization_result").innerHTML = ""
+    display(fig2, target="output_binarization_result")
+
     
-    
-    learning_rate = float(document.querySelector("#learning_rate_text").value)
