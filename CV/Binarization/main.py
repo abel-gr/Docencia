@@ -12,18 +12,38 @@ import numpy as np
 from pyscript import document
 from pyscript import display
 
-image = np.fromfile('tshirt_grayscale0.txt', dtype=np.uint8)
-image = image.reshape(540,540)
 
-fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
-ax1.imshow(image, cmap='gray')
-ax1.axis("off")
+from PIL import Image
 
-document.querySelector("#output_original_image").innerHTML = ""
-display(fig1, target="output_original_image")
+def load_image(event):
+    file = event.target.files[0]
+    if not file:
+        return
+
+    reader = document.createElement('FileReader')
+
+    def onload(event):
+        img_data = event.target.result.to_bytes()
+        
+        image = Image.open(io.BytesIO(img_data))
+        
+        fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
+        ax1.imshow(image, cmap='gray')
+        ax1.axis("off")
+
+        document.querySelector("#output_original_image").innerHTML = ""
+        display(fig1, target="output_original_image")
+
+    reader.onload = onload
+    reader.readAsArrayBuffer(file)
+
+file_input = document.getElementById('imagefile')
+file_input.addEventListener('change', load_image)
+
+
+
 
 def learning_rate_button(event):
-
-
+    
     
     learning_rate = float(document.querySelector("#learning_rate_text").value)
