@@ -10,8 +10,10 @@ import matplotlib.image as mpimg
 
 import numpy as np
 
-from pyscript import document, display, URL
+from pyscript import document, display
 from pyodide.ffi import create_proxy
+
+from js import URL
 
 def load_image(event):
     file = event.target.files[0]
