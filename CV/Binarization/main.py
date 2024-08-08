@@ -15,27 +15,33 @@ from pyodide.ffi import create_proxy
 
 from js import URL
 
+import io
+
 def load_image(event):
     file = event.target.files.item(0)
     if not file:
         return
+    
+    reader = document.createElement('FileReader')
 
-    file_url = URL.createObjectURL(file)
-
-    img = mpimg.imread(file_url)
-
+    def onload(event):
+        img_data = np.frombuffer(event.target.result.to_py(), dtype=np.uint8)
         
-    fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
-    ax1.imshow(img, cmap='gray')
-    ax1.axis("off")
+        img = plt.imread(io.BytesIO(img_data))
 
-    document.querySelector("#output_original_image").innerHTML = ""
-    display(fig1, target="output_original_image")
+        fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
+        ax1.imshow(img, cmap='gray')
+        ax1.axis("off")
+
+        document.querySelector("#output_original_image").innerHTML = ""
+        display(fig1, target="output_original_image")
+
+    reader.onload = create_proxy(onload)
+    reader.readAsArrayBuffer(file)
 
 
 file_input = document.getElementById('imagefile')
 file_input.addEventListener('change', create_proxy(load_image))
-
 
 
 
