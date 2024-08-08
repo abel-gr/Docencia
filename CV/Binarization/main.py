@@ -25,9 +25,13 @@ def load_image(event):
     reader = document.createElement('FileReader')
 
     def onload(event):
-        img_data = np.frombuffer(event.target.result.to_py(), dtype=np.uint8)
-        
-        img = plt.imread(io.BytesIO(img_data))
+        data_url = event.target.result
+
+        base64_data = data_url.split(',')[1]
+
+        img_data = io.BytesIO(base64.b64decode(base64_data))
+
+        img = plt.imread(img_data, format='png')
 
         fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
         ax1.imshow(img, cmap='gray')
@@ -37,7 +41,7 @@ def load_image(event):
         display(fig1, target="output_original_image")
 
     reader.onload = create_proxy(onload)
-    reader.readAsArrayBuffer(file)
+    reader.readAsDataURL(file)
 
 
 file_input = document.getElementById('imagefile')
