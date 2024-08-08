@@ -16,26 +16,17 @@ import cv2
 from pyscript import document
 from pyscript import display
 
+image = np.fromfile('tshirt_grayscale0.txt', dtype=np.uint8)
+image = image.reshape(540,540)
+
+fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
+ax1.imshow(image, cmap='gray')
+ax1.axis("off")
 
 def learning_rate_button(event):
-    
 
-    image = cv2.imread('tshirt_grayscale0.png', cv2.IMREAD_GRAYSCALE)
-
-    fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
-    ax1.imshow(image, cmap='gray')
-    ax1.axis("off")
             
     document.querySelector("#output_hidden_layer_sizes").innerHTML = ""
     display(fig1, target="output_hidden_layer_sizes")
     
     learning_rate = float(document.querySelector("#learning_rate_text").value)
-    hidden_layer_sizes_str = str(document.querySelector("#hidden_layer_sizes_text").value)
-    
-    hidden_layer_sizes = tuple([int(h) for h in hidden_layer_sizes_str.split(",")])
-    
-    # dataset = load_breast_cancer()
-    dataset = load_digits()
-    
-    x = dataset.data
-    y = dataset.target
