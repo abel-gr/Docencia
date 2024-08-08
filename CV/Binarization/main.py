@@ -13,29 +13,25 @@ from pyscript import document
 from pyscript import display
 
 
-from PIL import Image
+import matplotlib.image as mpimg
 
 def load_image(event):
     file = event.target.files[0]
     if not file:
         return
 
-    reader = document.createElement('FileReader')
+    file_url = URL.createObjectURL(file)
 
-    def onload(event):
-        img_data = event.target.result.to_bytes()
+    img = mpimg.imread(file_url)
+
         
-        image = Image.open(io.BytesIO(img_data))
-        
-        fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
-        ax1.imshow(image, cmap='gray')
-        ax1.axis("off")
+    fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
+    ax1.imshow(img, cmap='gray')
+    ax1.axis("off")
 
-        document.querySelector("#output_original_image").innerHTML = ""
-        display(fig1, target="output_original_image")
+    document.querySelector("#output_original_image").innerHTML = ""
+    display(fig1, target="output_original_image")
 
-    reader.onload = onload
-    reader.readAsArrayBuffer(file)
 
 file_input = document.getElementById('imagefile')
 file_input.addEventListener('change', load_image)
