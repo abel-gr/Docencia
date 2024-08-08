@@ -60,10 +60,20 @@
                             <input type="text" class="form-control" id="threshold_text" placeholder="Enter threshold (e.g.: 100)">
                             <br>
                         </div>
-                        <button class="btn btn-primary" py-click="button">Train</button>
+                        <button class="btn btn-primary" py-click="button">Apply binarization</button>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Original Image</h5>
+                        <div id="output_original_image"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
@@ -73,21 +83,11 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row mt-5">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Original Image</h5>
-                        <div id="output_original_image"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Original Image (with values)</h5>
-                        <div id="output_original_image_with_values"></div>
+                        <h5 class="card-title">Binarization Result (with values)</h5>
+                        <div id="output_binarization_result_with_values"></div>
                     </div>
                 </div>
             </div>
