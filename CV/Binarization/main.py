@@ -34,7 +34,7 @@ def load_image(event):
 
         img = plt.imread(img_data, format='png')
 
-        fig1, ax1 = plt.subplot(1, 1, figsize=(2,2), dpi=200)
+        fig1, ax1 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
         ax1.imshow(img, cmap='gray')
         ax1.axis("off")
 
