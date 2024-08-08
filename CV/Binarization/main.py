@@ -6,7 +6,6 @@ Created on Thu Feb  1 18:07:39 2024
 """
 
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 import numpy as np
 
@@ -77,7 +76,7 @@ def button(event):
         document.querySelector("#output_binarization_result").innerHTML = "Select an image"
         return
     
-    th_img = np.copy(original_img)
+    th_img = np.copy(np.mean(original_img[:, :, 0:3], axis=2) * 255)
     
     th_img[th_img < th] = 0
     th_img[th_img >= th] = 1
