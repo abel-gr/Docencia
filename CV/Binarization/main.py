@@ -6,14 +6,12 @@ Created on Thu Feb  1 18:07:39 2024
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
 import numpy as np
 
+from pyscript import document, display, URL
 
-from pyscript import document
-from pyscript import display
-
-
-import matplotlib.image as mpimg
 
 def load_image(event):
     file = event.target.files[0]
