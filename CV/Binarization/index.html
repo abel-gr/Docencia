@@ -51,11 +51,14 @@
                     <div class="card-body">
                         <h5 class="card-title">Binarization Settings</h5>
                         <div class="form-group">
-                            <label for="learningRate">Learning Rate:</label>
+                            <label for="imagefile">Select a file image:</label>
+                            <br>
+                            <input type="file" id="imagefile" name="imagefile">
+                            <br>
+                            <br>
+                            <label for="learningRate">Binarization threshold:</label>
                             <input type="text" class="form-control" id="learning_rate_text" placeholder="Enter learning rate (e.g.: 0.01)">
                             <br>
-                            <label for="hidden_layer_sizes">Hidden layer sizes:</label>
-                            <input type="text" class="form-control" id="hidden_layer_sizes_text" placeholder="Enter the number of neurons in each hidden layer (e.g.: 5,10,15)">
                         </div>
                         <button class="btn btn-primary" py-click="learning_rate_button">Train</button>
                     </div>
