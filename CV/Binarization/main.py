@@ -11,7 +11,7 @@ import matplotlib.image as mpimg
 import numpy as np
 
 from pyscript import document, display, URL
-
+from pyodide.ffi import create_proxy
 
 def load_image(event):
     file = event.target.files[0]
@@ -32,7 +32,7 @@ def load_image(event):
 
 
 file_input = document.getElementById('imagefile')
-file_input.addEventListener('change', load_image)
+file_input.addEventListener('change', create_proxy(load_image))
 
 
 
