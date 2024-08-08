@@ -13,7 +13,7 @@ import numpy as np
 from pyscript import document, display
 from pyodide.ffi import create_proxy
 
-from js import URL
+from js import FileReader
 
 import io
 
@@ -22,7 +22,7 @@ def load_image(event):
     if not file:
         return
     
-    reader = js.FileReader.new()
+    reader = FileReader.new()
 
     def onload(event):
         # data_url = event.target.result
