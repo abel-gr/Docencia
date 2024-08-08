@@ -3,7 +3,7 @@
   <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <title>MLP Trainer</title>
+      <title>Binarization</title>
       <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.3/core.css">
       <script type="module" src="https://pyscript.net/releases/2024.1.3/core.js"></script>
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -24,19 +24,15 @@
             height: 100%;
         }
 
-        #output_confusion_matrix {
-            text-align: center;
-        }
-
-        #output_loss_curve {
+        #output_binarization_result {
             text-align: center;
         }
         
-        #output_hidden_layer_sizes {
+        #output_original_image {
             text-align: center;
         }
 
-        #output_hidden_layer_sizes_no_input_layer {
+        #output_original_image_with_values {
             text-align: center;
         }
 
@@ -44,7 +40,7 @@
   
     </head>
   <body>
-    <h1 style="padding-left: 6%">MLP Trainer</h1>
+    <h1 style="padding-left: 6%">Binarization</h1>
     <p style="padding-left: 6%">Copyright Abel Garcia</p>
 
 
@@ -53,7 +49,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Training Settings</h5>
+                        <h5 class="card-title">Binarization Settings</h5>
                         <div class="form-group">
                             <label for="learningRate">Learning Rate:</label>
                             <input type="text" class="form-control" id="learning_rate_text" placeholder="Enter learning rate (e.g.: 0.01)">
@@ -68,8 +64,8 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Training Result</h5>
-                        <p>Accuracy: <span id="accuracy"></span></p>
+                        <h5 class="card-title">Binarization Result</h5>
+                        <div id="output_binarization_result"></div>
                     </div>
                 </div>
             </div>
@@ -78,34 +74,16 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Confusion Matrix</h5>
-                        <div id="output_confusion_matrix"></div>
+                        <h5 class="card-title">Original Image</h5>
+                        <div id="output_original_image"></div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Loss Curve</h5>
-                        <div id="output_loss_curve"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row mt-5">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Network Architecture</h5>
-                        <div id="output_hidden_layer_sizes"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Network Architecture (without showing the input layer)</h5>
-                        <div id="output_hidden_layer_sizes_no_input_layer"></div>
+                        <h5 class="card-title">Original Image (with values)</h5>
+                        <div id="output_original_image_with_values"></div>
                     </div>
                 </div>
             </div>
