@@ -59,19 +59,21 @@ file_input.addEventListener('change', create_proxy(load_image))
 
 def button(event):
     
-    
     th = document.querySelector("#threshold_text").value
     
     if th is None:
+        document.querySelector("#output_binarization_result").innerHTML = "Write a threshold"
         return
     
     if type(th) == str:
         if th == '' or th == ' ':
+            document.querySelector("#output_binarization_result").innerHTML = "Write a threshold value"
             return
     
     th = int(th)
     
     if original_img is None:
+        document.querySelector("#output_binarization_result").innerHTML = "Select an image"
         return
     
     th_img = np.copy(original_img)
