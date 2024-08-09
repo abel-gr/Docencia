@@ -136,12 +136,12 @@ def button(event):
     k = document.querySelector("#k_value_text").value
 
     if k is None:
-        document.querySelector("#output_binarization_result").innerHTML = "Write a window size"
+        document.querySelector("#output_binarization_result").innerHTML = "Write a value of parameter k"
         return
     
     if type(k) == str:
         if k == '' or k == ' ':
-            document.querySelector("#output_binarization_result").innerHTML = "Write a window size"
+            document.querySelector("#output_binarization_result").innerHTML = "Write a value of parameter k"
             return
     
     k = float(k)
@@ -160,7 +160,7 @@ def button(event):
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
     ax2.imshow(th_img, cmap='gray')
     ax2.axis("off")
-    ax2.set_title("Image after binarization \n" + "(window_size = " + str(window_size) + "k = " + str(k) + ")", size=5)
+    ax2.set_title("Image after binarization \n" + "(window_size = " + str(window_size) + ", k = " + str(k) + ")", size=5)
 
     document.querySelector("#output_binarization_result").innerHTML = ""
     display(fig2, target="output_binarization_result")
