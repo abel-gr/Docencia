@@ -17,7 +17,64 @@ from js import FileReader
 import io
 import base64
 
-from skimage.filters import threshold_niblack
+
+def NiblackThreshold(im, sizeI=4, sizeJ=4, k=1.0):
+    img = im.copy()
+    
+    s1 = img.shape[0]
+    s2 = img.shape[1]
+    
+    sizeI = int(sizeI/2)
+    sizeJ = int(sizeJ/2)
+    
+    if(sizeI <= 0):
+        sizeI = 1
+        
+    if(sizeJ <= 0):
+        sizeJ = 1
+    
+    for i in range(0, s1):
+        for j in range(0, s2):
+            
+            posI1 = i-sizeI
+            posI2 = i+sizeI
+            
+            posJ1 = j-sizeJ
+            posJ2 = j+sizeJ
+            
+            if(posI1 < 0):
+                posI1 = 0
+            
+            if(posI2 >= s1):
+                posI2 = s1 - 1
+                
+            if(posJ1 < 0):
+                posJ1 = 0
+            
+            if(posJ2 >= s2):
+                posJ2 = s2 - 1
+            
+            subImg = im[posI1:posI2, posJ1:posJ2]
+                        
+            t = np.mean(subImg) + k * np.std(subImg)
+                        
+            img[i, j] = t
+            
+    return img
+
+def NiblackBinarization(im, sizeI=4, sizeJ=4, k=1.0):
+    t = NiblackThreshold(im, sizeI, sizeJ, k)
+
+    img = im.copy()
+    img[img <= t] = 0
+    img[img > t] = 1
+    
+    img[:, 0:9] = 0
+    img[:, -9:] = 0
+    img[0:9, :] = 0
+    img[-9:, :] = 0
+    
+    return img
 
 def load_image(event):
     file = event.target.files.item(0)
@@ -95,10 +152,9 @@ def button(event):
         document.querySelector("#output_binarization_result").innerHTML = "Select an image"
         return
     
-    
-    thresh_niblack = threshold_niblack(np.mean(original_img[:, :, 0:3], axis=2) * 255, window_size=window_size, k=k)
-    
-    th_img = original_img > thresh_niblack
+        
+    th_img = NiblackBinarization(np.copy(np.mean(original_img[:, :, 0:3], axis=2) * 255),
+                                 sizeI=window_size, sizeJ=window_size, k=k)
     
     
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
