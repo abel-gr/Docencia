@@ -85,7 +85,7 @@ def button(event):
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
     ax2.imshow(th_img, cmap='gray')
     ax2.axis("off")
-    ax2.set_title("Image after binarization \n" + "(threshold = " + str(th) + ")", size=5)
+    ax2.set_title("Image after binarization (global thresholding) \n" + "(threshold = " + str(th) + ")", size=5)
 
     document.querySelector("#output_binarization_result").innerHTML = ""
     display(fig2, target="output_binarization_result")
