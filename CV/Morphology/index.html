@@ -58,21 +58,47 @@
                             <br>
                             <br>
 
-                            <div class="dropdown show">
-                              <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Morphological operation
-                              </a>
+                            <label for="morphological_operation">Select a morphological operation:</label>
+                            <br>
                             
-                              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <a class="dropdown-item" href="#">Dilation</a>
-                                <a class="dropdown-item" href="#">Erosion</a>
-                                <a class="dropdown-item" href="#">Opening</a>
-                                <a class="dropdown-item" href="#">Closing</a>
-                                <a class="dropdown-item" href="#">Opening Residue</a>
-                                <a class="dropdown-item" href="#">Closing Residue</a>
-                              </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation1" value="Dilation" checked>
+                              <label class="form-check-label" for="morphological_operation1">
+                                Dilation
+                              </label>
                             </div>
-
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation2" value="Erosion">
+                              <label class="form-check-label" for="morphological_operation2">
+                                Erosion
+                              </label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation3" value="Opening">
+                              <label class="form-check-label" for="morphological_operation3">
+                                Opening
+                              </label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation4" value="Closing">
+                              <label class="form-check-label" for="morphological_operation4">
+                                Closing
+                              </label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation5" value="OpeningResidue">
+                              <label class="form-check-label" for="morphological_operation5">
+                                Opening Residue
+                              </label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation6" value="ClosingResidue">
+                              <label class="form-check-label" for="morphological_operation6">
+                                Closing Residue
+                              </label>
+                            </div>
+                            <br>
+                            <br>
                             
                             <label for="structuring_element">Structuring element:</label>
                             <input type="text" class="form-control" id="structuring_element_text" placeholder="Enter window size (e.g.: 3, 5, 7, …)">
@@ -104,7 +130,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Binarization Result</h5>
-                        <div id="output_binarization_result"></div>
+                        <div id="output_result"></div>
                         <img id="image"/>
                     </div>
                 </div>
