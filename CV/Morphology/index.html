@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Mathematical Morphology</title>
+      <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.3/core.css">
+      <script type="module" src="https://pyscript.net/releases/2024.1.3/core.js"></script>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  
+      <style>
+        img {
+            vertical-align: middle;
+            border-style: none;
+            max-width: 100%;
+        }
+
+        .container {
+            max-width: 90%; 
+            width: 90%;
+        }
+        
+        .card {
+            height: 100%;
+        }
+
+        #output_binarization_result {
+            text-align: center;
+        }
+        
+        #output_original_image {
+            text-align: center;
+        }
+
+        #output_original_image_with_values {
+            text-align: center;
+        }
+
+    </style>
+  
+    </head>
+  <body>
+    <h1 style="padding-left: 6%">Mathematical Morphology</h1>
+    <h2 style="padding-left: 6%">Grayscale morphological operations on an image</h2>
+    <p style="padding-left: 6%">Copyright Abel Garcia</p>
+
+
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Morphology Settings</h5>
+                        <div class="form-group">
+                            <label for="imagefile">Select a file image:</label>
+                            <br>
+                            <input type="file" id="imagefile" name="imagefile">
+                            <br>
+                            <br>
+
+                            <div class="dropdown show">
+                              <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Morphological operation
+                              </a>
+                            
+                              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="#">Dilation</a>
+                                <a class="dropdown-item" href="#">Erosion</a>
+                                <a class="dropdown-item" href="#">Opening</a>
+                                <a class="dropdown-item" href="#">Closing</a>
+                                <a class="dropdown-item" href="#">Opening Residue</a>
+                                <a class="dropdown-item" href="#">Closing Residue</a>
+                              </div>
+                            </div>
+
+                            
+                            <label for="structuring_element">Structuring element:</label>
+                            <input type="text" class="form-control" id="structuring_element_text" placeholder="Enter window size (e.g.: 3, 5, 7, …)">
+                            <br>
+                            
+                            <label for="width_value">Structuring element width:</label>
+                            <input type="text" class="form-control" id="width_value_text" placeholder="Enter value of parameter k in threshold formula (e.g.: 0.5)">
+                            <br>
+                            
+                            <label for="height_value">Structuring element width:</label>
+                            <input type="text" class="form-control" id="height_value_text" placeholder="Enter value of parameter k in threshold formula (e.g.: 0.5)">
+                            <br>
+                        </div>
+                        <button class="btn btn-primary" py-click="button">Apply binarization</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Original Image</h5>
+                        <div id="output_original_image"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Binarization Result</h5>
+                        <div id="output_binarization_result"></div>
+                        <img id="image"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="py" src="./main.py" config="./pyscript.json"></script>
+
+  </body>
+</html>
