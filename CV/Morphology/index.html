@@ -62,57 +62,52 @@
                             <br>
                             
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation1" value="Dilation" checked>
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation_Dilation" value="Dilation" checked>
                               <label class="form-check-label" for="morphological_operation1">
                                 Dilation
                               </label>
                             </div>
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation2" value="Erosion">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation_Erosion" value="Erosion">
                               <label class="form-check-label" for="morphological_operation2">
                                 Erosion
                               </label>
                             </div>
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation3" value="Opening">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation_Opening" value="Opening">
                               <label class="form-check-label" for="morphological_operation3">
                                 Opening
                               </label>
                             </div>
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation4" value="Closing">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation_Closing" value="Closing">
                               <label class="form-check-label" for="morphological_operation4">
                                 Closing
                               </label>
                             </div>
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation5" value="OpeningResidue">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation_OpeningResidue" value="OpeningResidue">
                               <label class="form-check-label" for="morphological_operation5">
                                 Opening Residue
                               </label>
                             </div>
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation6" value="ClosingResidue">
+                              <input class="form-check-input" type="radio" name="morphological_operation" id="morphological_operation_ClosingResidue" value="ClosingResidue">
                               <label class="form-check-label" for="morphological_operation6">
                                 Closing Residue
                               </label>
                             </div>
                             <br>
-                            <br>
-                            
-                            <label for="structuring_element">Structuring element:</label>
-                            <input type="text" class="form-control" id="structuring_element_text" placeholder="Enter window size (e.g.: 3, 5, 7, …)">
-                            <br>
                             
                             <label for="width_value">Structuring element width:</label>
-                            <input type="text" class="form-control" id="width_value_text" placeholder="Enter value of parameter k in threshold formula (e.g.: 0.5)">
+                            <input type="text" class="form-control" id="width_value_text" placeholder="Enter value of width (e.g.: 5)">
                             <br>
                             
                             <label for="height_value">Structuring element width:</label>
-                            <input type="text" class="form-control" id="height_value_text" placeholder="Enter value of parameter k in threshold formula (e.g.: 0.5)">
+                            <input type="text" class="form-control" id="height_value_text" placeholder="Enter value of height (e.g.: 5)">
                             <br>
                         </div>
-                        <button class="btn btn-primary" py-click="button">Apply binarization</button>
+                        <button class="btn btn-primary" py-click="button">Apply morphological operation</button>
                     </div>
                 </div>
             </div>
@@ -129,7 +124,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Binarization Result</h5>
+                        <h5 class="card-title">Result</h5>
                         <div id="output_result"></div>
                         <img id="image"/>
                     </div>
