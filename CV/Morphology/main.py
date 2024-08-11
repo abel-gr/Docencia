@@ -204,7 +204,7 @@ def button(event):
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
     ax2.imshow(o_img, cmap='gray')
     ax2.axis("off")
-    ax2.set_title("Image after" + morphological_operation + "\n" + "(structuring element width = " + str(width_value) + ",\n structuring element height = " + str(height_value) + ")", size=5)
+    ax2.set_title("Image after" + morphological_operation + "\n" + "(str. el. width = " + str(width_value) + ", str. el. height = " + str(height_value) + ")", size=5)
 
     document.querySelector("#output_result").innerHTML = ""
     display(fig2, target="output_result")
