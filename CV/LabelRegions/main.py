@@ -6,6 +6,8 @@ Created on Thu Feb  1 18:07:39 2024
 """
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.colors import ListedColormap
 
 import numpy as np
 
@@ -273,9 +275,20 @@ def button(event):
     else:
         document.querySelector("#output_result").innerHTML = "Select a connectivity"
         return
+    
+    
+    tab20b = mpl.colormaps['tab20b']
+    tab20c = mpl.colormaps['tab20c']
+
+    newcolors = np.vstack((tab20b(np.linspace(0, 1, 20)), tab20c(np.linspace(0, 1, 20))))
+
+    rng = np.random.default_rng(12345)
+    rng.shuffle(newcolors)
+
+    newcmp = ListedColormap(newcolors, name='tab20b_tab20c')
         
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
-    ax2.imshow(o_img, cmap='gray')
+    ax2.imshow(o_img, cmap=newcmp)
     ax2.axis("off")
     ax2.set_title("Image after region labelling \n(" + connectivity + ")", size=5)
 
