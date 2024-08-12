@@ -21,7 +21,7 @@ import base64
 
 def LabelingRegions(img, min_region_area=2):
     K = 1
-    im_out = np.zeros((img.shape), dtype=np.uint8)
+    im_out = np.zeros((img.shape), dtype=np.uint32)
 
     equivalences = {}
 
@@ -81,12 +81,13 @@ def LabelingRegions(img, min_region_area=2):
         im_out_seq[im_out == region_val] = regions_count_def
         regions_count_def = regions_count_def + 1
             
+    im_out_seq = im_out_seq.astype(np.uint8)
     return [im_out_seq, equivalences]
 
 
 def LabelingRegionsC8(img, min_region_area=2):
     K = 1
-    im_out = np.zeros((img.shape), dtype=np.uint8)
+    im_out = np.zeros((img.shape), dtype=np.uint32)
 
     equivalences = {}
 
@@ -247,6 +248,7 @@ def LabelingRegionsC8(img, min_region_area=2):
         im_out_seq[im_out == region_val] = regions_count_def
         regions_count_def = regions_count_def + 1
             
+    im_out_seq = im_out_seq.astype(np.uint8)
     return [im_out_seq, equivalences]
 
 
