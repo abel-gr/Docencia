@@ -266,16 +266,18 @@ def button(event):
     
     if document.querySelector("#connectivity4").checked:
         o_img = LabelingRegions(img)
-        connectivity = "4-connectivity"
+        connectivity = "C4"
         
     elif document.querySelector("#connectivity8").checked:
         o_img, _ = LabelingRegionsC8(img)
-        connectivity = "8-connectivity"
+        connectivity = "C8"
         
     else:
         document.querySelector("#output_result").innerHTML = "Select a connectivity"
         return
     
+    u = np.unique(o_img, return_counts=True)
+    regions_found = len(u) - 1
     
     tab20b = mpl.colormaps['tab20b']
     tab20c = mpl.colormaps['tab20c']
@@ -292,7 +294,8 @@ def button(event):
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
     ax2.imshow(o_img, cmap=newcmp)
     ax2.axis("off")
-    ax2.set_title("Image after region labelling \n(" + connectivity + ")", size=5)
+    ax2.set_title("Image after region labelling (" + connectivity + ")\n (regions found: " + str(regions_found) + ")", size=5)
+    psm = ax2.pcolormesh(o_img, cmap=newcmp, rasterized=True, vmin=0, vmax=41)
 
     document.querySelector("#output_result").innerHTML = ""
     display(fig2, target="output_result")
