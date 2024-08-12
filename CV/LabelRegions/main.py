@@ -295,6 +295,19 @@ file_input.addEventListener('change', create_proxy(load_image))
 
 def button(event):    
     
+    min_region_area = document.querySelector("#min_region_area_text").value
+    
+    if min_region_area is None:
+        document.querySelector("#output_result").innerHTML = "Write a minimum area"
+        return
+    
+    if type(min_region_area) == str:
+        if min_region_area == '' or min_region_area == ' ':
+            document.querySelector("#output_result").innerHTML = "Write a minimum area"
+            return
+    
+    min_region_area = int(min_region_area)
+    
     
     if original_img is None:
         document.querySelector("#output_result").innerHTML = "Select an image"
@@ -304,11 +317,11 @@ def button(event):
 
     
     if document.querySelector("#connectivity4").checked:
-        o_img, _ = LabelingRegions(img)
+        o_img, _ = LabelingRegions(img, min_region_area=min_region_area)
         connectivity = "C4"
         
     elif document.querySelector("#connectivity8").checked:
-        o_img, _ = LabelingRegionsC8(img)
+        o_img, _ = LabelingRegionsC8(img, min_region_area=min_region_area)
         connectivity = "C8"
         
     else:
@@ -333,7 +346,7 @@ def button(event):
     fig2, ax2 = plt.subplots(1, 1, figsize=(2,2), dpi=200)
     ax2.imshow(o_img, cmap=newcmp)
     ax2.axis("off")
-    ax2.set_title("Image after region labelling (" + connectivity + ")\n (regions found: " + str(regions_found) + ")", size=5)
+    ax2.set_title("Image after region labelling (" + connectivity + ")\n (min area: " + str(min_region_area) + ", regions found: " + str(regions_found) + ")", size=5)
     psm = ax2.pcolormesh(o_img, cmap=newcmp, rasterized=True, vmin=0, vmax=regions_found)
 
     document.querySelector("#output_result").innerHTML = ""
