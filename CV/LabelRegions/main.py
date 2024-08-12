@@ -19,7 +19,7 @@ from js import FileReader
 import io
 import base64
 
-def LabelingRegions(img):
+def LabelingRegions(img, min_region_area=2):
     K = 1
     im_out = np.zeros((img.shape), dtype=np.uint8)
 
@@ -63,10 +63,28 @@ def LabelingRegions(img):
         for equiv in v:
             im_out[im_out==equiv] = k
             
-    return im_out
+            
+    u = np.unique(im_out, return_counts=True)      
+    u2 = np.hstack((u[0].reshape(-1, 1), u[1].reshape(-1, 1)))
+    u2_small_regions = u2[u2[:, 1] < min_region_area][:, 0]
+
+    for small_region_val in u2_small_regions:
+        im_out = np.where(im_out == small_region_val, 0, im_out)
+        
+    
+    im_out_seq = np.copy(im_out)
+        
+    u2_regions = u2[u2[:, 1] >= min_region_area][:, 0]
+
+    regions_count_def = 0
+    for region_val in u2_regions:
+        im_out_seq[im_out == region_val] = regions_count_def
+        regions_count_def = regions_count_def + 1
+            
+    return [im_out_seq, equivalences]
 
 
-def LabelingRegionsC8(img):
+def LabelingRegionsC8(img, min_region_area=2):
     K = 1
     im_out = np.zeros((img.shape), dtype=np.uint8)
 
@@ -210,8 +228,27 @@ def LabelingRegionsC8(img):
         for equiv in v:
             if(k in equivalences):
                 im_out[im_out==k] = equiv
+                 
+
+    u = np.unique(im_out, return_counts=True)      
+    u2 = np.hstack((u[0].reshape(-1, 1), u[1].reshape(-1, 1)))
+    u2_small_regions = u2[u2[:, 1] < min_region_area][:, 0]
+
+    for small_region_val in u2_small_regions:
+        im_out = np.where(im_out == small_region_val, 0, im_out)
+        
+    
+    im_out_seq = np.copy(im_out)
+        
+    u2_regions = u2[u2[:, 1] >= min_region_area][:, 0]
+
+    regions_count_def = 0
+    for region_val in u2_regions:
+        im_out_seq[im_out == region_val] = regions_count_def
+        regions_count_def = regions_count_def + 1
             
-    return [im_out, equivalences]
+    return [im_out_seq, equivalences]
+
 
 def load_image(event):
     file = event.target.files.item(0)
@@ -265,7 +302,7 @@ def button(event):
 
     
     if document.querySelector("#connectivity4").checked:
-        o_img = LabelingRegions(img)
+        o_img, _ = LabelingRegions(img)
         connectivity = "C4"
         
     elif document.querySelector("#connectivity8").checked:
@@ -277,7 +314,7 @@ def button(event):
         return
     
     u = np.unique(o_img, return_counts=True)
-    regions_found = len(u) - 1
+    regions_found = u[0].shape[0] - 1
     
     tab20b = mpl.colormaps['tab20b']
     tab20c = mpl.colormaps['tab20c']
@@ -295,7 +332,7 @@ def button(event):
     ax2.imshow(o_img, cmap=newcmp)
     ax2.axis("off")
     ax2.set_title("Image after region labelling (" + connectivity + ")\n (regions found: " + str(regions_found) + ")", size=5)
-    psm = ax2.pcolormesh(o_img, cmap=newcmp, rasterized=True, vmin=0, vmax=41)
+    psm = ax2.pcolormesh(o_img, cmap=newcmp, rasterized=True, vmin=0, vmax=regions_found)
 
     document.querySelector("#output_result").innerHTML = ""
     display(fig2, target="output_result")
