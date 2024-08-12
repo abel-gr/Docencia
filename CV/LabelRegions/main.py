@@ -284,6 +284,8 @@ def button(event):
 
     rng = np.random.default_rng(12345)
     rng.shuffle(newcolors)
+    
+    newcolors = np.concatenate(([[0, 0, 0, 1]], newcolors), axis=0)
 
     newcmp = ListedColormap(newcolors, name='tab20b_tab20c')
         
