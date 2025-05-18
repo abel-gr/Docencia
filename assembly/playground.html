@@ -1,0 +1,998 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assembly Code Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+        }
+        
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .tab-active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        
+        .challenge-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .challenge-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .register-table {
+            transition: all 0.3s ease;
+        }
+        
+        .highlight-row {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+        
+        .code-line {
+            transition: background-color 0.2s ease;
+        }
+        
+        .code-line-active {
+            background-color: rgba(79, 70, 229, 0.2);
+            font-weight: bold;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.inset-0{inset:0px}.z-50{z-index:50}.mx-4{margin-left:1rem;margin-right:1rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-auto{margin-left:auto}.mr-1{margin-right:0.25rem}.mt-4{margin-top:1rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-16{height:4rem}.h-40{height:10rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-64{height:16rem}.h-8{height:2rem}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-16{width:4rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-8{width:2rem}.w-full{width:100%}.max-w-4xl{max-width:56rem}.max-w-md{max-width:28rem}.flex-1{flex:1 1 0%}.flex-grow{flex-grow:1}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-6{gap:1.5rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-t-lg{border-top-left-radius:0.5rem;border-top-right-radius:0.5rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-indigo-200{--tw-border-opacity:1;border-color:rgb(199 210 254 / var(--tw-border-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-gray-600{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.bg-gray-700{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-indigo-700{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.bg-red-600{--tw-bg-opacity:1;background-color:rgb(220 38 38 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(239 246 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-50{--tw-gradient-from:#faf5ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(250 245 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-indigo-100{--tw-gradient-to:#e0e7ff var(--tw-gradient-to-position)}.p-2{padding:0.5rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-indigo-800{--tw-text-opacity:1;color:rgb(55 48 163 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-500:hover{--tw-bg-opacity:1;background-color:rgb(107 114 128 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-500:hover{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:bg-red-700:hover{--tw-bg-opacity:1;background-color:rgb(185 28 28 / var(--tw-bg-opacity, 1))}.hover\:text-indigo-200:hover{--tw-text-opacity:1;color:rgb(199 210 254 / var(--tw-text-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:flex-none{flex:none}}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-indigo-600 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                    <h1 class="text-2xl font-bold">Assembly Code Adventure</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-indigo-700 rounded-full px-4 py-1 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span id="points-display">0 Points</span>
+                    </div>
+                    <div class="bg-indigo-700 rounded-full px-4 py-1 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span id="level-display">Level 1</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-6">
+            <!-- Mode Tabs -->
+            <div class="flex mb-6">
+                <button id="experiment-tab" class="tab-active px-6 py-3 rounded-t-lg font-medium flex-1 sm:flex-none text-center">
+                    🧪 Experiment Mode
+                </button>
+                <button id="challenge-tab" class="bg-gray-200 px-6 py-3 rounded-t-lg font-medium flex-1 sm:flex-none text-center">
+                    🏆 Challenge Mode
+                </button>
+            </div>
+
+            <!-- Experiment Mode -->
+            <div id="experiment-mode" class="bg-white rounded-lg shadow-lg p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Code Editor -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-gray-800 rounded-lg overflow-hidden">
+                            <div class="bg-gray-700 px-4 py-2 text-white flex justify-between items-center">
+                                <span>Assembly Code Editor</span>
+                                <div class="flex space-x-2">
+                                    <button id="clear-code" class="bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded text-sm">
+                                        Clear
+                                    </button>
+                                    <button id="load-example" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded text-sm">
+                                        Load Example
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <textarea id="code-editor" class="w-full h-64 bg-gray-800 text-green-400 p-2 code-font focus:outline-none" placeholder="Enter your assembly code here...
+Example:
+MOV R1, 5
+MOV R2, 10
+ADD R3, R1, R2
+SUB R4, R2, R1"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <button id="run-code" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                Run Code
+                            </button>
+                            <button id="step-code" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                Step Through
+                            </button>
+                            <button id="reset-code" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                                </svg>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Register Display -->
+                    <div>
+                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 font-medium">
+                                Registers
+                            </div>
+                            <div class="p-4">
+                                <table class="w-full register-table">
+                                    <thead>
+                                        <tr class="bg-gray-50">
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Register</th>
+                                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="registers-body"><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R1</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R2</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R3</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R4</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R5</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R6</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R7</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr><tr><td class="px-4 py-2 border-t border-gray-200 code-font">R8</td><td class="px-4 py-2 border-t border-gray-200 code-font">0</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 font-medium">
+                                Execution Log
+                            </div>
+                            <div class="p-4 h-40 overflow-y-auto" id="execution-log">
+                                <div class="text-gray-500 italic">Execution log will appear here...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge Mode -->
+            <div id="challenge-mode" class="bg-white rounded-lg shadow-lg p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Level 1 -->
+                    <div class="challenge-card bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-md overflow-hidden border border-indigo-200">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-indigo-800">Level 1</h3>
+                                <span class="bg-indigo-600 text-white px-2 py-1 rounded-full text-xs">10 points</span>
+                            </div>
+                            <h4 class="font-medium text-indigo-700 mb-2">Basic Register Operations</h4>
+                            <p class="text-sm text-gray-600 mb-4">Store the value 42 in register R1 and then copy it to R2.</p>
+                            <button class="start-challenge bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg w-full" data-level="1">
+                                Start Challenge
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Level 2 -->
+                    <div class="challenge-card bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-md overflow-hidden border border-indigo-200">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-indigo-800">Level 2</h3>
+                                <span class="bg-indigo-600 text-white px-2 py-1 rounded-full text-xs">20 points</span>
+                            </div>
+                            <h4 class="font-medium text-indigo-700 mb-2">Addition Challenge</h4>
+                            <p class="text-sm text-gray-600 mb-4">Add the values in R1 (5) and R2 (7) and store the result in R3.</p>
+                            <button class="start-challenge bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg w-full" data-level="2">
+                                Start Challenge
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Level 3 -->
+                    <div class="challenge-card bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-md overflow-hidden border border-indigo-200">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-indigo-800">Level 3</h3>
+                                <span class="bg-indigo-600 text-white px-2 py-1 rounded-full text-xs">30 points</span>
+                            </div>
+                            <h4 class="font-medium text-indigo-700 mb-2">Subtraction &amp; Multiplication</h4>
+                            <p class="text-sm text-gray-600 mb-4">Subtract R2 from R1, then multiply the result by 3.</p>
+                            <button class="start-challenge bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg w-full" data-level="3">
+                                Start Challenge
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Level 4 -->
+                    <div class="challenge-card bg-gradient-to-br from-purple-50 to-indigo-100 rounded-lg shadow-md overflow-hidden border border-indigo-200">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-indigo-800">Level 4</h3>
+                                <span class="bg-indigo-600 text-white px-2 py-1 rounded-full text-xs">40 points</span>
+                            </div>
+                            <h4 class="font-medium text-indigo-700 mb-2">Conditional Operations</h4>
+                            <p class="text-sm text-gray-600 mb-4">Compare R1 and R2, store 1 in R3 if R1 &gt; R2, otherwise store 0.</p>
+                            <button class="start-challenge bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg w-full" data-level="4">
+                                Start Challenge
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Level 5 -->
+                    <div class="challenge-card bg-gradient-to-br from-purple-50 to-indigo-100 rounded-lg shadow-md overflow-hidden border border-indigo-200">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-indigo-800">Level 5</h3>
+                                <span class="bg-indigo-600 text-white px-2 py-1 rounded-full text-xs">50 points</span>
+                            </div>
+                            <h4 class="font-medium text-indigo-700 mb-2">Simple Loop</h4>
+                            <p class="text-sm text-gray-600 mb-4">Create a loop that adds 1 to R1 until it reaches 10.</p>
+                            <button class="start-challenge bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg w-full" data-level="5">
+                                Start Challenge
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Level 6 -->
+                    <div class="challenge-card bg-gradient-to-br from-purple-50 to-indigo-100 rounded-lg shadow-md overflow-hidden border border-indigo-200">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold text-indigo-800">Level 6</h3>
+                                <span class="bg-indigo-600 text-white px-2 py-1 rounded-full text-xs">60 points</span>
+                            </div>
+                            <h4 class="font-medium text-indigo-700 mb-2">Fibonacci Sequence</h4>
+                            <p class="text-sm text-gray-600 mb-4">Calculate the first 5 numbers of the Fibonacci sequence.</p>
+                            <button class="start-challenge bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg w-full" data-level="6">
+                                Start Challenge
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge Modal -->
+            <div id="challenge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4">
+                    <div class="bg-indigo-600 text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
+                        <h3 class="text-xl font-bold" id="challenge-title">Challenge Title</h3>
+                        <button id="close-challenge" class="text-white hover:text-indigo-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-4">
+                            <h4 class="font-medium text-lg mb-2">Instructions:</h4>
+                            <p id="challenge-description" class="text-gray-700">Challenge description goes here.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Challenge Code Editor -->
+                            <div class="lg:col-span-2">
+                                <div class="bg-gray-800 rounded-lg overflow-hidden">
+                                    <div class="bg-gray-700 px-4 py-2 text-white">
+                                        <span>Write your solution:</span>
+                                    </div>
+                                    <div class="p-4">
+                                        <textarea id="challenge-editor" class="w-full h-64 bg-gray-800 text-green-400 p-2 code-font focus:outline-none" placeholder="Enter your assembly code here..."></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    <button id="run-challenge" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Run Code
+                                    </button>
+                                    <button id="step-challenge" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Step Through
+                                    </button>
+                                    <button id="reset-challenge" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Reset
+                                    </button>
+                                    <button id="submit-challenge" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center ml-auto">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Submit Solution
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Challenge Register Display -->
+                            <div>
+                                <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+                                    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 font-medium">
+                                        Registers
+                                    </div>
+                                    <div class="p-4">
+                                        <table class="w-full register-table">
+                                            <thead>
+                                                <tr class="bg-gray-50">
+                                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Register</th>
+                                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="challenge-registers-body">
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R1</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R2</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R3</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R4</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R5</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R6</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R7</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">R8</td>
+                                                    <td class="px-4 py-2 border-t border-gray-200 code-font">0</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                                    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 font-medium">
+                                        Execution Log
+                                    </div>
+                                    <div class="p-4 h-40 overflow-y-auto" id="challenge-execution-log">
+                                        <div class="text-gray-500 italic">Execution log will appear here...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Modal -->
+            <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Challenge Completed!</h3>
+                        <p class="text-gray-600 mb-4">Congratulations! You've successfully completed the challenge.</p>
+                        <div class="bg-indigo-100 rounded-lg p-4 mb-4">
+                            <p class="text-indigo-800 font-medium">You earned <span id="points-earned" class="font-bold">0</span> points!</p>
+                            <p class="text-indigo-700">Total points: <span id="total-points" class="font-bold">0</span></p>
+                        </div>
+                        <button id="close-success" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-4">
+            <div class="container mx-auto px-4 text-center">
+                <p>Assembly Code Adventure - A fun way to learn assembly programming for K-12 students</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTab = 'experiment';
+        let registers = {};
+        let challengeRegisters = {};
+        let currentLine = -1;
+        let codeLines = [];
+        let challengeCodeLines = [];
+        let userPoints = 0;
+        let userLevel = 1;
+        let currentChallenge = null;
+        
+        // Initialize registers
+        function initRegisters(registerObj) {
+            for (let i = 1; i <= 8; i++) {
+                registerObj[`R${i}`] = 0;
+            }
+            return registerObj;
+        }
+        
+        registers = initRegisters(registers);
+        challengeRegisters = initRegisters(challengeRegisters);
+        
+        // Update register display
+        function updateRegisterDisplay(registersObj, tableId) {
+            const tbody = document.getElementById(tableId);
+            tbody.innerHTML = '';
+            
+            for (let i = 1; i <= 8; i++) {
+                const regName = `R${i}`;
+                const row = document.createElement('tr');
+                
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-4 py-2 border-t border-gray-200 code-font';
+                nameCell.textContent = regName;
+                
+                const valueCell = document.createElement('td');
+                valueCell.className = 'px-4 py-2 border-t border-gray-200 code-font';
+                valueCell.textContent = registersObj[regName];
+                
+                row.appendChild(nameCell);
+                row.appendChild(valueCell);
+                
+                if (currentLine >= 0 && codeLines[currentLine] && codeLines[currentLine].includes(regName)) {
+                    row.classList.add('highlight-row');
+                }
+                
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Add log entry
+        function addLogEntry(message, logId) {
+            const log = document.getElementById(logId);
+            const entry = document.createElement('div');
+            entry.className = 'mb-1 text-sm';
+            entry.textContent = message;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        // Parse and execute code
+        function parseCode(code, registersObj, logId) {
+            const lines = code.trim().split('\n').filter(line => line.trim() !== '');
+            const parsedLines = [];
+            
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (trimmedLine.startsWith(';') || trimmedLine === '') continue; // Skip comments and empty lines
+                parsedLines.push(trimmedLine);
+            }
+            
+            return parsedLines;
+        }
+        
+        // Execute a single line of code
+        function executeLine(line, registersObj, logId) {
+            const parts = line.split(/[ ,]+/).filter(part => part !== '');
+            const instruction = parts[0].toUpperCase();
+            
+            switch (instruction) {
+                case 'MOV':
+                    if (parts.length < 3) {
+                        addLogEntry(`Error: Invalid MOV instruction: ${line}`, logId);
+                        return false;
+                    }
+                    const destReg = parts[1];
+                    const srcValue = parts[2].startsWith('R') ? registersObj[parts[2]] : parseInt(parts[2]);
+                    
+                    if (destReg.startsWith('R') && !isNaN(srcValue)) {
+                        registersObj[destReg] = srcValue;
+                        addLogEntry(`Moved ${srcValue} to ${destReg}`, logId);
+                    } else {
+                        addLogEntry(`Error: Invalid operands in MOV instruction: ${line}`, logId);
+                        return false;
+                    }
+                    break;
+                    
+                case 'ADD':
+                    if (parts.length < 4) {
+                        addLogEntry(`Error: Invalid ADD instruction: ${line}`, logId);
+                        return false;
+                    }
+                    const addDestReg = parts[1];
+                    const addSrc1 = parts[2].startsWith('R') ? registersObj[parts[2]] : parseInt(parts[2]);
+                    const addSrc2 = parts[3].startsWith('R') ? registersObj[parts[3]] : parseInt(parts[3]);
+                    
+                    if (addDestReg.startsWith('R') && !isNaN(addSrc1) && !isNaN(addSrc2)) {
+                        registersObj[addDestReg] = addSrc1 + addSrc2;
+                        addLogEntry(`Added ${addSrc1} + ${addSrc2} = ${registersObj[addDestReg]} to ${addDestReg}`, logId);
+                    } else {
+                        addLogEntry(`Error: Invalid operands in ADD instruction: ${line}`, logId);
+                        return false;
+                    }
+                    break;
+                    
+                case 'SUB':
+                    if (parts.length < 4) {
+                        addLogEntry(`Error: Invalid SUB instruction: ${line}`, logId);
+                        return false;
+                    }
+                    const subDestReg = parts[1];
+                    const subSrc1 = parts[2].startsWith('R') ? registersObj[parts[2]] : parseInt(parts[2]);
+                    const subSrc2 = parts[3].startsWith('R') ? registersObj[parts[3]] : parseInt(parts[3]);
+                    
+                    if (subDestReg.startsWith('R') && !isNaN(subSrc1) && !isNaN(subSrc2)) {
+                        registersObj[subDestReg] = subSrc1 - subSrc2;
+                        addLogEntry(`Subtracted ${subSrc1} - ${subSrc2} = ${registersObj[subDestReg]} to ${subDestReg}`, logId);
+                    } else {
+                        addLogEntry(`Error: Invalid operands in SUB instruction: ${line}`, logId);
+                        return false;
+                    }
+                    break;
+                    
+                case 'MUL':
+                    if (parts.length < 4) {
+                        addLogEntry(`Error: Invalid MUL instruction: ${line}`, logId);
+                        return false;
+                    }
+                    const mulDestReg = parts[1];
+                    const mulSrc1 = parts[2].startsWith('R') ? registersObj[parts[2]] : parseInt(parts[2]);
+                    const mulSrc2 = parts[3].startsWith('R') ? registersObj[parts[3]] : parseInt(parts[3]);
+                    
+                    if (mulDestReg.startsWith('R') && !isNaN(mulSrc1) && !isNaN(mulSrc2)) {
+                        registersObj[mulDestReg] = mulSrc1 * mulSrc2;
+                        addLogEntry(`Multiplied ${mulSrc1} * ${mulSrc2} = ${registersObj[mulDestReg]} to ${mulDestReg}`, logId);
+                    } else {
+                        addLogEntry(`Error: Invalid operands in MUL instruction: ${line}`, logId);
+                        return false;
+                    }
+                    break;
+                    
+                case 'DIV':
+                    if (parts.length < 4) {
+                        addLogEntry(`Error: Invalid DIV instruction: ${line}`, logId);
+                        return false;
+                    }
+                    const divDestReg = parts[1];
+                    const divSrc1 = parts[2].startsWith('R') ? registersObj[parts[2]] : parseInt(parts[2]);
+                    const divSrc2 = parts[3].startsWith('R') ? registersObj[parts[3]] : parseInt(parts[3]);
+                    
+                    if (divDestReg.startsWith('R') && !isNaN(divSrc1) && !isNaN(divSrc2)) {
+                        if (divSrc2 === 0) {
+                            addLogEntry(`Error: Division by zero in: ${line}`, logId);
+                            return false;
+                        }
+                        registersObj[divDestReg] = Math.floor(divSrc1 / divSrc2);
+                        addLogEntry(`Divided ${divSrc1} / ${divSrc2} = ${registersObj[divDestReg]} to ${divDestReg}`, logId);
+                    } else {
+                        addLogEntry(`Error: Invalid operands in DIV instruction: ${line}`, logId);
+                        return false;
+                    }
+                    break;
+                    
+                case 'CMP':
+                    if (parts.length < 3) {
+                        addLogEntry(`Error: Invalid CMP instruction: ${line}`, logId);
+                        return false;
+                    }
+                    const cmpSrc1 = parts[1].startsWith('R') ? registersObj[parts[1]] : parseInt(parts[1]);
+                    const cmpSrc2 = parts[2].startsWith('R') ? registersObj[parts[2]] : parseInt(parts[2]);
+                    
+                    if (!isNaN(cmpSrc1) && !isNaN(cmpSrc2)) {
+                        // Store comparison result in special register
+                        registersObj['CMP'] = cmpSrc1 - cmpSrc2;
+                        addLogEntry(`Compared ${cmpSrc1} with ${cmpSrc2}`, logId);
+                    } else {
+                        addLogEntry(`Error: Invalid operands in CMP instruction: ${line}`, logId);
+                        return false;
+                    }
+                    break;
+                    
+                case 'JMP':
+                    addLogEntry(`Jump instructions not implemented yet: ${line}`, logId);
+                    break;
+                    
+                default:
+                    addLogEntry(`Unknown instruction: ${instruction}`, logId);
+                    return false;
+            }
+            
+            return true;
+        }
+        
+        // Run all code
+        function runAllCode(code, registersObj, logId, tableId) {
+            // Reset registers
+            registersObj = initRegisters(registersObj);
+            
+            // Clear log
+            document.getElementById(logId).innerHTML = '';
+            
+            // Parse code
+            const lines = parseCode(code, registersObj, logId);
+            
+            // Execute each line
+            let success = true;
+            for (const line of lines) {
+                if (!executeLine(line, registersObj, logId)) {
+                    success = false;
+                    break;
+                }
+            }
+            
+            // Update register display
+            updateRegisterDisplay(registersObj, tableId);
+            
+            return success;
+        }
+        
+        // Step through code
+        function stepCode(code, registersObj, logId, tableId) {
+            // Initialize if first step
+            if (currentLine === -1) {
+                // Reset registers
+                registersObj = initRegisters(registersObj);
+                
+                // Clear log
+                document.getElementById(logId).innerHTML = '';
+                
+                // Parse code
+                codeLines = parseCode(code, registersObj, logId);
+                
+                // Reset line counter
+                currentLine = 0;
+                
+                // Update code display with highlighting
+                updateCodeHighlighting(code, currentLine);
+            } else {
+                // Move to next line
+                currentLine++;
+            }
+            
+            // Check if we've reached the end
+            if (currentLine >= codeLines.length) {
+                addLogEntry('Program execution completed', logId);
+                currentLine = -1;
+                updateCodeHighlighting(code, -1);
+                return false;
+            }
+            
+            // Execute current line
+            const success = executeLine(codeLines[currentLine], registersObj, logId);
+            
+            // Update register display
+            updateRegisterDisplay(registersObj, tableId);
+            
+            // Update code highlighting
+            updateCodeHighlighting(code, currentLine);
+            
+            return success;
+        }
+        
+        // Update code highlighting
+        function updateCodeHighlighting(code, lineIndex) {
+            const lines = code.split('\n');
+            const codeEditor = document.getElementById('code-editor');
+            const challengeEditor = document.getElementById('challenge-editor');
+            
+            // Determine which editor to use
+            const editor = currentTab === 'experiment' ? codeEditor : challengeEditor;
+            
+            // Reset cursor position to preserve user's place
+            const cursorPosition = editor.selectionStart;
+            
+            if (lineIndex >= 0 && lineIndex < lines.length) {
+                // Add a class to the active line for highlighting
+                const lineStart = lines.slice(0, lineIndex).join('\n').length + (lineIndex > 0 ? 1 : 0);
+                const lineEnd = lineStart + lines[lineIndex].length;
+                
+                // Set selection to highlight the current line
+                editor.focus();
+                editor.setSelectionRange(lineStart, lineEnd);
+            }
+        }
+        
+        // Reset code execution
+        function resetCode() {
+            currentLine = -1;
+            codeLines = [];
+            registers = initRegisters({});
+            updateRegisterDisplay(registers, 'registers-body');
+            document.getElementById('execution-log').innerHTML = '';
+        }
+        
+        // Reset challenge code execution
+        function resetChallengeCode() {
+            currentLine = -1;
+            challengeCodeLines = [];
+            challengeRegisters = initRegisters({});
+            updateRegisterDisplay(challengeRegisters, 'challenge-registers-body');
+            document.getElementById('challenge-execution-log').innerHTML = '';
+        }
+        
+        // Load example code
+        function loadExampleCode() {
+            const exampleCode = `; Simple Assembly Example
+; This program demonstrates basic operations
+
+; Store values in registers
+MOV R1, 5      ; Set R1 to 5
+MOV R2, 10     ; Set R2 to 10
+
+; Perform addition
+ADD R3, R1, R2 ; R3 = R1 + R2 (15)
+
+; Perform subtraction
+SUB R4, R2, R1 ; R4 = R2 - R1 (5)
+
+; Perform multiplication
+MUL R5, R1, R2 ; R5 = R1 * R2 (50)
+
+; Perform division
+DIV R6, R5, R1 ; R6 = R5 / R1 (10)
+
+; Compare values
+CMP R1, R2     ; Compare R1 and R2`;
+
+            document.getElementById('code-editor').value = exampleCode;
+        }
+        
+        // Switch tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            if (tab === 'experiment') {
+                document.getElementById('experiment-tab').classList.add('tab-active');
+                document.getElementById('experiment-tab').classList.remove('bg-gray-200');
+                document.getElementById('challenge-tab').classList.remove('tab-active');
+                document.getElementById('challenge-tab').classList.add('bg-gray-200');
+                
+                document.getElementById('experiment-mode').classList.remove('hidden');
+                document.getElementById('challenge-mode').classList.add('hidden');
+            } else {
+                document.getElementById('challenge-tab').classList.add('tab-active');
+                document.getElementById('challenge-tab').classList.remove('bg-gray-200');
+                document.getElementById('experiment-tab').classList.remove('tab-active');
+                document.getElementById('experiment-tab').classList.add('bg-gray-200');
+                
+                document.getElementById('challenge-mode').classList.remove('hidden');
+                document.getElementById('experiment-mode').classList.add('hidden');
+            }
+            
+            // Reset code execution when switching tabs
+            resetCode();
+            resetChallengeCode();
+        }
+        
+        // Update points display
+        function updatePointsDisplay() {
+            document.getElementById('points-display').textContent = `${userPoints} Points`;
+            document.getElementById('level-display').textContent = `Level ${userLevel}`;
+        }
+        
+        // Challenge definitions
+        const challenges = {
+            1: {
+                title: "Level 1: Basic Register Operations",
+                description: "Store the value 42 in register R1 and then copy it to R2.",
+                points: 10,
+                verify: function(registers) {
+                    return registers.R1 === 42 && registers.R2 === 42;
+                },
+                hint: "Use MOV R1, 42 to store 42 in R1, then MOV R2, R1 to copy it to R2."
+            },
+            2: {
+                title: "Level 2: Addition Challenge",
+                description: "Add the values in R1 (5) and R2 (7) and store the result in R3.",
+                points: 20,
+                setup: function(registers) {
+                    registers.R1 = 5;
+                    registers.R2 = 7;
+                    return registers;
+                },
+                verify: function(registers) {
+                    return registers.R3 === 12;
+                },
+                hint: "First make sure R1=5 and R2=7, then use ADD R3, R1, R2 to add them."
+            },
+            3: {
+                title: "Level 3: Subtraction & Multiplication",
+                description: "Subtract R2 from R1, then multiply the result by 3. Store the final result in R3.",
+                points: 30,
+                setup: function(registers) {
+                    registers.R1 = 10;
+                    registers.R2 = 4;
+                    return registers;
+                },
+                verify: function(registers) {
+                    return registers.R3 === 18; // (10-4)*3 = 18
+                },
+                hint: "Use SUB to calculate R1-R2, store it in a register, then use MUL to multiply by 3."
+            },
+            4: {
+                title: "Level 4: Conditional Operations",
+                description: "Compare R1 and R2. If R1 > R2, store 1 in R3. Otherwise, store 0 in R3.",
+                points: 40,
+                setup: function(registers) {
+                    registers.R1 = 15;
+                    registers.R2 = 10;
+                    return registers;
+                },
+                verify: function(registers) {
+                    return registers.R3 === 1;
+                },
+                hint: "Use CMP to compare R1 and R2, then check the result to decide what to store in R3."
+            },
+            5: {
+                title: "Level 5: Simple Loop",
+                description: "Create a loop that adds 1 to R1 until it reaches 10. Start with R1 = 0.",
+                points: 50,
+                verify: function(registers) {
+                    return registers.R1 === 10;
+                },
+                hint: "Use a register as a counter, increment it in a loop, and use CMP to check when to stop."
+            },
+            6: {
+                title: "Level 6: Fibonacci Sequence",
+                description: "Calculate the first 5 numbers of the Fibonacci sequence (1,1,2,3,5) and store the 5th number in R5.",
+                points: 60,
+                verify: function(registers) {
+                    return registers.R5 === 5;
+                },
+                hint: "Start with 1,1 in R1,R2. Then calculate each next number by adding the previous two."
+            }
+        };
+        
+        // Open challenge
+        function openChallenge(level) {
+            currentChallenge = level;
+            const challenge = challenges[level];
+            
+            document.getElementById('challenge-title').textContent = challenge.title;
+            document.getElementById('challenge-description').textContent = challenge.description;
+            
+            // Reset challenge registers
+            challengeRegisters = initRegisters({});
+            
+            // Apply any setup for the challenge
+            if (challenge.setup) {
+                challengeRegisters = challenge.setup(challengeRegisters);
+            }
+            
+            // Update register display
+            updateRegisterDisplay(challengeRegisters, 'challenge-registers-body');
+            
+            // Clear editor and log
+            document.getElementById('challenge-editor').value = '';
+            document.getElementById('challenge-execution-log').innerHTML = '';
+            
+            // Show modal
+            document.getElementById('challenge-modal').classList.remove('hidden');
+        }
+        
+        // Close challenge
+        function closeChallenge() {
+            document.getElementById('challenge-modal').classList.add('hidden');
+            currentChallenge = null;
+        }
+        
+        // Submit challenge solution
+        function submitChallenge() {
+            const challenge = challenges[currentChallenge];
+            
+            // Run the code to make sure registers are updated
+            const code = document.getElementById('challenge-editor').value;
+            runAllCode(code, challengeRegisters, 'challenge-execution-log', 'challenge-registers-body');
+            
+            // Verify the solution
+            if (challenge.verify(challengeRegisters)) {
+                // Award points
+                userPoints += challenge.points;
+                
+                // Update level if needed
+                if (userPoints >= userLevel * 50) {
+                    userLevel++;
+                }
+                
+                // Update displays
+                updatePointsDisplay();
+                
+                // Show success modal
+                document.getElementById('points-earned').textContent = challenge.points;
+                document.getElementById('total-points').textContent = userPoints;
+                document.getElementById('success-modal').classList.remove('hidden');
+                
+                // Close challenge modal
+                document.getElementById('challenge-modal').classList.add('hidden');
+            } else {
+                // Show failure message
+                addLogEntry('Your solution doesn\'t meet the requirements. Try again!', 'challenge-execution-log');
+                
+                // Add hint
+                if (challenge.hint) {
+                    addLogEntry(`Hint: ${challenge.hint}`, 'challenge-execution-log');
+                }
+            }
+        }
+        
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            document.getElementById('experiment-tab').addEventListener('click', () => switchTab('experiment'));
+            document.getElementById('challenge-tab').addEventListener('click', () => switchTab('challenge'));
+            
+            // Experiment mode buttons
+            document.getElementById('run-code').addEventListener('click', () => {
+                const code = document.getElementById('code-editor').value;
+                runAllCode(code, registers, 'execution-log', 'registers-body');
+            });
+            
+            document.getElementById('step-code').addEventListener('click', () => {
+                const code = document.getElementById('code-editor').value;
+                stepCode(code, registers, 'execution-log', 'registers-body');
+            });
+            
+            document.getElementById('reset-code').addEventListener('click', resetCode);
+            document.getElementById('clear-code').addEventListener('click', () => {
+                document.getElementById('code-editor').value = '';
+                resetCode();
+            });
+            
+            document.getElementById('load-example').addEventListener('click', loadExampleCode);
+            
+            // Challenge mode buttons
+            document.querySelectorAll('.start-challenge').forEach(button => {
+                button.addEventListener('click', () => {
+                    const level = parseInt(button.getAttribute('data-level'));
+                    openChallenge(level);
+                });
+            });
+            
+            document.getElementById('close-challenge').addEventListener('click', closeChallenge);
+            
+            document.getElementById('run-challenge').addEventListener('click', () => {
+                const code = document.getElementById('challenge-editor').value;
+                runAllCode(code, challengeRegisters, 'challenge-execution-log', 'challenge-registers-body');
+            });
+            
+            document.getElementById('step-challenge').addEventListener('click', () => {
+                const code = document.getElementById('challenge-editor').value;
+                stepCode(code, challengeRegisters, 'challenge-execution-log', 'challenge-registers-body');
+            });
+            
+            document.getElementById('reset-challenge').addEventListener('click', resetChallengeCode);
+            document.getElementById('submit-challenge').addEventListener('click', submitChallenge);
+            
+            document.getElementById('close-success').addEventListener('click', closeSuccessModal);
+            
+            // Initialize
+            updateRegisterDisplay(registers, 'registers-body');
+            updatePointsDisplay();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'941d1a84b2d0d781',t:'MTc0NzU4OTY0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+</body></html>
