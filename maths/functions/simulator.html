@@ -1,0 +1,1692 @@
+<html lang="ca"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explora les Funcions Matemàtiques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255, 105, 180, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 75% 75%, rgba(65, 105, 225, 0.1) 0%, transparent 40%);
+        }
+        
+        .function-card {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .function-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .parameter-slider {
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            outline: none;
+        }
+        
+        .parameter-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .parameter-slider.a-slider::-webkit-slider-thumb {
+            background: #8b5cf6;
+        }
+        
+        .parameter-slider.b-slider::-webkit-slider-thumb {
+            background: #ec4899;
+        }
+        
+        .parameter-slider.c-slider::-webkit-slider-thumb {
+            background: #3b82f6;
+        }
+        
+        .parameter-slider.d-slider::-webkit-slider-thumb {
+            background: #10b981;
+        }
+        
+        .tab {
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom-width: 3px;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .table-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .table-row-animated {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .function-selector {
+            transition: all 0.3s ease;
+        }
+        
+        .function-selector:hover {
+            transform: scale(1.02);
+        }
+        
+        .function-selector.active {
+            border: 3px solid black;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .function-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .function-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.mx-auto{margin-left:auto;margin-right:auto}.mb-10{margin-bottom:2.5rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-2{margin-right:0.5rem}.mt-12{margin-top:3rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-5{height:1.25rem}.h-80{height:20rem}.min-h-screen{min-height:100vh}.w-5{width:1.25rem}.w-full{width:100%}.min-w-full{min-width:100%}.flex-1{flex:1 1 0%}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.items-center{align-items:center}.gap-4{gap:1rem}.gap-8{gap:2rem}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-xl{border-radius:0.75rem}.rounded-tl-lg{border-top-left-radius:0.5rem}.rounded-tr-lg{border-top-right-radius:0.5rem}.border-b{border-bottom-width:1px}.border-pink-500{--tw-border-opacity:1;border-color:rgb(236 72 153 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.bg-indigo-900{--tw-bg-opacity:1;background-color:rgb(49 46 129 / var(--tw-bg-opacity, 1))}.bg-pink-100{--tw-bg-opacity:1;background-color:rgb(252 231 243 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.bg-pink-50{--tw-bg-opacity:1;background-color:rgb(253 242 248 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-100{--tw-gradient-from:#dbeafe var(--tw-gradient-from-position);--tw-gradient-to:rgb(219 234 254 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-indigo-100{--tw-gradient-from:#e0e7ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(224 231 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-indigo-50{--tw-gradient-from:#eef2ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(238 242 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-pink-100{--tw-gradient-from:#fce7f3 var(--tw-gradient-from-position);--tw-gradient-to:rgb(252 231 243 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-pink-50{--tw-gradient-from:#fdf2f8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(253 242 248 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-blue-200{--tw-gradient-to:#bfdbfe var(--tw-gradient-to-position)}.to-indigo-200{--tw-gradient-to:#c7d2fe var(--tw-gradient-to-position)}.to-indigo-50{--tw-gradient-to:#eef2ff var(--tw-gradient-to-position)}.to-pink-200{--tw-gradient-to:#fbcfe8 var(--tw-gradient-to-position)}.to-purple-50{--tw-gradient-to:#faf5ff var(--tw-gradient-to-position)}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-indigo-800{--tw-text-opacity:1;color:rgb(55 48 163 / var(--tw-text-opacity, 1))}.text-pink-600{--tw-text-opacity:1;color:rgb(219 39 119 / var(--tw-text-opacity, 1))}.text-pink-700{--tw-text-opacity:1;color:rgb(190 24 93 / var(--tw-text-opacity, 1))}.text-pink-800{--tw-text-opacity:1;color:rgb(157 23 77 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style><style type="text/css">.CtxtMenu_InfoClose {  top:.2em; right:.2em;}
+.CtxtMenu_InfoContent {  overflow:auto; text-align:left; font-size:80%;  padding:.4em .6em; border:1px inset; margin:1em 0px;  max-height:20em; max-width:30em; background-color:#EEEEEE;  white-space:normal;}
+.CtxtMenu_Info.CtxtMenu_MousePost {outline:none;}
+.CtxtMenu_Info {  position:fixed; left:50%; width:auto; text-align:center;  border:3px outset; padding:1em 2em; background-color:#DDDDDD;  color:black;  cursor:default; font-family:message-box; font-size:120%;  font-style:normal; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 15px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius:15px;               /* Safari and Chrome */  -moz-border-radius:15px;                  /* Firefox */  -khtml-border-radius:15px;                /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true"); /* IE */}
+</style><style type="text/css">.CtxtMenu_MenuClose {  position:absolute;  cursor:pointer;  display:inline-block;  border:2px solid #AAA;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  font-family: "Courier New", Courier;  font-size:24px;  color:#F0F0F0}
+.CtxtMenu_MenuClose span {  display:block; background-color:#AAA; border:1.5px solid;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  line-height:0;  padding:8px 0 6px     /* may need to be browser-specific */}
+.CtxtMenu_MenuClose:hover {  color:white!important;  border:2px solid #CCC!important}
+.CtxtMenu_MenuClose:hover span {  background-color:#CCC!important}
+.CtxtMenu_MenuClose:hover:focus {  outline:none}
+</style><style type="text/css">.CtxtMenu_Menu {  position:absolute;  background-color:white;  color:black;  width:auto; padding:5px 0px;  border:1px solid #CCCCCC; margin:0; cursor:default;  font: menu; text-align:left; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 5px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius: 5px;             /* Safari and Chrome */  -moz-border-radius: 5px;                /* Firefox */  -khtml-border-radius: 5px;              /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */}
+.CtxtMenu_MenuItem {  padding: 1px 2em;  background:transparent;}
+.CtxtMenu_MenuArrow {  position:absolute; right:.5em; padding-top:.25em; color:#666666;  font-family: null; font-size: .75em}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {color:white}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {left:.5em; right:auto}
+.CtxtMenu_MenuCheck {  position:absolute; left:.7em;  font-family: null}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL { right:.7em; left:auto }
+.CtxtMenu_MenuRadioCheck {  position:absolute; left: .7em;}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {  right: .7em; left:auto}
+.CtxtMenu_MenuInputBox {  padding-left: 1em; right:.5em; color:#666666;  font-family: null;}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {  left: .1em;}
+.CtxtMenu_MenuComboBox {  left:.1em; padding-bottom:.5em;}
+.CtxtMenu_MenuSlider {  left: .1em;}
+.CtxtMenu_SliderValue {  position:absolute; right:.1em; padding-top:.25em; color:#333333;  font-size: .75em}
+.CtxtMenu_SliderBar {  outline: none; background: #d3d3d3}
+.CtxtMenu_MenuLabel {  padding: 1px 2em 3px 1.33em;  font-style:italic}
+.CtxtMenu_MenuRule {  border-top: 1px solid #DDDDDD;  margin: 4px 3px;}
+.CtxtMenu_MenuDisabled {  color:GrayText}
+.CtxtMenu_MenuActive {  background-color: #606872;  color: white;}
+.CtxtMenu_MenuDisabled:focus {  background-color: #E8E8E8}
+.CtxtMenu_MenuLabel:focus {  background-color: #E8E8E8}
+.CtxtMenu_ContextMenu:focus {  outline:none}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {  outline:none}
+.CtxtMenu_SelectionMenu {  position:relative; float:left;  border-bottom: none; -webkit-box-shadow:none; -webkit-border-radius:0px; }
+.CtxtMenu_SelectionItem {  padding-right: 1em;}
+.CtxtMenu_Selection {  right: 40%; width:50%; }
+.CtxtMenu_SelectionBox {  padding: 0em; max-height:20em; max-width: none;  background-color:#FFFFFF;}
+.CtxtMenu_SelectionDivider {  clear: both; border-top: 2px solid #000000;}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {  top:-10px; left:-10px}
+</style><style id="MJX-CHTML-styles">
+mjx-container[jax="CHTML"] {
+  line-height: 0;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > * {
+  display: table-cell;
+}
+
+mjx-mtext {
+  display: inline-block;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+_::-webkit-full-page-media, _:future, :root mjx-container {
+  will-change: opacity;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-math {
+  display: inline-block;
+  text-align: left;
+  line-height: 0;
+  text-indent: 0;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 100%;
+  font-size-adjust: none;
+  letter-spacing: normal;
+  border-collapse: collapse;
+  word-wrap: normal;
+  word-spacing: normal;
+  white-space: nowrap;
+  direction: ltr;
+  padding: 1px 0;
+}
+
+mjx-container[jax="CHTML"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="CHTML"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="CHTML"][display="true"] mjx-math {
+  padding: 0;
+}
+
+mjx-container[jax="CHTML"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="CHTML"][justify="right"] {
+  text-align: right;
+}
+
+mjx-mi {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-c {
+  display: inline-block;
+}
+
+mjx-utext {
+  display: inline-block;
+  padding: .75em 0 .2em 0;
+}
+
+mjx-mo {
+  display: inline-block;
+  text-align: left;
+}
+
+mjx-stretchy-h {
+  display: inline-table;
+  width: 100%;
+}
+
+mjx-stretchy-h > * {
+  display: table-cell;
+  width: 0;
+}
+
+mjx-stretchy-h > * > mjx-c {
+  display: inline-block;
+  transform: scalex(1.0000001);
+}
+
+mjx-stretchy-h > * > mjx-c::before {
+  display: inline-block;
+  width: initial;
+}
+
+mjx-stretchy-h > mjx-ext {
+  /* IE */ overflow: hidden;
+  /* others */ overflow: clip visible;
+  width: 100%;
+}
+
+mjx-stretchy-h > mjx-ext > mjx-c::before {
+  transform: scalex(500);
+}
+
+mjx-stretchy-h > mjx-ext > mjx-c {
+  width: 0;
+}
+
+mjx-stretchy-h > mjx-beg > mjx-c {
+  margin-right: -.1em;
+}
+
+mjx-stretchy-h > mjx-end > mjx-c {
+  margin-left: -.1em;
+}
+
+mjx-stretchy-v {
+  display: inline-block;
+}
+
+mjx-stretchy-v > * {
+  display: block;
+}
+
+mjx-stretchy-v > mjx-beg {
+  height: 0;
+}
+
+mjx-stretchy-v > mjx-end > mjx-c {
+  display: block;
+}
+
+mjx-stretchy-v > * > mjx-c {
+  transform: scaley(1.0000001);
+  transform-origin: left center;
+  overflow: hidden;
+}
+
+mjx-stretchy-v > mjx-ext {
+  display: block;
+  height: 100%;
+  box-sizing: border-box;
+  border: 0px solid transparent;
+  /* IE */ overflow: hidden;
+  /* others */ overflow: visible clip;
+}
+
+mjx-stretchy-v > mjx-ext > mjx-c::before {
+  width: initial;
+  box-sizing: border-box;
+}
+
+mjx-stretchy-v > mjx-ext > mjx-c {
+  transform: scaleY(500) translateY(.075em);
+  overflow: visible;
+}
+
+mjx-mark {
+  display: inline-block;
+  height: 0px;
+}
+
+mjx-c::before {
+  display: block;
+  width: 0;
+}
+
+.MJX-TEX {
+  font-family: MJXZERO, MJXTEX;
+}
+
+.TEX-B {
+  font-family: MJXZERO, MJXTEX-B;
+}
+
+.TEX-I {
+  font-family: MJXZERO, MJXTEX-I;
+}
+
+.TEX-MI {
+  font-family: MJXZERO, MJXTEX-MI;
+}
+
+.TEX-BI {
+  font-family: MJXZERO, MJXTEX-BI;
+}
+
+.TEX-S1 {
+  font-family: MJXZERO, MJXTEX-S1;
+}
+
+.TEX-S2 {
+  font-family: MJXZERO, MJXTEX-S2;
+}
+
+.TEX-S3 {
+  font-family: MJXZERO, MJXTEX-S3;
+}
+
+.TEX-S4 {
+  font-family: MJXZERO, MJXTEX-S4;
+}
+
+.TEX-A {
+  font-family: MJXZERO, MJXTEX-A;
+}
+
+.TEX-C {
+  font-family: MJXZERO, MJXTEX-C;
+}
+
+.TEX-CB {
+  font-family: MJXZERO, MJXTEX-CB;
+}
+
+.TEX-FR {
+  font-family: MJXZERO, MJXTEX-FR;
+}
+
+.TEX-FRB {
+  font-family: MJXZERO, MJXTEX-FRB;
+}
+
+.TEX-SS {
+  font-family: MJXZERO, MJXTEX-SS;
+}
+
+.TEX-SSB {
+  font-family: MJXZERO, MJXTEX-SSB;
+}
+
+.TEX-SSI {
+  font-family: MJXZERO, MJXTEX-SSI;
+}
+
+.TEX-SC {
+  font-family: MJXZERO, MJXTEX-SC;
+}
+
+.TEX-T {
+  font-family: MJXZERO, MJXTEX-T;
+}
+
+.TEX-V {
+  font-family: MJXZERO, MJXTEX-V;
+}
+
+.TEX-VB {
+  font-family: MJXZERO, MJXTEX-VB;
+}
+
+mjx-stretchy-v mjx-c, mjx-stretchy-h mjx-c {
+  font-family: MJXZERO, MJXTEX-S1, MJXTEX-S4, MJXTEX, MJXTEX-A ! important;
+}
+
+@font-face /* 0 */ {
+  font-family: MJXZERO;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff") format("woff");
+}
+
+@font-face /* 1 */ {
+  font-family: MJXTEX;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff") format("woff");
+}
+
+@font-face /* 2 */ {
+  font-family: MJXTEX-B;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Bold.woff") format("woff");
+}
+
+@font-face /* 3 */ {
+  font-family: MJXTEX-I;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff") format("woff");
+}
+
+@font-face /* 4 */ {
+  font-family: MJXTEX-MI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Italic.woff") format("woff");
+}
+
+@font-face /* 5 */ {
+  font-family: MJXTEX-BI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Math-BoldItalic.woff") format("woff");
+}
+
+@font-face /* 6 */ {
+  font-family: MJXTEX-S1;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size1-Regular.woff") format("woff");
+}
+
+@font-face /* 7 */ {
+  font-family: MJXTEX-S2;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size2-Regular.woff") format("woff");
+}
+
+@font-face /* 8 */ {
+  font-family: MJXTEX-S3;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size3-Regular.woff") format("woff");
+}
+
+@font-face /* 9 */ {
+  font-family: MJXTEX-S4;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size4-Regular.woff") format("woff");
+}
+
+@font-face /* 10 */ {
+  font-family: MJXTEX-A;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_AMS-Regular.woff") format("woff");
+}
+
+@font-face /* 11 */ {
+  font-family: MJXTEX-C;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Regular.woff") format("woff");
+}
+
+@font-face /* 12 */ {
+  font-family: MJXTEX-CB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Bold.woff") format("woff");
+}
+
+@font-face /* 13 */ {
+  font-family: MJXTEX-FR;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Regular.woff") format("woff");
+}
+
+@font-face /* 14 */ {
+  font-family: MJXTEX-FRB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Bold.woff") format("woff");
+}
+
+@font-face /* 15 */ {
+  font-family: MJXTEX-SS;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Regular.woff") format("woff");
+}
+
+@font-face /* 16 */ {
+  font-family: MJXTEX-SSB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Bold.woff") format("woff");
+}
+
+@font-face /* 17 */ {
+  font-family: MJXTEX-SSI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Italic.woff") format("woff");
+}
+
+@font-face /* 18 */ {
+  font-family: MJXTEX-SC;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Script-Regular.woff") format("woff");
+}
+
+@font-face /* 19 */ {
+  font-family: MJXTEX-T;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Typewriter-Regular.woff") format("woff");
+}
+
+@font-face /* 20 */ {
+  font-family: MJXTEX-V;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Regular.woff") format("woff");
+}
+
+@font-face /* 21 */ {
+  font-family: MJXTEX-VB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Bold.woff") format("woff");
+}
+
+mjx-c.mjx-c1D453.TEX-I::before {
+  padding: 0.705em 0.55em 0.205em 0;
+  content: "f";
+}
+
+mjx-c.mjx-c28::before {
+  padding: 0.75em 0.389em 0.25em 0;
+  content: "(";
+}
+
+mjx-c.mjx-c1D465.TEX-I::before {
+  padding: 0.442em 0.572em 0.011em 0;
+  content: "x";
+}
+
+mjx-c.mjx-c29::before {
+  padding: 0.75em 0.389em 0.25em 0;
+  content: ")";
+}
+
+mjx-c.mjx-c3D::before {
+  padding: 0.583em 0.778em 0.082em 0;
+  content: "=";
+}
+
+mjx-c.mjx-c1D45A.TEX-I::before {
+  padding: 0.442em 0.878em 0.011em 0;
+  content: "m";
+}
+
+mjx-c.mjx-c2B::before {
+  padding: 0.583em 0.778em 0.082em 0;
+  content: "+";
+}
+
+mjx-c.mjx-c1D45B.TEX-I::before {
+  padding: 0.442em 0.6em 0.011em 0;
+  content: "n";
+}
+</style></head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-indigo-700 mb-2">Explora les Funcions Matemàtiques</h1>
+            <p class="text-lg text-gray-600">Una eina interactiva per entendre i visualitzar funcions</p>
+        </header>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+                <h3 class="text-xl font-semibold text-indigo-700 mb-4">Selecciona una funció</h3>
+                <div class="function-grid">
+                    <button id="linear-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md active" style="background-color: #8b5cf6;" onclick="selectFunction('linear')">
+                        Funció Lineal
+                    </button>
+                    <button id="quadratic-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #ec4899;" onclick="selectFunction('quadratic')">
+                        Funció Quadràtica
+                    </button>
+                    <button id="cubic-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #3b82f6;" onclick="selectFunction('cubic')">
+                        Funció Cúbica
+                    </button>
+                    <button id="exponential-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #10b981;" onclick="selectFunction('exponential')">
+                        Funció Exponencial
+                    </button>
+                    <button id="sine-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #f59e0b;" onclick="selectFunction('sine')">
+                        Funció Sinusoidal
+                    </button>
+                    <button id="logarithmic-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #6366f1;" onclick="selectFunction('logarithmic')">
+                        Funció Logarítmica
+                    </button>
+                    <button id="rational-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #14b8a6;" onclick="selectFunction('rational')">
+                        Funció Racional
+                    </button>
+                    <button id="direct-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #f43f5e;" onclick="selectFunction('direct')">
+                        Proporcional Directa
+                    </button>
+                    <button id="inverse-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #8b5cf6;" onclick="selectFunction('inverse')">
+                        Proporcional Inversa
+                    </button>
+                    <button id="absolute-btn" class="function-selector px-4 py-3 rounded-full text-white font-medium shadow-md" style="background-color: #d946ef;" onclick="selectFunction('absolute')">
+                        Valor Absolut
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="function-card bg-gradient-to-br from-indigo-50 to-purple-50 p-6 shadow-md">
+                    <h2 class="text-2xl font-bold text-indigo-700 mb-4"><span id="function-title">Funció Lineal</span>: Equació de la Funció</h2>
+                    <div class="bg-white rounded-xl p-4 shadow-inner mb-6">
+                        <div id="equation-display" class="text-xl text-center py-4"><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" tabindex="0" ctxtmenu_counter="1" style="font-size: 124.1%; position: relative;"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mi class="mjx-i"><mjx-c class="mjx-c1D453 TEX-I"></mjx-c></mjx-mi><mjx-mo class="mjx-n"><mjx-c class="mjx-c28"></mjx-c></mjx-mo><mjx-mi class="mjx-i"><mjx-c class="mjx-c1D465 TEX-I"></mjx-c></mjx-mi><mjx-mo class="mjx-n"><mjx-c class="mjx-c29"></mjx-c></mjx-mo><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c31"></mjx-c></mjx-mn><mjx-mi class="mjx-i"><mjx-c class="mjx-c1D465 TEX-I"></mjx-c></mjx-mi><mjx-mo class="mjx-n" space="3"><mjx-c class="mjx-c2B"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="3"><mjx-c class="mjx-c30"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mi>x</mi><mo>+</mo><mn>0</mn></math></mjx-assistive-mml></mjx-container></div>
+                    </div>
+                    
+                    <div id="parameters-container" class="space-y-6">
+                        <div id="param-a" class="parameter-group">
+                            <div class="flex items-center mb-2">
+                                <div class="tooltip mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="tooltiptext">Controla el pendent de la funció lineal</span>
+                                </div>
+                                <label class="text-indigo-700 font-medium">Pendent (m): <span id="a-value">1</span></label>
+                            </div>
+                            <input type="range" min="-10" max="10" step="0.1" value="1" class="parameter-slider a-slider w-full" id="param-a-slider" oninput="updateFunction()">
+                        </div>
+                        
+                        <div id="param-b" class="parameter-group hidden">
+                            <div class="flex items-center mb-2">
+                                <div class="tooltip mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0 v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="tooltiptext">Controla el terme lineal</span>
+                                </div>
+                                <label class="text-pink-600 font-medium">Paràmetre b: <span id="b-value">0</span></label>
+                            </div>
+                            <input type="range" min="-10" max="10" step="0.1" value="0" class="parameter-slider b-slider w-full" id="param-b-slider" oninput="updateFunction()">
+                        </div>
+                        
+                        <div id="param-c" class="parameter-group hidden">
+                            <div class="flex items-center mb-2">
+                                <div class="tooltip mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0 v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="tooltiptext">Controla el terme quadràtic</span>
+                                </div>
+                                <label class="text-blue-600 font-medium">Coeficient x²: <span id="c-value">0</span></label>
+                            </div>
+                            <input type="range" min="-10" max="10" step="0.1" value="0" class="parameter-slider c-slider w-full" id="param-c-slider" oninput="updateFunction()">
+                        </div>
+                        
+                        <div id="param-d" class="parameter-group">
+                            <div class="flex items-center mb-2">
+                                <div class="tooltip mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0 v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="tooltiptext">Controla el terme independent (desplaçament vertical)</span>
+                                </div>
+                                <label class="text-green-600 font-medium">Ordenada a l'origen (n): <span id="d-value">0</span></label>
+                            </div>
+                            <input type="range" min="-10" max="10" step="0.1" value="0" class="parameter-slider d-slider w-full" id="param-d-slider" oninput="updateFunction()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="function-card bg-gradient-to-br from-pink-50 to-indigo-50 p-6 shadow-md">
+                    <div class="flex mb-4">
+                        <button id="graph-tab" class="tab active px-4 py-2 font-medium text-pink-600 border-b-3 border-pink-500 flex-1 text-center">Gràfic</button>
+                        <button id="table-tab" class="tab px-4 py-2 font-medium text-gray-500 flex-1 text-center">Taula</button>
+                    </div>
+                    
+                    <div id="graph-view" class="bg-white rounded-xl p-4 shadow-inner h-80">
+                        <canvas id="functionGraph" width="756" height="432" style="display: block; box-sizing: border-box; height: 288px; width: 504px;"></canvas>
+                    </div>
+                    
+                    <div id="table-view" class="bg-white rounded-xl p-4 shadow-inner hidden">
+                        <div class="table-container">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-tl-lg">x</th>
+                                        <th class="px-4 py-2 bg-pink-100 text-pink-800 rounded-tr-lg">f(x)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="function-table-body"><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">-5</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">-5.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">-4</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">-4.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">-3</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">-3.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">-2</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">-2.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">-1</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">-1.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">0</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">0.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">1</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">1.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">2</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">2.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">3</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">3.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">4</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">4.00</td></tr><tr class="table-row-animated"><td class="px-4 py-2 border-b border-gray-200 bg-indigo-50">5</td><td class="px-4 py-2 border-b border-gray-200 bg-pink-50">5.00</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+            <h2 class="text-2xl font-bold text-indigo-700 mb-4">Propietats de la Funció</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-gradient-to-r from-indigo-100 to-indigo-200 p-4 rounded-xl shadow-md">
+                    <h3 class="text-lg font-semibold text-indigo-700 mb-2">Domini</h3>
+                    <p id="domain-info" class="text-gray-700">ℝ (tots els nombres reals)</p>
+                </div>
+                <div class="bg-gradient-to-r from-pink-100 to-pink-200 p-4 rounded-xl shadow-md">
+                    <h3 class="text-lg font-semibold text-pink-700 mb-2">Recorregut</h3>
+                    <p id="range-info" class="text-gray-700">ℝ (tots els nombres reals)</p>
+                </div>
+                <div class="bg-gradient-to-r from-blue-100 to-blue-200 p-4 rounded-xl shadow-md">
+                    <h3 class="text-lg font-semibold text-blue-700 mb-2">Punts Clau</h3>
+                    <p id="key-points-info" class="text-gray-700">Tall amb l'eix Y: (0, 0)<br>Tall amb l'eix X: (0.00, 0)</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-indigo-700 mb-4">Interpretació</h2>
+            <div id="interpretation" class="text-gray-700 space-y-4">
+                        <p>La funció lineal <strong>f(x) = 1x + 0</strong> representa una línia recta.</p>
+                        <p>El coeficient 1 indica el pendent de la recta, que determina la seva inclinació. La funció és creixent.</p>
+                        <p>El terme independent 0 indica el punt on la recta talla l'eix Y (ordenada a l'origen).</p>
+                    </div>
+        </div>
+    </div>
+    
+    <footer class="bg-indigo-900 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>Creat per ajudar l'alumnat a entendre les funcions matemàtiques de manera visual i interactiva.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Variables globals
+        let currentFunction = 'linear';
+        let chart;
+        let a = 1, b = 0, c = 0, d = 0;
+        
+        // Inicialització
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChart();
+            selectFunction('linear'); // Inicialitzar amb funció lineal
+            setupTabSwitching();
+            
+            // Inicialitzar MathJax
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            }
+        });
+        
+        // Configuració de les pestanyes
+        function setupTabSwitching() {
+            const graphTab = document.getElementById('graph-tab');
+            const tableTab = document.getElementById('table-tab');
+            const graphView = document.getElementById('graph-view');
+            const tableView = document.getElementById('table-view');
+            
+            graphTab.addEventListener('click', function() {
+                graphTab.classList.add('active', 'text-pink-600', 'border-b-3', 'border-pink-500');
+                graphTab.classList.remove('text-gray-500');
+                tableTab.classList.remove('active', 'text-pink-600', 'border-b-3', 'border-pink-500');
+                tableTab.classList.add('text-gray-500');
+                graphView.classList.remove('hidden');
+                tableView.classList.add('hidden');
+            });
+            
+            tableTab.addEventListener('click', function() {
+                tableTab.classList.add('active', 'text-pink-600', 'border-b-3', 'border-pink-500');
+                tableTab.classList.remove('text-gray-500');
+                graphTab.classList.remove('active', 'text-pink-600', 'border-b-3', 'border-pink-500');
+                graphTab.classList.add('text-gray-500');
+                tableView.classList.remove('hidden');
+                graphView.classList.add('hidden');
+            });
+        }
+        
+        // Inicialització del gràfic
+        function initializeChart() {
+            const ctx = document.getElementById('functionGraph').getContext('2d');
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'f(x)',
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#8b5cf6',
+                        fill: true,
+                        tension: 0.1,
+                        data: []
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'center',
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            title: {
+                                display: true,
+                                text: 'x',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            min: -10,
+                            max: 10
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'center',
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            title: {
+                                display: true,
+                                text: 'f(x)',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            },
+                            min: -10,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `f(${context.parsed.x.toFixed(2)}) = ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+        
+        // Selecció de la funció
+        function selectFunction(funcType) {
+            currentFunction = funcType;
+            
+            // Actualitzar el títol de la funció
+            const functionTitles = {
+                'linear': 'Funció Lineal',
+                'quadratic': 'Funció Quadràtica',
+                'cubic': 'Funció Cúbica',
+                'exponential': 'Funció Exponencial',
+                'sine': 'Funció Sinusoidal',
+                'logarithmic': 'Funció Logarítmica',
+                'rational': 'Funció Racional',
+                'direct': 'Proporcional Directa',
+                'inverse': 'Proporcional Inversa',
+                'absolute': 'Valor Absolut'
+            };
+            
+            document.getElementById('function-title').textContent = functionTitles[funcType];
+            
+            // Actualitzar el botó actiu
+            document.querySelectorAll('.function-selector').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`${funcType}-btn`).classList.add('active');
+            
+            // Reiniciar paràmetres amb valors per defecte segons la funció
+            switch(funcType) {
+                case 'linear':
+                    a = 1;
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'quadratic':
+                    a = 1;
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'cubic':
+                    a = 1;
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'exponential':
+                    a = 2;  // Base 2 per defecte
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'sine':
+                    a = 1;  // Amplitud 1
+                    b = 1;  // Freqüència 1
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'logarithmic':
+                    a = 2;  // Base 2 per defecte
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'rational':
+                    a = 1;
+                    b = 1;  // Denominador 1 per defecte (evitar divisió per zero)
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'direct':
+                    a = 1;
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'inverse':
+                    a = 1;
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+                case 'absolute':
+                    a = 1;
+                    b = 0;
+                    c = 0;
+                    d = 0;
+                    break;
+            }
+            
+            // Actualitzar els sliders amb els valors per defecte
+            document.getElementById('param-a-slider').value = a;
+            document.getElementById('param-b-slider').value = b;
+            document.getElementById('param-c-slider').value = c;
+            document.getElementById('param-d-slider').value = d;
+            
+            // Mostrar/amagar paràmetres segons la funció
+            const paramB = document.getElementById('param-b');
+            const paramA = document.getElementById('param-a');
+            const paramC = document.getElementById('param-c');
+            const paramD = document.getElementById('param-d');
+            
+            switch(funcType) {
+                case 'linear':
+                    paramB.classList.add('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Pendent (m): <span id="a-value">1</span>';
+                    paramD.querySelector('label').innerHTML = 'Ordenada a l\'origen (n): <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla el pendent de la funció lineal';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el terme independent (desplaçament vertical)';
+                    break;
+                case 'quadratic':
+                    paramB.classList.remove('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Coeficient a: <span id="a-value">1</span>';
+                    paramB.querySelector('label').innerHTML = 'Coeficient b: <span id="b-value">0</span>';
+                    paramD.querySelector('label').innerHTML = 'Coeficient c: <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla el coeficient del terme quadràtic (x²)';
+                    paramB.querySelector('.tooltiptext').textContent = 'Controla el coeficient del terme lineal (x)';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el terme independent';
+                    break;
+                case 'cubic':
+                    paramB.classList.remove('hidden');
+                    paramC.classList.remove('hidden');
+                    paramA.querySelector('label').innerHTML = 'Coeficient a: <span id="a-value">1</span>';
+                    paramB.querySelector('label').innerHTML = 'Coeficient b: <span id="b-value">0</span>';
+                    paramC.querySelector('label').innerHTML = 'Coeficient c: <span id="c-value">0</span>';
+                    paramD.querySelector('label').innerHTML = 'Coeficient d: <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla el coeficient del terme cúbic (x³)';
+                    paramB.querySelector('.tooltiptext').textContent = 'Controla el coeficient del terme lineal (x)';
+                    paramC.querySelector('.tooltiptext').textContent = 'Controla el coeficient del terme quadràtic (x²)';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el terme independent';
+                    break;
+                case 'exponential':
+                    paramB.classList.add('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Base (a): <span id="a-value">2</span>';
+                    paramD.querySelector('label').innerHTML = 'Desplaçament vertical (c): <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla la base de la funció exponencial';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el desplaçament vertical de la funció';
+                    break;
+                case 'sine':
+                    paramB.classList.remove('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Amplitud (a): <span id="a-value">1</span>';
+                    paramB.querySelector('label').innerHTML = 'Freqüència (b): <span id="b-value">1</span>';
+                    paramD.querySelector('label').innerHTML = 'Desplaçament vertical (c): <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla l\'amplitud de l\'ona sinusoidal';
+                    paramB.querySelector('.tooltiptext').textContent = 'Controla la freqüència de l\'ona sinusoidal';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el desplaçament vertical de la funció';
+                    break;
+                case 'logarithmic':
+                    paramB.classList.add('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Base (a): <span id="a-value">2</span>';
+                    paramD.querySelector('label').innerHTML = 'Desplaçament vertical (c): <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla la base del logaritme';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el desplaçament vertical de la funció';
+                    break;
+                case 'rational':
+                    paramB.classList.remove('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Numerador (a): <span id="a-value">1</span>';
+                    paramB.querySelector('label').innerHTML = 'Denominador (b): <span id="b-value">1</span>';
+                    paramD.querySelector('label').innerHTML = 'Desplaçament vertical (c): <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla el valor del numerador';
+                    paramB.querySelector('.tooltiptext').textContent = 'Controla el desplaçament horitzontal al denominador';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el desplaçament vertical de la funció';
+                    break;
+                case 'direct':
+                    paramB.classList.add('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Constant de proporcionalitat (k): <span id="a-value">1</span>';
+                    paramD.classList.add('hidden');
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla la constant de proporcionalitat directa';
+                    break;
+                case 'inverse':
+                    paramB.classList.add('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Constant de proporcionalitat (k): <span id="a-value">1</span>';
+                    paramD.classList.add('hidden');
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla la constant de proporcionalitat inversa';
+                    break;
+                case 'absolute':
+                    paramB.classList.add('hidden');
+                    paramC.classList.add('hidden');
+                    paramA.querySelector('label').innerHTML = 'Factor d\'escala (a): <span id="a-value">1</span>';
+                    paramD.querySelector('label').innerHTML = 'Desplaçament vertical (c): <span id="d-value">0</span>';
+                    paramA.querySelector('.tooltiptext').textContent = 'Controla el factor d\'escala del valor absolut';
+                    paramD.querySelector('.tooltiptext').textContent = 'Controla el desplaçament vertical de la funció';
+                    break;
+            }
+            
+            // Mostrar el paràmetre D si estava amagat (excepte per proporcional directa i inversa)
+            if (funcType !== 'direct' && funcType !== 'inverse') {
+                paramD.classList.remove('hidden');
+            }
+            
+            // Actualitzar els valors mostrats
+            document.getElementById('a-value').textContent = a;
+            if (!paramB.classList.contains('hidden')) {
+                document.getElementById('b-value').textContent = b;
+            }
+            if (!paramC.classList.contains('hidden')) {
+                document.getElementById('c-value').textContent = c;
+            }
+            if (!paramD.classList.contains('hidden')) {
+                document.getElementById('d-value').textContent = d;
+            }
+            
+            updateFunction();
+        }
+        
+        // Actualització de la funció
+        function updateFunction() {
+            a = parseFloat(document.getElementById('param-a-slider').value);
+            document.getElementById('a-value').textContent = a;
+            
+            if (!document.getElementById('param-b').classList.contains('hidden')) {
+                b = parseFloat(document.getElementById('param-b-slider').value);
+                document.getElementById('b-value').textContent = b;
+                
+                // Evitar divisió per zero en funcions racionals
+                if (currentFunction === 'rational' && b === 0) {
+                    b = 0.1;
+                    document.getElementById('param-b-slider').value = 0.1;
+                    document.getElementById('b-value').textContent = 0.1;
+                }
+            }
+            
+            if (!document.getElementById('param-c').classList.contains('hidden')) {
+                c = parseFloat(document.getElementById('param-c-slider').value);
+                document.getElementById('c-value').textContent = c;
+            }
+            
+            if (!document.getElementById('param-d').classList.contains('hidden')) {
+                d = parseFloat(document.getElementById('param-d-slider').value);
+                document.getElementById('d-value').textContent = d;
+            }
+            
+            updateEquationDisplay();
+            updateGraph();
+            updateTable();
+            updateProperties();
+            updateInterpretation();
+        }
+        
+        // Actualització de l'equació
+        function updateEquationDisplay() {
+            let equationText = '';
+            
+            switch(currentFunction) {
+                case 'linear':
+                    equationText = `\\(f(x) = ${a}x ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+                case 'quadratic':
+                    equationText = `\\(f(x) = ${a}x^2 ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+                case 'cubic':
+                    equationText = `\\(f(x) = ${a}x^3 ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}x^2 ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+                case 'exponential':
+                    equationText = `\\(f(x) = ${a}^x ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+                case 'sine':
+                    equationText = `\\(f(x) = ${a} \\cdot \\sin(${b}x) ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+                case 'logarithmic':
+                    equationText = `\\(f(x) = \\log_{${a}}(x) ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+                case 'rational':
+                    equationText = `\\(f(x) = \\frac{${a}}{x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}} ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+                case 'direct':
+                    equationText = `\\(f(x) = ${a}x\\)`;
+                    break;
+                case 'inverse':
+                    equationText = `\\(f(x) = \\frac{${a}}{x}\\)`;
+                    break;
+                case 'absolute':
+                    equationText = `\\(f(x) = ${a} \\cdot |x| ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}\\)`;
+                    break;
+            }
+            
+            document.getElementById('equation-display').innerHTML = equationText;
+            
+            // Renderitzar l'equació amb MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise && MathJax.typesetPromise();
+                MathJax.Hub && MathJax.Hub.Queue(["Typeset", MathJax.Hub, "equation-display"]);
+            }
+        }
+        
+        // Càlcul del valor de la funció
+        function calculateY(x) {
+            switch(currentFunction) {
+                case 'linear':
+                    return a * x + d;
+                case 'quadratic':
+                    return a * x * x + b * x + d;
+                case 'cubic':
+                    return a * x * x * x + b * x + c * x * x + d;
+                case 'exponential':
+                    // Gestionar correctament bases negatives
+                    if (a < 0) {
+                        // Per a bases negatives, només podem calcular per a valors enters de x
+                        if (Math.abs(x - Math.round(x)) < 0.0001) {
+                            return Math.pow(a, Math.round(x)) + d;
+                        } else {
+                            return NaN; // No definit per a valors no enters quan la base és negativa
+                        }
+                    } else {
+                        return Math.pow(a, x) + d;
+                    }
+                case 'sine':
+                    return a * Math.sin(b * x) + d;
+                case 'logarithmic':
+                    // Evitar logaritme de nombres negatius o zero
+                    return x > 0 ? Math.log(x) / Math.log(Math.abs(a)) + d : NaN;
+                case 'rational':
+                    // Evitar divisió per zero
+                    return x + b !== 0 ? a / (x + b) + d : NaN;
+                case 'direct':
+                    return a * x;
+                case 'inverse':
+                    // Evitar divisió per zero
+                    return x !== 0 ? a / x : NaN;
+                case 'absolute':
+                    return a * Math.abs(x) + d;
+                default:
+                    return 0;
+            }
+        }
+        
+        // Actualització del gràfic
+        function updateGraph() {
+            const points = [];
+            
+            // Generar punts per al gràfic
+            for (let x = -10; x <= 10; x += 0.1) {
+                const y = calculateY(x);
+                
+                // Només afegir punts vàlids (no NaN o Infinity)
+                if (!isNaN(y) && isFinite(y)) {
+                    points.push({
+                        x: x,
+                        y: y
+                    });
+                }
+            }
+            
+            // Actualitzar el gràfic
+            chart.data.datasets[0].data = points;
+            
+            // Canviar el color segons la funció
+            switch(currentFunction) {
+                case 'linear':
+                    chart.data.datasets[0].borderColor = '#8b5cf6';
+                    chart.data.datasets[0].backgroundColor = 'rgba(139, 92, 246, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#8b5cf6';
+                    break;
+                case 'quadratic':
+                    chart.data.datasets[0].borderColor = '#ec4899';
+                    chart.data.datasets[0].backgroundColor = 'rgba(236, 72, 153, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#ec4899';
+                    break;
+                case 'cubic':
+                    chart.data.datasets[0].borderColor = '#3b82f6';
+                    chart.data.datasets[0].backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#3b82f6';
+                    break;
+                case 'exponential':
+                    chart.data.datasets[0].borderColor = '#10b981';
+                    chart.data.datasets[0].backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#10b981';
+                    break;
+                case 'sine':
+                    chart.data.datasets[0].borderColor = '#f59e0b';
+                    chart.data.datasets[0].backgroundColor = 'rgba(245, 158, 11, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#f59e0b';
+                    break;
+                case 'logarithmic':
+                    chart.data.datasets[0].borderColor = '#6366f1';
+                    chart.data.datasets[0].backgroundColor = 'rgba(99, 102, 241, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#6366f1';
+                    break;
+                case 'rational':
+                    chart.data.datasets[0].borderColor = '#14b8a6';
+                    chart.data.datasets[0].backgroundColor = 'rgba(20, 184, 166, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#14b8a6';
+                    break;
+                case 'direct':
+                    chart.data.datasets[0].borderColor = '#f43f5e';
+                    chart.data.datasets[0].backgroundColor = 'rgba(244, 63, 94, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#f43f5e';
+                    break;
+                case 'inverse':
+                    chart.data.datasets[0].borderColor = '#8b5cf6';
+                    chart.data.datasets[0].backgroundColor = 'rgba(139, 92, 246, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#8b5cf6';
+                    break;
+                case 'absolute':
+                    chart.data.datasets[0].borderColor = '#d946ef';
+                    chart.data.datasets[0].backgroundColor = 'rgba(217, 70, 239, 0.1)';
+                    chart.data.datasets[0].pointBackgroundColor = '#d946ef';
+                    break;
+            }
+            
+            // Mantenir els eixos fixos sempre
+            chart.options.scales.y.min = -10;
+            chart.options.scales.y.max = 10;
+            chart.options.scales.x.min = -10;
+            chart.options.scales.x.max = 10;
+            
+            chart.update();
+        }
+        
+        // Actualització de la taula
+        function updateTable() {
+            const tableBody = document.getElementById('function-table-body');
+            tableBody.innerHTML = '';
+            
+            for (let x = -5; x <= 5; x++) {
+                const y = calculateY(x);
+                
+                const row = document.createElement('tr');
+                row.className = 'table-row-animated';
+                
+                const xCell = document.createElement('td');
+                xCell.className = 'px-4 py-2 border-b border-gray-200 bg-indigo-50';
+                xCell.textContent = x;
+                
+                const yCell = document.createElement('td');
+                yCell.className = 'px-4 py-2 border-b border-gray-200 bg-pink-50';
+                
+                // Comprovar si el valor és vàlid
+                if (!isNaN(y) && isFinite(y)) {
+                    yCell.textContent = y.toFixed(2);
+                } else {
+                    yCell.textContent = "No definit";
+                    yCell.className += ' text-red-500';
+                }
+                
+                row.appendChild(xCell);
+                row.appendChild(yCell);
+                tableBody.appendChild(row);
+            }
+        }
+        
+        // Actualització de les propietats
+        function updateProperties() {
+            // Domini
+            let domainText = '';
+            switch(currentFunction) {
+                case 'logarithmic':
+                    domainText = '(0, +∞)';
+                    break;
+                case 'rational':
+                    domainText = `ℝ - {${-b}} (tots els nombres reals excepte x = ${-b})`;
+                    break;
+                case 'inverse':
+                    domainText = 'ℝ - {0} (tots els nombres reals excepte x = 0)';
+                    break;
+                case 'exponential':
+                    if (a < 0) {
+                        domainText = 'ℤ (nombres enters)';
+                    } else {
+                        domainText = 'ℝ (tots els nombres reals)';
+                    }
+                    break;
+                default:
+                    domainText = 'ℝ (tots els nombres reals)';
+            }
+            
+            // Recorregut
+            let rangeText = '';
+            switch(currentFunction) {
+                case 'linear':
+                case 'cubic':
+                    rangeText = 'ℝ (tots els nombres reals)';
+                    break;
+                case 'quadratic':
+                    if (a > 0) {
+                        const vertex = -b / (2 * a);
+                        const minValue = calculateY(vertex);
+                        rangeText = `[${minValue.toFixed(2)}, +∞)`;
+                    } else if (a < 0) {
+                        const vertex = -b / (2 * a);
+                        const maxValue = calculateY(vertex);
+                        rangeText = `(-∞, ${maxValue.toFixed(2)}]`;
+                    } else {
+                        rangeText = 'ℝ (tots els nombres reals)';
+                    }
+                    break;
+                case 'exponential':
+                    if (a > 1) {
+                        rangeText = `(${d}, +∞)`;
+                    } else if (a > 0 && a < 1) {
+                        rangeText = `(-∞, ${d})`;
+                    } else if (a < 0) {
+                        rangeText = 'ℝ (tots els nombres reals)';
+                    } else {
+                        rangeText = `{${d}}`;
+                    }
+                    break;
+                case 'sine':
+                    rangeText = `[${d - Math.abs(a)}, ${d + Math.abs(a)}]`;
+                    break;
+                case 'logarithmic':
+                    if (a > 1) {
+                        rangeText = 'ℝ (tots els nombres reals)';
+                    } else if (a > 0 && a < 1) {
+                        rangeText = 'ℝ (tots els nombres reals)';
+                    } else {
+                        rangeText = 'ℝ (tots els nombres reals)';
+                    }
+                    break;
+                case 'rational':
+                    rangeText = `ℝ - {${d}} (tots els nombres reals excepte y = ${d})`;
+                    break;
+                case 'direct':
+                    rangeText = 'ℝ (tots els nombres reals)';
+                    break;
+                case 'inverse':
+                    rangeText = 'ℝ - {0} (tots els nombres reals excepte y = 0)';
+                    break;
+                case 'absolute':
+                    rangeText = `[${d}, +∞)`;
+                    break;
+            }
+            
+            // Punts clau
+            let keyPointsText = '';
+            switch(currentFunction) {
+                case 'linear':
+                    const xIntercept = d !== 0 ? -d / a : 0;
+                    keyPointsText = `Tall amb l'eix Y: (0, ${d})<br>Tall amb l'eix X: (${xIntercept.toFixed(2)}, 0)`;
+                    break;
+                case 'quadratic':
+                    const vertex = -b / (2 * a);
+                    const vertexY = calculateY(vertex);
+                    keyPointsText = `Vèrtex: (${vertex.toFixed(2)}, ${vertexY.toFixed(2)})<br>Tall amb l'eix Y: (0, ${d})`;
+                    
+                    // Calcular arrels (si existeixen)
+                    const discriminant = b * b - 4 * a * d;
+                    if (discriminant > 0) {
+                        const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                        const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                        keyPointsText += `<br>Arrels: (${x1.toFixed(2)}, 0), (${x2.toFixed(2)}, 0)`;
+                    } else if (discriminant === 0) {
+                        const x = -b / (2 * a);
+                        keyPointsText += `<br>Arrel doble: (${x.toFixed(2)}, 0)`;
+                    } else {
+                        keyPointsText += '<br>No hi ha arrels reals';
+                    }
+                    break;
+                case 'cubic':
+                    keyPointsText = `Tall amb l'eix Y: (0, ${d})`;
+                    break;
+                case 'exponential':
+                    keyPointsText = `Tall amb l'eix Y: (0, ${(Math.pow(a, 0) + d).toFixed(2)})`;
+                    break;
+                case 'sine':
+                    keyPointsText = `Tall amb l'eix Y: (0, ${(a * Math.sin(0) + d).toFixed(2)})`;
+                    break;
+                case 'logarithmic':
+                    keyPointsText = `Tall amb l'eix X: (1, ${d})`;
+                    break;
+                case 'rational':
+                    keyPointsText = `Asímptota vertical: x = ${-b}<br>Asímptota horitzontal: y = ${d}`;
+                    break;
+                case 'direct':
+                    keyPointsText = `Passa per l'origen: (0, 0)`;
+                    break;
+                case 'inverse':
+                    keyPointsText = `Asímptotes: eix X i eix Y`;
+                    break;
+                case 'absolute':
+                    keyPointsText = `Punt de canvi de pendent: (0, ${d})<br>Simètrica respecte a l'eix Y`;
+                    break;
+            }
+            
+            document.getElementById('domain-info').textContent = domainText;
+            document.getElementById('range-info').textContent = rangeText;
+            document.getElementById('key-points-info').innerHTML = keyPointsText;
+        }
+        
+        // Actualització de la interpretació
+        function updateInterpretation() {
+            let interpretationText = '';
+            
+            switch(currentFunction) {
+                case 'linear':
+                    interpretationText = `
+                        <p>La funció lineal <strong>f(x) = ${a}x ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> representa una línia recta.</p>
+                        <p>El coeficient ${a} indica el pendent de la recta, que determina la seva inclinació. ${a > 0 ? 'La funció és creixent.' : a < 0 ? 'La funció és decreixent.' : 'La funció és constant.'}</p>
+                        <p>El terme independent ${d} indica el punt on la recta talla l'eix Y (ordenada a l'origen).</p>
+                    `;
+                    break;
+                case 'quadratic':
+                    const openingDirection = a > 0 ? 'cap amunt' : 'cap avall';
+                    const vertex = -b / (2 * a);
+                    const vertexY = calculateY(vertex);
+                    
+                    interpretationText = `
+                        <p>La funció quadràtica <strong>f(x) = ${a}x² ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> representa una paràbola que s'obre ${openingDirection}.</p>
+                        <p>El vèrtex de la paràbola es troba en el punt (${vertex.toFixed(2)}, ${vertexY.toFixed(2)}), que és el ${a > 0 ? 'mínim' : 'màxim'} de la funció.</p>
+                        <p>El coeficient ${a} determina l'obertura de la paràbola: com més gran és el seu valor absolut, més tancada és la paràbola.</p>
+                    `;
+                    break;
+                case 'cubic':
+                    interpretationText = `
+                        <p>La funció cúbica <strong>f(x) = ${a}x³ ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}x² ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> té forma de "S" estirada.</p>
+                        <p>El coeficient ${a} determina la direcció i la velocitat de creixement: ${a > 0 ? 'creix ràpidament cap a l\'infinit positiu quan x creix, i cap a l\'infinit negatiu quan x decreix' : 'creix ràpidament cap a l\'infinit negatiu quan x creix, i cap a l\'infinit positiu quan x decreix'}.</p>
+                        <p>A diferència de les funcions quadràtiques, les cúbiques no tenen un màxim o mínim global, sinó que poden tenir punts d'inflexió.</p>
+                    `;
+                    break;
+                case 'exponential':
+                    interpretationText = `
+                        <p>La funció exponencial <strong>f(x) = ${a}<sup>x</sup> ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> mostra un creixement o decreixement molt ràpid.</p>
+                        <p>${a > 1 ? 'Com que la base és major que 1, la funció creix exponencialment.' : a < 1 && a > 0 ? 'Com que la base està entre 0 i 1, la funció decreix i s\'aproxima a ' + d + '.' : 'Aquesta funció té un comportament oscil·lant perquè la base és negativa.'}</p>
+                        <p>${a < 0 ? 'Amb base negativa, la funció només està definida per a valors enters de x, i alterna entre valors positius i negatius.' : ''}</p>
+                        <p>Les funcions exponencials són importants en molts fenòmens naturals com el creixement de poblacions, la desintegració radioactiva o l'interès compost.</p>
+                    `;
+                    break;
+                case 'sine':
+                    interpretationText = `
+                        <p>La funció sinusoidal <strong>f(x) = ${a}·sin(${b}x) ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> representa un moviment ondulatori periòdic.</p>
+                        <p>L'amplitud ${Math.abs(a)} indica la "altura" de l'ona des del centre.</p>
+                        <p>El paràmetre ${b} controla la freqüència (quantes oscil·lacions completes per unitat de x).</p>
+                        <p>El terme ${d} desplaça tota la funció verticalment.</p>
+                        <p>Les funcions sinusoidals són fonamentals en l'estudi d'ones, so, electricitat i molts fenòmens periòdics.</p>
+                    `;
+                    break;
+                case 'logarithmic':
+                    interpretationText = `
+                        <p>La funció logarítmica <strong>f(x) = log<sub>${a}</sub>(x) ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> creix molt lentament.</p>
+                        <p>És la funció inversa de l'exponencial de base ${a}.</p>
+                        <p>Només està definida per a valors positius de x.</p>
+                        <p>Quan x s'apropa a 0 per la dreta, la funció tendeix a -∞.</p>
+                        <p>Els logaritmes són útils per representar escales molt grans de valors, com l'escala de Richter per a terratrèmols o els decibels per al so.</p>
+                    `;
+                    break;
+                case 'rational':
+                    interpretationText = `
+                        <p>La funció racional <strong>f(x) = <span class="inline-block"><span class="block text-center">${a}</span><span class="block text-center border-t border-black">x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}</span></span> ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> té una asímptota vertical a x = ${-b}.</p>
+                        <p>Quan x s'apropa a ${-b}, la funció tendeix a ±∞, depenent de si ens apropem per la dreta o per l'esquerra.</p>
+                        <p>Per a valors molt grans de |x|, la funció s'aproxima a ${d} (asímptota horitzontal).</p>
+                        <p>Les funcions racionals són importants en física i enginyeria per modelar fenòmens com circuits elèctrics i sistemes dinàmics.</p>
+                    `;
+                    break;
+                case 'direct':
+                    interpretationText = `
+                        <p>La funció de proporcionalitat directa <strong>f(x) = ${a}x</strong> representa una relació on una variable és directament proporcional a l'altra.</p>
+                        <p>El coeficient ${a} és la constant de proporcionalitat.</p>
+                        <p>La gràfica passa sempre per l'origen de coordenades.</p>
+                        <p>Si una variable es multiplica per un factor, l'altra també es multiplica pel mateix factor.</p>
+                        <p>Exemples quotidians inclouen la relació entre distància i temps a velocitat constant, o entre preu i quantitat a preu unitari constant.</p>
+                    `;
+                    break;
+                case 'inverse':
+                    interpretationText = `
+                        <p>La funció de proporcionalitat inversa <strong>f(x) = <span class="inline-block"><span class="block text-center">${a}</span><span class="block text-center border-t border-black">x</span></span></strong> representa una relació on una variable és inversament proporcional a l'altra.</p>
+                        <p>El coeficient ${a} és la constant de proporcionalitat.</p>
+                        <p>La gràfica és una hipèrbola amb asímptotes als eixos de coordenades.</p>
+                        <p>Si una variable es multiplica per un factor, l'altra es divideix pel mateix factor.</p>
+                        <p>Exemples quotidians inclouen la relació entre velocitat i temps per a una distància fixa, o entre pressió i volum en un gas a temperatura constant (Llei de Boyle).</p>
+                    `;
+                    break;
+                case 'absolute':
+                    interpretationText = `
+                        <p>La funció valor absolut <strong>f(x) = ${a} \\cdot |x| ${d >= 0 ? '+ ' + d : '- ' + Math.abs(d)}</strong> representa la distància d'un punt a l'origen, escalada per ${a}.</p>
+                        <p>La gràfica té forma de V, amb el vèrtex a (0, ${d}).</p>
+                        <p>La funció és simètrica respecte a l'eix Y.</p>
+                        <p>El pendent és ${-a} per a x < 0 i ${a} per a x > 0.</p>
+                        <p>Les funcions de valor absolut són útils en problemes que impliquen distàncies, errors o desviacions.</p>
+                    `;
+                    break;
+            }
+            
+            document.getElementById('interpretation').innerHTML = interpretationText;
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'941d1aa3659cd781',t:'MTc0NzU4OTY1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+</body></html>
