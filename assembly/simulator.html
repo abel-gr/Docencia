@@ -1,0 +1,1383 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assembly Code Simulator for K-12 Students</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .code-editor {
+            background-color: #e6f2ff;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .code-editor-content {
+            color: #0a5c36;
+            caret-color: #333;
+        }
+        
+        .line-numbers {
+            user-select: none;
+            text-align: right;
+            color: #666;
+            padding-right: 10px;
+            border-right: 1px solid #ccc;
+        }
+        
+        .active-line {
+            background-color: rgba(255, 255, 0, 0.2);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .challenge-card {
+            transition: transform 0.2s;
+        }
+        
+        .challenge-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .instruction-category {
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .register-modified {
+            background-color: rgba(255, 255, 0, 0.2);
+            transition: background-color 0.5s;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.inset-0{inset:0px}.z-50{z-index:50}.mx-4{margin-left:1rem;margin-right:1rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mt-2{margin-top:0.5rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-64{height:16rem}.h-96{height:24rem}.w-12{width:3rem}.w-full{width:100%}.min-w-full{min-width:100%}.max-w-2xl{max-width:42rem}.max-w-7xl{max-width:80rem}.flex-grow{flex-grow:1}.resize-none{resize:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-6{gap:1.5rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-gray-100 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(243 244 246 / var(--tw-divide-opacity, 1))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.overflow-y-hidden{overflow-y:hidden}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-t-4{border-top-width:4px}.border-blue-600{--tw-border-opacity:1;border-color:rgb(37 99 235 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-green-500{--tw-border-opacity:1;border-color:rgb(34 197 94 / var(--tw-border-opacity, 1))}.border-red-500{--tw-border-opacity:1;border-color:rgb(239 68 68 / var(--tw-border-opacity, 1))}.border-yellow-500{--tw-border-opacity:1;border-color:rgb(234 179 8 / var(--tw-border-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-red-600{--tw-bg-opacity:1;background-color:rgb(220 38 38 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-100{--tw-bg-opacity:1;background-color:rgb(254 249 195 / var(--tw-bg-opacity, 1))}.bg-yellow-600{--tw-bg-opacity:1;background-color:rgb(202 138 4 / var(--tw-bg-opacity, 1))}.bg-opacity-50{--tw-bg-opacity:0.5}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pb-4{padding-bottom:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-red-800{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-800{--tw-text-opacity:1;color:rgb(133 77 14 / var(--tw-text-opacity, 1))}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.outline-none{outline:2px solid transparent;outline-offset:2px}.hover\:bg-blue-200:hover{--tw-bg-opacity:1;background-color:rgb(191 219 254 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-300:hover{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-50:hover{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.hover\:bg-red-200:hover{--tw-bg-opacity:1;background-color:rgb(254 202 202 / var(--tw-bg-opacity, 1))}.hover\:bg-red-700:hover{--tw-bg-opacity:1;background-color:rgb(185 28 28 / var(--tw-bg-opacity, 1))}.hover\:bg-yellow-700:hover{--tw-bg-opacity:1;background-color:rgb(161 98 7 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-50:hover{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.hover\:text-blue-600:hover{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:col-span-1{grid-column:span 1 / span 1}.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-center text-blue-700">Assembly Code Simulator</h1>
+            <p class="text-center text-gray-600 mt-2">An interactive learning tool for K-12 students</p>
+        </header>
+        
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-gray-200 mb-6">
+            <button id="tab-experiment" class="tab-btn px-6 py-3 font-medium text-blue-600 border-b-2 border-blue-600">
+                <i class="fas fa-flask mr-2"></i>Experiment Mode
+            </button>
+            <button id="tab-challenge" class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600">
+                <i class="fas fa-trophy mr-2"></i>Challenge Mode
+            </button>
+            <button id="tab-instructions" class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600">
+                <i class="fas fa-book mr-2"></i>Instruction Set
+            </button>
+        </div>
+        
+        <!-- Experiment Mode -->
+        <div id="experiment-content" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Code Editor Section -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">
+                                <i class="fas fa-code mr-2"></i>Code Editor
+                            </h2>
+                            <div class="flex space-x-2">
+                                <button id="load-example" class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 flex items-center">
+                                    <i class="fas fa-file-import mr-1"></i> Load Example
+                                </button>
+                                <button id="clear-code" class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 flex items-center">
+                                    <i class="fas fa-trash-alt mr-1"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="code-editor flex h-96 mb-4 border border-gray-200 rounded overflow-hidden">
+                            <div id="line-numbers" class="line-numbers code-font p-2 bg-gray-100 w-12 overflow-y-hidden" style="height: 383px;"><div class="code-line">01</div></div>
+                            <textarea id="code-input" class="code-editor-content code-font p-2 flex-grow resize-none outline-none" spellcheck="false"></textarea>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <div class="flex space-x-2">
+                                <button id="run-all" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center">
+                                    <i class="fas fa-play mr-2"></i> Run All
+                                </button>
+                                <button id="step-through" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center">
+                                    <i class="fas fa-step-forward mr-2"></i> Step Through
+                                </button>
+                                <button id="restart" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 flex items-center hidden">
+                                    <i class="fas fa-redo mr-2"></i> Restart
+                                </button>
+                            </div>
+                            <button id="stop-execution" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex items-center hidden">
+                                <i class="fas fa-stop mr-2"></i> Stop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Register and Execution Log Section -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-microchip mr-2"></i>Registers
+                        </h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white">
+                                <thead>
+                                    <tr class="bg-blue-50 text-blue-700">
+                                        <th class="py-2 px-4 border-b text-left">Register</th>
+                                        <th class="py-2 px-4 border-b text-left">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="register-table"><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R1</td><td class="py-2 px-4 border-b code-font">0</td></tr><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R2</td><td class="py-2 px-4 border-b code-font">0</td></tr><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R3</td><td class="py-2 px-4 border-b code-font">0</td></tr><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R4</td><td class="py-2 px-4 border-b code-font">0</td></tr><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R5</td><td class="py-2 px-4 border-b code-font">0</td></tr><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R6</td><td class="py-2 px-4 border-b code-font">0</td></tr><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R7</td><td class="py-2 px-4 border-b code-font">0</td></tr><tr class="hover:bg-blue-50"><td class="py-2 px-4 border-b font-medium">R8</td><td class="py-2 px-4 border-b code-font">0</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-list-ul mr-2"></i>Execution Log
+                        </h2>
+                        <div id="execution-log" class="h-64 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50 code-font text-sm">
+                            <!-- Execution log will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Challenge Mode -->
+        <div id="challenge-content" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Challenge Cards -->
+                <div class="challenge-card bg-white rounded-lg shadow-md overflow-hidden border-t-4 border-green-500">
+                    <div class="p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold">Beginner: First Steps</h3>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Easy</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Learn basic register operations and simple arithmetic.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">10 points</span>
+                            <button class="challenge-start-btn px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700" data-challenge="beginner">Start</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="challenge-card bg-white rounded-lg shadow-md overflow-hidden border-t-4 border-yellow-500">
+                    <div class="p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold">Loops and Jumps</h3>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Medium</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Create loops using jump instructions to solve problems.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">25 points</span>
+                            <button class="challenge-start-btn px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700" data-challenge="loops">Start</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="challenge-card bg-white rounded-lg shadow-md overflow-hidden border-t-4 border-red-500">
+                    <div class="p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold">Bitwise Operations</h3>
+                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Hard</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Master bitwise logic to solve complex problems.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">50 points</span>
+                            <button class="challenge-start-btn px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700" data-challenge="bitwise">Start</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="challenge-card bg-white rounded-lg shadow-md overflow-hidden border-t-4 border-green-500">
+                    <div class="p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold">Simple Calculator</h3>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Easy</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Build a basic calculator using arithmetic operations.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">15 points</span>
+                            <button class="challenge-start-btn px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700" data-challenge="calculator">Start</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="challenge-card bg-white rounded-lg shadow-md overflow-hidden border-t-4 border-yellow-500">
+                    <div class="p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold">Fibonacci Sequence</h3>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Medium</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Generate the Fibonacci sequence using loops and arithmetic.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">30 points</span>
+                            <button class="challenge-start-btn px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700" data-challenge="fibonacci">Start</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="challenge-card bg-white rounded-lg shadow-md overflow-hidden border-t-4 border-red-500">
+                    <div class="p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold">Binary Conversion</h3>
+                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Hard</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Convert decimal numbers to binary using bitwise operations.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">45 points</span>
+                            <button class="challenge-start-btn px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700" data-challenge="binary">Start</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instruction Set -->
+        <div id="instructions-content" class="tab-content">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    <i class="fas fa-book mr-2"></i>Instruction Set Reference
+                </h2>
+                
+                <!-- Arithmetic Instructions -->
+                <div class="mb-8 instruction-category pb-4">
+                    <h3 class="text-xl font-medium text-blue-700 mb-4">
+                        <i class="fas fa-calculator mr-2"></i>Arithmetic Instructions
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr class="bg-blue-50">
+                                    <th class="py-3 px-4 text-left">Instruction</th>
+                                    <th class="py-3 px-4 text-left">Description</th>
+                                    <th class="py-3 px-4 text-left">Example</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">ADD</td>
+                                    <td class="py-3 px-4">Add two values and store in a register</td>
+                                    <td class="py-3 px-4 code-font">ADD R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">SUB</td>
+                                    <td class="py-3 px-4">Subtract second value from first and store in a register</td>
+                                    <td class="py-3 px-4 code-font">SUB R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">INC</td>
+                                    <td class="py-3 px-4">Increment a register by 1</td>
+                                    <td class="py-3 px-4 code-font">INC R1</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">DEC</td>
+                                    <td class="py-3 px-4">Decrement a register by 1</td>
+                                    <td class="py-3 px-4 code-font">DEC R1</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">NEG</td>
+                                    <td class="py-3 px-4">Two's complement negation</td>
+                                    <td class="py-3 px-4 code-font">NEG R1</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">MUL</td>
+                                    <td class="py-3 px-4">Unsigned multiply</td>
+                                    <td class="py-3 px-4 code-font">MUL R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">IMUL</td>
+                                    <td class="py-3 px-4">Signed multiply</td>
+                                    <td class="py-3 px-4 code-font">IMUL R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">DIV</td>
+                                    <td class="py-3 px-4">Unsigned divide</td>
+                                    <td class="py-3 px-4 code-font">DIV R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">IDIV</td>
+                                    <td class="py-3 px-4">Signed divide</td>
+                                    <td class="py-3 px-4 code-font">IDIV R1, R2, R3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Bitwise Logic Instructions -->
+                <div class="mb-8 instruction-category pb-4">
+                    <h3 class="text-xl font-medium text-blue-700 mb-4">
+                        <i class="fas fa-microchip mr-2"></i>Bitwise Logic Instructions
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr class="bg-blue-50">
+                                    <th class="py-3 px-4 text-left">Instruction</th>
+                                    <th class="py-3 px-4 text-left">Description</th>
+                                    <th class="py-3 px-4 text-left">Example</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">AND</td>
+                                    <td class="py-3 px-4">Bitwise AND operation</td>
+                                    <td class="py-3 px-4 code-font">AND R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">OR</td>
+                                    <td class="py-3 px-4">Bitwise OR operation</td>
+                                    <td class="py-3 px-4 code-font">OR R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">XOR</td>
+                                    <td class="py-3 px-4">Bitwise XOR operation</td>
+                                    <td class="py-3 px-4 code-font">XOR R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">NAND</td>
+                                    <td class="py-3 px-4">Bitwise NAND operation</td>
+                                    <td class="py-3 px-4 code-font">NAND R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">NOR</td>
+                                    <td class="py-3 px-4">Bitwise NOR operation</td>
+                                    <td class="py-3 px-4 code-font">NOR R1, R2, R3</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">XNOR</td>
+                                    <td class="py-3 px-4">Bitwise XNOR operation</td>
+                                    <td class="py-3 px-4 code-font">XNOR R1, R2, R3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Jump Instructions -->
+                <div class="instruction-category pb-4">
+                    <h3 class="text-xl font-medium text-blue-700 mb-4">
+                        <i class="fas fa-arrows-alt mr-2"></i>Jump Instructions
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr class="bg-blue-50">
+                                    <th class="py-3 px-4 text-left">Instruction</th>
+                                    <th class="py-3 px-4 text-left">Description</th>
+                                    <th class="py-3 px-4 text-left">Example</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JMP</td>
+                                    <td class="py-3 px-4">Unconditional jump to address</td>
+                                    <td class="py-3 px-4 code-font">JMP 5</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JE</td>
+                                    <td class="py-3 px-4">Jump if equal</td>
+                                    <td class="py-3 px-4 code-font">JE 10</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JNE</td>
+                                    <td class="py-3 px-4">Jump if not equal</td>
+                                    <td class="py-3 px-4 code-font">JNE 15</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JZ</td>
+                                    <td class="py-3 px-4">Jump if zero</td>
+                                    <td class="py-3 px-4 code-font">JZ 20</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JLE</td>
+                                    <td class="py-3 px-4">Jump if less than or equal</td>
+                                    <td class="py-3 px-4 code-font">JLE 25</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JGE</td>
+                                    <td class="py-3 px-4">Jump if greater than or equal</td>
+                                    <td class="py-3 px-4 code-font">JGE 30</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JG</td>
+                                    <td class="py-3 px-4">Jump if greater than</td>
+                                    <td class="py-3 px-4 code-font">JG 35</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 font-medium">JL</td>
+                                    <td class="py-3 px-4">Jump if less than</td>
+                                    <td class="py-3 px-4 code-font">JL 40</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Challenge Modal -->
+        <div id="challenge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 id="challenge-title" class="text-xl font-semibold text-gray-800"></h3>
+                        <button id="close-challenge" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="challenge-description" class="mb-4 text-gray-600"></div>
+                    <div id="challenge-goal" class="mb-6 p-3 bg-blue-50 text-blue-700 rounded"></div>
+                    
+                    <div class="mb-4">
+                        <button id="load-challenge" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Load Challenge Code
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button id="close-challenge-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 mr-2">
+                            Close
+                        </button>
+                        <button id="verify-challenge" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                            Verify Solution
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Assembly Simulator Implementation
+        class AssemblySimulator {
+            constructor() {
+                this.registers = {};
+                this.code = [];
+                this.currentLine = 0;
+                this.executionLog = [];
+                this.isRunning = false;
+                this.compareFlag = 0; // For conditional jumps
+                this.modifiedRegisters = new Set(); // Track modified registers
+                
+                // Initialize registers R1 through R8
+                for (let i = 1; i <= 8; i++) {
+                    this.registers[`R${i}`] = 0;
+                }
+            }
+            
+            reset() {
+                // Reset registers to 0
+                Object.keys(this.registers).forEach(reg => {
+                    this.registers[reg] = 0;
+                });
+                
+                this.currentLine = 0;
+                this.executionLog = [];
+                this.isRunning = false;
+                this.compareFlag = 0;
+                this.modifiedRegisters.clear();
+                
+                // Update UI
+                this.updateRegisterTable();
+                this.updateExecutionLog();
+                document.querySelectorAll('.code-line').forEach(line => {
+                    line.classList.remove('active-line');
+                });
+                
+                // Hide restart button, show run and step buttons
+                document.getElementById('restart').classList.add('hidden');
+                document.getElementById('run-all').classList.remove('hidden');
+                document.getElementById('step-through').classList.remove('hidden');
+            }
+            
+            parseCode(codeText) {
+                this.code = codeText.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0 && !line.startsWith(';'));
+                return this.code;
+            }
+            
+            executeInstruction(instruction) {
+                if (!instruction || instruction.trim() === '' || instruction.trim().startsWith(';')) return false;
+                
+                const parts = instruction.trim().split(/\s+/);
+                const opcode = parts[0].toUpperCase();
+                
+                // Clear previously modified registers
+                this.modifiedRegisters.clear();
+                
+                // Log the execution
+                this.executionLog.push(`Line ${this.currentLine + 1}: ${instruction}`);
+                
+                // Highlight the current line being executed (not the next one)
+                this.highlightCurrentLine();
+                
+                switch (opcode) {
+                    // Arithmetic operations
+                    case 'ADD':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = this.registers[src1] + this.registers[src2];
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'SUB':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = this.registers[src1] - this.registers[src2];
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'MUL':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = this.registers[src1] * this.registers[src2];
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'IMUL':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = this.registers[src1] * this.registers[src2];
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'DIV':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined &&
+                                this.registers[src2] !== 0) {
+                                this.registers[dest] = Math.floor(this.registers[src1] / this.registers[src2]);
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'IDIV':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined &&
+                                this.registers[src2] !== 0) {
+                                this.registers[dest] = Math.floor(this.registers[src1] / this.registers[src2]);
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'INC':
+                        if (parts.length === 2) {
+                            const reg = parts[1];
+                            if (this.registers[reg] !== undefined) {
+                                this.registers[reg]++;
+                                this.modifiedRegisters.add(reg);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'DEC':
+                        if (parts.length === 2) {
+                            const reg = parts[1];
+                            if (this.registers[reg] !== undefined) {
+                                this.registers[reg]--;
+                                this.modifiedRegisters.add(reg);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'NEG':
+                        if (parts.length === 2) {
+                            const reg = parts[1];
+                            if (this.registers[reg] !== undefined) {
+                                this.registers[reg] = -this.registers[reg];
+                                this.modifiedRegisters.add(reg);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    // Bitwise operations
+                    case 'AND':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = this.registers[src1] & this.registers[src2];
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'OR':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = this.registers[src1] | this.registers[src2];
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'XOR':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = this.registers[src1] ^ this.registers[src2];
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'NAND':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = ~(this.registers[src1] & this.registers[src2]);
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'NOR':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = ~(this.registers[src1] | this.registers[src2]);
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    case 'XNOR':
+                        if (parts.length === 4) {
+                            const dest = parts[1].replace(',', '');
+                            const src1 = parts[2].replace(',', '');
+                            const src2 = parts[3];
+                            
+                            if (this.registers[dest] !== undefined && 
+                                this.registers[src1] !== undefined && 
+                                this.registers[src2] !== undefined) {
+                                this.registers[dest] = ~(this.registers[src1] ^ this.registers[src2]);
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    // Comparison for conditional jumps
+                    case 'CMP':
+                        if (parts.length === 3) {
+                            const reg1 = parts[1].replace(',', '');
+                            const reg2 = parts[2];
+                            
+                            if (this.registers[reg1] !== undefined && this.registers[reg2] !== undefined) {
+                                if (this.registers[reg1] === this.registers[reg2]) this.compareFlag = 0;
+                                else if (this.registers[reg1] < this.registers[reg2]) this.compareFlag = -1;
+                                else this.compareFlag = 1;
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    // Jump instructions
+                    case 'JMP':
+                        if (parts.length === 2) {
+                            const address = parseInt(parts[1]) - 1; // -1 because line numbers start at 1
+                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    case 'JE':
+                        if (parts.length === 2 && this.compareFlag === 0) {
+                            const address = parseInt(parts[1]) - 1;
+                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    case 'JNE':
+                        if (parts.length === 2 && this.compareFlag !== 0) {
+                            const address = parseInt(parts[1]) - 1;
+                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    case 'JZ':
+                        if (parts.length === 3) {
+                            const reg = parts[1].replace(',', '');
+                            const address = parseInt(parts[2]) - 1;
+                            
+                            if (this.registers[reg] !== undefined && 
+                                this.registers[reg] === 0 &&
+                                !isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    case 'JLE':
+                        if (parts.length === 2 && this.compareFlag <= 0) {
+                            const address = parseInt(parts[1]) - 1;
+                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    case 'JGE':
+                        if (parts.length === 2 && this.compareFlag >= 0) {
+                            const address = parseInt(parts[1]) - 1;
+                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    case 'JG':
+                        if (parts.length === 2 && this.compareFlag > 0) {
+                            const address = parseInt(parts[1]) - 1;
+                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    case 'JL':
+                        if (parts.length === 2 && this.compareFlag < 0) {
+                            const address = parseInt(parts[1]) - 1;
+                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                                this.currentLine = address;
+                            } else {
+                                this.currentLine++;
+                            }
+                        } else {
+                            this.currentLine++;
+                        }
+                        break;
+                        
+                    // Move value to register
+                    case 'MOV':
+                        if (parts.length === 3) {
+                            const dest = parts[1].replace(',', '');
+                            const src = parts[2];
+                            
+                            if (this.registers[dest] !== undefined) {
+                                // Check if source is a register or immediate value
+                                if (this.registers[src] !== undefined) {
+                                    this.registers[dest] = this.registers[src];
+                                } else {
+                                    const value = parseInt(src);
+                                    if (!isNaN(value)) {
+                                        this.registers[dest] = value;
+                                    }
+                                }
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    default:
+                        // Unknown instruction, just move to next line
+                        this.currentLine++;
+                        break;
+                }
+                
+                // Update UI
+                this.updateRegisterTable();
+                this.updateExecutionLog();
+                
+                // Check if we've reached the end of the code
+                const hasMoreInstructions = this.currentLine < this.code.length;
+                
+                // If we've reached the end, add a completion message to the log
+                if (!hasMoreInstructions) {
+                    this.executionLog.push("✅ Program execution completed.");
+                    this.updateExecutionLog();
+                    
+                    // Show restart button
+                    document.getElementById('restart').classList.remove('hidden');
+                }
+                
+                return hasMoreInstructions;
+            }
+            
+            updateRegisterTable() {
+                const registerTable = document.getElementById('register-table');
+                registerTable.innerHTML = '';
+                
+                Object.entries(this.registers).forEach(([reg, value]) => {
+                    const row = document.createElement('tr');
+                    
+                    // Highlight modified registers
+                    if (this.modifiedRegisters.has(reg)) {
+                        row.className = 'register-modified';
+                    } else {
+                        row.className = 'hover:bg-blue-50';
+                    }
+                    
+                    const regCell = document.createElement('td');
+                    regCell.className = 'py-2 px-4 border-b font-medium';
+                    regCell.textContent = reg;
+                    
+                    const valueCell = document.createElement('td');
+                    valueCell.className = 'py-2 px-4 border-b code-font';
+                    valueCell.textContent = value;
+                    
+                    row.appendChild(regCell);
+                    row.appendChild(valueCell);
+                    registerTable.appendChild(row);
+                });
+                
+                // Remove highlight after a delay
+                setTimeout(() => {
+                    document.querySelectorAll('.register-modified').forEach(row => {
+                        row.classList.remove('register-modified');
+                        row.classList.add('hover:bg-blue-50');
+                    });
+                }, 1000);
+            }
+            
+            updateExecutionLog() {
+                const logElement = document.getElementById('execution-log');
+                logElement.innerHTML = '';
+                
+                this.executionLog.forEach(log => {
+                    const logLine = document.createElement('div');
+                    
+                    // Style completion message differently
+                    if (log.includes("✅ Program execution completed")) {
+                        logLine.className = 'py-1 font-medium text-green-600';
+                    } else {
+                        logLine.className = 'py-1';
+                    }
+                    
+                    logLine.textContent = log;
+                    logElement.appendChild(logLine);
+                });
+                
+                // Scroll to bottom
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+            
+            highlightCurrentLine() {
+                // Remove highlight from all lines
+                document.querySelectorAll('.code-line').forEach(line => {
+                    line.classList.remove('active-line');
+                });
+                
+                // Add highlight to current line
+                if (this.currentLine < this.code.length) {
+                    const lineElements = document.querySelectorAll('.code-line');
+                    if (lineElements[this.currentLine]) {
+                        lineElements[this.currentLine].classList.add('active-line');
+                    }
+                }
+            }
+            
+            runAll() {
+                this.isRunning = true;
+                document.getElementById('stop-execution').classList.remove('hidden');
+                document.getElementById('run-all').classList.add('hidden');
+                document.getElementById('step-through').classList.add('hidden');
+                
+                const runNextInstruction = () => {
+                    if (this.isRunning && this.currentLine < this.code.length) {
+                        const hasMore = this.executeInstruction(this.code[this.currentLine]);
+                        if (hasMore) {
+                            setTimeout(runNextInstruction, 200); // Run next instruction after a short delay
+                        } else {
+                            this.finishExecution();
+                        }
+                    } else {
+                        this.finishExecution();
+                    }
+                };
+                
+                runNextInstruction();
+            }
+            
+            stepThrough() {
+                if (this.currentLine < this.code.length) {
+                    this.executeInstruction(this.code[this.currentLine]);
+                    
+                    // Show restart button after first step
+                    document.getElementById('restart').classList.remove('hidden');
+                } else {
+                    alert('End of code reached.');
+                }
+            }
+            
+            stopExecution() {
+                this.isRunning = false;
+                this.finishExecution();
+            }
+            
+            finishExecution() {
+                document.getElementById('stop-execution').classList.add('hidden');
+                document.getElementById('run-all').classList.remove('hidden');
+                document.getElementById('step-through').classList.remove('hidden');
+                document.getElementById('restart').classList.remove('hidden');
+                this.isRunning = false;
+            }
+        }
+
+        // Challenge data
+        const challenges = {
+            beginner: {
+                title: "Beginner: First Steps",
+                description: "In this challenge, you'll learn how to use basic register operations and simple arithmetic.",
+                goal: "Initialize R1 to 5, R2 to 10, and then add them together, storing the result in R3.",
+                code: "; Beginner Challenge: First Steps\n; Initialize registers and perform addition\n\n; Your code here:\n",
+                verify: function(simulator) {
+                    return simulator.registers.R1 === 5 && 
+                           simulator.registers.R2 === 10 && 
+                           simulator.registers.R3 === 15;
+                }
+            },
+            loops: {
+                title: "Loops and Jumps",
+                description: "Learn how to create loops using jump instructions to solve problems.",
+                goal: "Create a loop that counts from 1 to 5 in register R1.",
+                code: "; Loops and Jumps Challenge\n; Create a loop that counts from 1 to 5\n\n; Your code here:\n",
+                verify: function(simulator) {
+                    return simulator.registers.R1 === 5;
+                }
+            },
+            bitwise: {
+                title: "Bitwise Operations",
+                description: "Master bitwise logic operations to solve complex problems.",
+                goal: "Use AND, OR, and XOR operations to manipulate register values.",
+                code: "; Bitwise Operations Challenge\n; Set R1 to 5 (101 in binary)\n; Set R2 to 3 (011 in binary)\n; Store R1 AND R2 in R3\n; Store R1 OR R2 in R4\n; Store R1 XOR R2 in R5\n\n; Your code here:\n",
+                verify: function(simulator) {
+                    return simulator.registers.R1 === 5 && 
+                           simulator.registers.R2 === 3 && 
+                           simulator.registers.R3 === 1 && 
+                           simulator.registers.R4 === 7 && 
+                           simulator.registers.R5 === 6;
+                }
+            },
+            calculator: {
+                title: "Simple Calculator",
+                description: "Build a basic calculator using arithmetic operations.",
+                goal: "Implement addition, subtraction, multiplication, and division operations on registers.",
+                code: "; Simple Calculator Challenge\n; Set R1 to 10 and R2 to 5\n; Store R1 + R2 in R3\n; Store R1 - R2 in R4\n; Store R1 * R2 in R5\n; Store R1 / R2 in R6\n\n; Your code here:\n",
+                verify: function(simulator) {
+                    return simulator.registers.R1 === 10 && 
+                           simulator.registers.R2 === 5 && 
+                           simulator.registers.R3 === 15 && 
+                           simulator.registers.R4 === 5 && 
+                           simulator.registers.R5 === 50 && 
+                           simulator.registers.R6 === 2;
+                }
+            },
+            fibonacci: {
+                title: "Fibonacci Sequence",
+                description: "Generate the Fibonacci sequence using loops and arithmetic.",
+                goal: "Calculate the first 8 numbers of the Fibonacci sequence and store the 8th number in R8.",
+                code: "; Fibonacci Sequence Challenge\n; Calculate the first 8 Fibonacci numbers\n; Store the 8th Fibonacci number in R8\n\n; Your code here:\n",
+                verify: function(simulator) {
+                    return simulator.registers.R8 === 21; // 8th Fibonacci number (0, 1, 1, 2, 3, 5, 8, 13, 21)
+                }
+            },
+            binary: {
+                title: "Binary Conversion",
+                description: "Convert decimal numbers to binary using bitwise operations.",
+                goal: "Convert the decimal number 42 to binary representation using bitwise operations.",
+                code: "; Binary Conversion Challenge\n; Convert decimal 42 to binary representation\n; Store each binary digit in registers R1-R6 (R1 should have the least significant bit)\n\n; Your code here:\n",
+                verify: function(simulator) {
+                    // 42 in binary is 101010
+                    return simulator.registers.R1 === 0 && 
+                           simulator.registers.R2 === 1 && 
+                           simulator.registers.R3 === 0 && 
+                           simulator.registers.R4 === 1 && 
+                           simulator.registers.R5 === 0 && 
+                           simulator.registers.R6 === 1;
+                }
+            }
+        };
+
+        // UI Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const simulator = new AssemblySimulator();
+            const codeInput = document.getElementById('code-input');
+            const lineNumbers = document.getElementById('line-numbers');
+            let currentChallenge = null;
+            
+            // Tab navigation
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600'));
+                    tabButtons.forEach(btn => btn.classList.add('text-gray-500'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    button.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                    button.classList.remove('text-gray-500');
+                    
+                    // Show corresponding content
+                    const tabId = button.id.replace('tab-', '');
+                    document.getElementById(`${tabId}-content`).classList.add('active');
+                });
+            });
+            
+            // Code editor line numbers
+            function updateLineNumbers() {
+                const lines = codeInput.value.split('\n');
+                lineNumbers.innerHTML = '';
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const lineNumber = document.createElement('div');
+                    lineNumber.textContent = (i + 1).toString().padStart(2, '0');
+                    lineNumber.className = 'code-line';
+                    lineNumbers.appendChild(lineNumber);
+                }
+                
+                // Add an extra line number if the last line has content
+                if (lines[lines.length - 1].trim() !== '') {
+                    const lineNumber = document.createElement('div');
+                    lineNumber.textContent = (lines.length + 1).toString().padStart(2, '0');
+                    lineNumber.className = 'code-line';
+                    lineNumbers.appendChild(lineNumber);
+                }
+                
+                // Adjust line numbers div height to match textarea
+                lineNumbers.style.height = `${codeInput.scrollHeight}px`;
+            }
+            
+            // Initialize line numbers
+            updateLineNumbers();
+            
+            // Update line numbers when code changes
+            codeInput.addEventListener('input', updateLineNumbers);
+            codeInput.addEventListener('scroll', () => {
+                lineNumbers.scrollTop = codeInput.scrollTop;
+            });
+            
+            // Example code
+            const exampleCode = `; Example: Calculate Fibonacci sequence
+; Initialize registers
+MOV R1, 0    ; First Fibonacci number
+MOV R2, 1    ; Second Fibonacci number
+MOV R3, 10   ; How many numbers to calculate
+
+; Start loop
+MOV R4, 0    ; Loop counter
+; Print first two numbers (R1 and R2 already set)
+
+; Calculate next Fibonacci number
+ADD R5, R1, R2  ; R5 = R1 + R2
+MOV R1, R2      ; R1 = R2
+MOV R2, R5      ; R2 = R5
+INC R4          ; Increment counter
+
+; Check if we've calculated enough numbers
+CMP R4, R3
+JL 5            ; Jump back to line 5 if R4 < R3`;
+            
+            // Load example code button
+            document.getElementById('load-example').addEventListener('click', () => {
+                codeInput.value = exampleCode;
+                updateLineNumbers();
+                simulator.reset();
+            });
+            
+            // Clear code button
+            document.getElementById('clear-code').addEventListener('click', () => {
+                codeInput.value = '';
+                updateLineNumbers();
+                simulator.reset();
+            });
+            
+            // Run all button
+            document.getElementById('run-all').addEventListener('click', () => {
+                simulator.reset();
+                simulator.parseCode(codeInput.value);
+                simulator.runAll();
+            });
+            
+            // Step through button
+            document.getElementById('step-through').addEventListener('click', () => {
+                if (simulator.currentLine === 0) {
+                    simulator.parseCode(codeInput.value);
+                }
+                simulator.stepThrough();
+            });
+            
+            // Restart button
+            document.getElementById('restart').addEventListener('click', () => {
+                simulator.reset();
+                updateLineNumbers();
+            });
+            
+            // Stop execution button
+            document.getElementById('stop-execution').addEventListener('click', () => {
+                simulator.stopExecution();
+            });
+            
+            // Initialize register table
+            simulator.updateRegisterTable();
+            
+            // Challenge modal functionality
+            const challengeModal = document.getElementById('challenge-modal');
+            const challengeTitle = document.getElementById('challenge-title');
+            const challengeDescription = document.getElementById('challenge-description');
+            const challengeGoal = document.getElementById('challenge-goal');
+            const loadChallengeBtn = document.getElementById('load-challenge');
+            const verifyChallengeBtn = document.getElementById('verify-challenge');
+            
+            // Challenge buttons
+            document.querySelectorAll('.challenge-start-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const challengeId = button.getAttribute('data-challenge');
+                    currentChallenge = challenges[challengeId];
+                    
+                    if (currentChallenge) {
+                        challengeTitle.textContent = currentChallenge.title;
+                        challengeDescription.textContent = currentChallenge.description;
+                        challengeGoal.textContent = `Goal: ${currentChallenge.goal}`;
+                        
+                        challengeModal.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // Load challenge code
+            loadChallengeBtn.addEventListener('click', () => {
+                if (currentChallenge) {
+                    // Switch to experiment tab
+                    document.getElementById('tab-experiment').click();
+                    
+                    // Load challenge code
+                    codeInput.value = currentChallenge.code;
+                    updateLineNumbers();
+                    simulator.reset();
+                    
+                    // Close modal
+                    challengeModal.classList.add('hidden');
+                }
+            });
+            
+            // Verify challenge solution
+            verifyChallengeBtn.addEventListener('click', () => {
+                if (currentChallenge) {
+                    // Switch to experiment tab
+                    document.getElementById('tab-experiment').click();
+                    
+                    // Load code and run
+                    codeInput.value = currentChallenge.code;
+                    updateLineNumbers();
+                    simulator.reset();
+                    simulator.parseCode(codeInput.value);
+                    
+                    // Run all instructions
+                    while (simulator.currentLine < simulator.code.length) {
+                        simulator.executeInstruction(simulator.code[simulator.currentLine]);
+                    }
+                    
+                    // Verify solution
+                    const success = currentChallenge.verify(simulator);
+                    
+                    if (success) {
+                        alert('Challenge completed successfully! 🎉');
+                    } else {
+                        alert('Not quite right. Try again!');
+                    }
+                    
+                    // Close modal
+                    challengeModal.classList.add('hidden');
+                }
+            });
+            
+            // Close challenge modal
+            document.getElementById('close-challenge').addEventListener('click', () => {
+                challengeModal.classList.add('hidden');
+            });
+            
+            document.getElementById('close-challenge-btn').addEventListener('click', () => {
+                challengeModal.classList.add('hidden');
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'941d1a76a65cd781',t:'MTc0NzU4OTY0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+</body></html>
