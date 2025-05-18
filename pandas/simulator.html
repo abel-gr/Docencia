@@ -1,0 +1,1464 @@
+<html lang="ca"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anàlisi de Dades - Aeroport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff;
+        }
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        .field-name {
+            font-size: 0.75rem;
+            font-style: italic;
+            opacity: 0.8;
+            display: block;
+            margin-top: 2px;
+        }
+        tr:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+        tr:hover {
+            background-color: #e0f2fe;
+        }
+        .highlighted {
+            background-color: #bfdbfe !important;
+        }
+        .code-editor {
+            font-family: monospace;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            background-color: #1e293b;
+            color: #f8fafc;
+            resize: none;
+            width: 100%;
+            height: 100px;
+        }
+        .code-editor:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        .btn {
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .challenge-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .challenge-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .challenge-card.completed {
+            border-color: #10b981;
+            background-color: #ecfdf5;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.mx-auto{margin-left:auto;margin-right:auto}.my-3{margin-top:0.75rem;margin-bottom:0.75rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-6{margin-left:1.5rem}.mr-2{margin-right:0.5rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-16{height:4rem}.h-5{height:1.25rem}.w-5{width:1.25rem}.min-w-full{min-width:100%}.max-w-7xl{max-width:80rem}.cursor-pointer{cursor:pointer}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-x-auto{overflow-x:auto}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-l-4{border-left-width:4px}.border-blue-500{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.border-blue-600{--tw-border-opacity:1;border-color:rgb(37 99 235 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-green-500{--tw-border-opacity:1;border-color:rgb(34 197 94 / var(--tw-border-opacity, 1))}.border-yellow-500{--tw-border-opacity:1;border-color:rgb(234 179 8 / var(--tw-border-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-50{--tw-bg-opacity:1;background-color:rgb(254 252 232 / var(--tw-bg-opacity, 1))}.p-2{padding:0.5rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-600{--tw-text-opacity:1;color:rgb(202 138 4 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-200:hover{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.hover\:text-blue-600:hover{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}@media (min-width: 768px){.md\:w-1\/3{width:33.333333%}.md\:w-2\/3{width:66.666667%}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}}</style></head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-blue-700 mb-2">Anàlisi de Dades: Aeroport Internacional</h1>
+            <p class="text-xl text-gray-600">Aprèn a filtrar i analitzar dades com un científic de dades!</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex border-b border-gray-200 overflow-x-auto">
+                <button id="tab-intro" class="tab-btn px-4 py-2 font-medium text-gray-500">Introducció</button>
+                <button id="tab-data" class="tab-btn px-4 py-2 font-medium hover:text-blue-600 text-gray-500">Dades</button>
+                <button id="tab-query" class="tab-btn px-4 py-2 font-medium hover:text-blue-600 text-gray-500">Consultes</button>
+                <button id="tab-help" class="tab-btn px-4 py-2 font-medium hover:text-blue-600 text-gray-500">Ajuda</button>
+                <button id="tab-challenges" class="tab-btn px-4 py-2 font-medium hover:text-blue-600 text-blue-600 border-b-2 border-blue-600">Reptes</button>
+            </div>
+
+            <div id="content-intro" class="tab-content py-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Benvinguts a l'Anàlisi de Dades!</h2>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-2/3">
+                        <p class="mb-4">En aquesta activitat, aprendràs a analitzar dades d'un aeroport fictici. Tenim informació sobre passatgers i les seves maletes.</p>
+                        <p class="mb-4">Podràs escriure consultes similars a les que s'utilitzen en Python amb la biblioteca Pandas per filtrar i trobar informació específica.</p>
+                        <p class="mb-4">Comença explorant les dades a la pestanya "Dades" i després prova a fer consultes a la pestanya "Consultes".</p>
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
+                            <p class="font-bold">Objectius d'aprenentatge:</p>
+                            <ul class="list-disc ml-6 mt-2">
+                                <li>Entendre com funcionen les consultes de dades</li>
+                                <li>Aprendre a filtrar informació segons diferents criteris</li>
+                                <li>Practicar amb operadors lògics i comparacions</li>
+                                <li>Visualitzar els resultats de les teves consultes</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3 bg-blue-100 rounded-lg p-4">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-3">Sabies que...?</h3>
+                        <p class="mb-3">L'anàlisi de dades és una de les habilitats més demandades en el món laboral actual.</p>
+                        <p class="mb-3">Els científics de dades utilitzen aquestes tècniques per prendre decisions importants en empreses, hospitals, governs i molts altres àmbits.</p>
+                        <p>Amb aquesta activitat, estàs donant els primers passos en el món de la ciència de dades!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-data" class="tab-content py-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Base de Dades: Passatgers i Maletes</h2>
+                <p class="mb-4">Aquesta és la nostra base de dades completa. Conté informació sobre passatgers ficticis i les seves maletes.</p>
+                
+                <div class="table-container mb-6">
+                    <table id="data-table" class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th>ID<span class="field-name">id</span></th>
+                                <th>Nom<span class="field-name">nom</span></th>
+                                <th>Cognom<span class="field-name">cognom</span></th>
+                                <th>Edat<span class="field-name">edat</span></th>
+                                <th>Origen<span class="field-name">origen</span></th>
+                                <th>Destí<span class="field-name">desti</span></th>
+                                <th>Data<span class="field-name">data</span></th>
+                                <th>Núm. Maletes<span class="field-name">num_maletes</span></th>
+                                <th>Pes Total (kg)<span class="field-name">pes_total</span></th>
+                                <th>Classe<span class="field-name">classe</span></th>
+                                <th>Escala<span class="field-name">escala</span></th>
+                            </tr>
+                        </thead>
+                        <tbody><tr>
+                    <td>1</td>
+                    <td>Maria</td>
+                    <td>Garcia</td>
+                    <td>34</td>
+                    <td>Barcelona</td>
+                    <td>Londres</td>
+                    <td>2024-05-12</td>
+                    <td>2</td>
+                    <td>23.5</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>2</td>
+                    <td>Joan</td>
+                    <td>Martí</td>
+                    <td>45</td>
+                    <td>Madrid</td>
+                    <td>Nova York</td>
+                    <td>2024-06-03</td>
+                    <td>1</td>
+                    <td>18.2</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>3</td>
+                    <td>Anna</td>
+                    <td>López</td>
+                    <td>28</td>
+                    <td>València</td>
+                    <td>París</td>
+                    <td>2024-05-20</td>
+                    <td>3</td>
+                    <td>32.7</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>4</td>
+                    <td>Pau</td>
+                    <td>Ferrer</td>
+                    <td>52</td>
+                    <td>Barcelona</td>
+                    <td>Tòquio</td>
+                    <td>2024-07-15</td>
+                    <td>2</td>
+                    <td>27.8</td>
+                    <td>Primera</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>5</td>
+                    <td>Laia</td>
+                    <td>Soler</td>
+                    <td>19</td>
+                    <td>Girona</td>
+                    <td>Berlín</td>
+                    <td>2024-05-30</td>
+                    <td>1</td>
+                    <td>15.3</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>6</td>
+                    <td>Marc</td>
+                    <td>Vidal</td>
+                    <td>37</td>
+                    <td>Tarragona</td>
+                    <td>Roma</td>
+                    <td>2024-06-10</td>
+                    <td>2</td>
+                    <td>22.1</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>7</td>
+                    <td>Júlia</td>
+                    <td>Puig</td>
+                    <td>24</td>
+                    <td>Barcelona</td>
+                    <td>Amsterdam</td>
+                    <td>2024-06-22</td>
+                    <td>1</td>
+                    <td>19.5</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>8</td>
+                    <td>Oriol</td>
+                    <td>Roca</td>
+                    <td>41</td>
+                    <td>Lleida</td>
+                    <td>Londres</td>
+                    <td>2024-07-05</td>
+                    <td>3</td>
+                    <td>34.2</td>
+                    <td>Primera</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>9</td>
+                    <td>Carla</td>
+                    <td>Bosch</td>
+                    <td>31</td>
+                    <td>Barcelona</td>
+                    <td>París</td>
+                    <td>2024-05-18</td>
+                    <td>2</td>
+                    <td>26.8</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>10</td>
+                    <td>Sergi</td>
+                    <td>Costa</td>
+                    <td>22</td>
+                    <td>Girona</td>
+                    <td>Berlín</td>
+                    <td>2024-06-15</td>
+                    <td>1</td>
+                    <td>17.4</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>11</td>
+                    <td>Marta</td>
+                    <td>Pujol</td>
+                    <td>48</td>
+                    <td>Barcelona</td>
+                    <td>Nova York</td>
+                    <td>2024-08-20</td>
+                    <td>2</td>
+                    <td>29.3</td>
+                    <td>Primera</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>12</td>
+                    <td>Albert</td>
+                    <td>Serra</td>
+                    <td>33</td>
+                    <td>Tarragona</td>
+                    <td>Roma</td>
+                    <td>2024-07-12</td>
+                    <td>1</td>
+                    <td>20.7</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>13</td>
+                    <td>Núria</td>
+                    <td>Font</td>
+                    <td>27</td>
+                    <td>Barcelona</td>
+                    <td>Tòquio</td>
+                    <td>2024-09-05</td>
+                    <td>2</td>
+                    <td>24.6</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>14</td>
+                    <td>Gerard</td>
+                    <td>Sala</td>
+                    <td>39</td>
+                    <td>València</td>
+                    <td>Amsterdam</td>
+                    <td>2024-06-28</td>
+                    <td>3</td>
+                    <td>31.5</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>15</td>
+                    <td>Aina</td>
+                    <td>Roig</td>
+                    <td>25</td>
+                    <td>Barcelona</td>
+                    <td>Londres</td>
+                    <td>2024-05-25</td>
+                    <td>1</td>
+                    <td>16.8</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>16</td>
+                    <td>Jordi</td>
+                    <td>Casals</td>
+                    <td>42</td>
+                    <td>Madrid</td>
+                    <td>Barcelona</td>
+                    <td>2024-06-05</td>
+                    <td>2</td>
+                    <td>24.3</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>17</td>
+                    <td>Elena</td>
+                    <td>Martínez</td>
+                    <td>29</td>
+                    <td>Sevilla</td>
+                    <td>París</td>
+                    <td>2024-07-18</td>
+                    <td>1</td>
+                    <td>19.8</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>18</td>
+                    <td>Miquel</td>
+                    <td>Sánchez</td>
+                    <td>36</td>
+                    <td>Barcelona</td>
+                    <td>Milà</td>
+                    <td>2024-05-15</td>
+                    <td>2</td>
+                    <td>26.5</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>19</td>
+                    <td>Laura</td>
+                    <td>Gómez</td>
+                    <td>31</td>
+                    <td>València</td>
+                    <td>Atenes</td>
+                    <td>2024-08-10</td>
+                    <td>3</td>
+                    <td>33.2</td>
+                    <td>Primera</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>20</td>
+                    <td>David</td>
+                    <td>Fernández</td>
+                    <td>27</td>
+                    <td>Barcelona</td>
+                    <td>Lisboa</td>
+                    <td>2024-06-20</td>
+                    <td>1</td>
+                    <td>17.9</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>21</td>
+                    <td>Cristina</td>
+                    <td>Pérez</td>
+                    <td>44</td>
+                    <td>Girona</td>
+                    <td>Viena</td>
+                    <td>2024-07-25</td>
+                    <td>2</td>
+                    <td>25.6</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>22</td>
+                    <td>Xavier</td>
+                    <td>Ruiz</td>
+                    <td>38</td>
+                    <td>Barcelona</td>
+                    <td>Praga</td>
+                    <td>2024-09-12</td>
+                    <td>1</td>
+                    <td>20.3</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>23</td>
+                    <td>Sílvia</td>
+                    <td>Torres</td>
+                    <td>26</td>
+                    <td>Tarragona</td>
+                    <td>Dublín</td>
+                    <td>2024-06-08</td>
+                    <td>2</td>
+                    <td>27.4</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>24</td>
+                    <td>Àlex</td>
+                    <td>Navarro</td>
+                    <td>33</td>
+                    <td>Barcelona</td>
+                    <td>Estocolm</td>
+                    <td>2024-08-15</td>
+                    <td>3</td>
+                    <td>35.1</td>
+                    <td>Primera</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>25</td>
+                    <td>Montserrat</td>
+                    <td>Ortega</td>
+                    <td>51</td>
+                    <td>Lleida</td>
+                    <td>Brussel·les</td>
+                    <td>2024-07-02</td>
+                    <td>1</td>
+                    <td>18.7</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>26</td>
+                    <td>Ferran</td>
+                    <td>Molina</td>
+                    <td>29</td>
+                    <td>Barcelona</td>
+                    <td>Copenhaguen</td>
+                    <td>2024-05-28</td>
+                    <td>2</td>
+                    <td>24.9</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>27</td>
+                    <td>Gemma</td>
+                    <td>Delgado</td>
+                    <td>35</td>
+                    <td>Madrid</td>
+                    <td>Hèlsinki</td>
+                    <td>2024-06-17</td>
+                    <td>1</td>
+                    <td>19.2</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>28</td>
+                    <td>Arnau</td>
+                    <td>Serrano</td>
+                    <td>40</td>
+                    <td>Barcelona</td>
+                    <td>Oslo</td>
+                    <td>2024-08-22</td>
+                    <td>2</td>
+                    <td>28.3</td>
+                    <td>Primera</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>29</td>
+                    <td>Mireia</td>
+                    <td>Herrera</td>
+                    <td>23</td>
+                    <td>València</td>
+                    <td>Varsòvia</td>
+                    <td>2024-07-10</td>
+                    <td>1</td>
+                    <td>16.5</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>30</td>
+                    <td>Pol</td>
+                    <td>Giménez</td>
+                    <td>47</td>
+                    <td>Barcelona</td>
+                    <td>Budapest</td>
+                    <td>2024-09-03</td>
+                    <td>3</td>
+                    <td>32.1</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>31</td>
+                    <td>Berta</td>
+                    <td>Medina</td>
+                    <td>32</td>
+                    <td>Girona</td>
+                    <td>Cracòvia</td>
+                    <td>2024-06-25</td>
+                    <td>2</td>
+                    <td>25.8</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>32</td>
+                    <td>Roger</td>
+                    <td>Castillo</td>
+                    <td>28</td>
+                    <td>Barcelona</td>
+                    <td>Munic</td>
+                    <td>2024-08-05</td>
+                    <td>1</td>
+                    <td>18.9</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>33</td>
+                    <td>Ariadna</td>
+                    <td>Guerrero</td>
+                    <td>36</td>
+                    <td>Tarragona</td>
+                    <td>Frankfurt</td>
+                    <td>2024-07-20</td>
+                    <td>2</td>
+                    <td>26.2</td>
+                    <td>Primera</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>34</td>
+                    <td>Guillem</td>
+                    <td>Vega</td>
+                    <td>30</td>
+                    <td>Barcelona</td>
+                    <td>Hamburg</td>
+                    <td>2024-05-22</td>
+                    <td>1</td>
+                    <td>17.6</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>35</td>
+                    <td>Mariona</td>
+                    <td>Campos</td>
+                    <td>43</td>
+                    <td>Lleida</td>
+                    <td>Zuric</td>
+                    <td>2024-06-30</td>
+                    <td>2</td>
+                    <td>29.4</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>36</td>
+                    <td>Adrià</td>
+                    <td>Fuentes</td>
+                    <td>25</td>
+                    <td>Barcelona</td>
+                    <td>Ginebra</td>
+                    <td>2024-08-18</td>
+                    <td>3</td>
+                    <td>33.8</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>37</td>
+                    <td>Clara</td>
+                    <td>Carrasco</td>
+                    <td>39</td>
+                    <td>València</td>
+                    <td>Nàpols</td>
+                    <td>2024-07-08</td>
+                    <td>1</td>
+                    <td>20.5</td>
+                    <td>Primera</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>38</td>
+                    <td>Martí</td>
+                    <td>Caballero</td>
+                    <td>34</td>
+                    <td>Barcelona</td>
+                    <td>Florència</td>
+                    <td>2024-09-15</td>
+                    <td>2</td>
+                    <td>27.9</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>39</td>
+                    <td>Judit</td>
+                    <td>Reyes</td>
+                    <td>27</td>
+                    <td>Girona</td>
+                    <td>Venècia</td>
+                    <td>2024-06-12</td>
+                    <td>1</td>
+                    <td>19.7</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>40</td>
+                    <td>Bernat</td>
+                    <td>Nieto</td>
+                    <td>46</td>
+                    <td>Barcelona</td>
+                    <td>Palerm</td>
+                    <td>2024-08-28</td>
+                    <td>2</td>
+                    <td>30.2</td>
+                    <td>Primera</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>41</td>
+                    <td>Abril</td>
+                    <td>Santana</td>
+                    <td>22</td>
+                    <td>Tarragona</td>
+                    <td>Màlaga</td>
+                    <td>2024-05-10</td>
+                    <td>1</td>
+                    <td>16.3</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>42</td>
+                    <td>Nil</td>
+                    <td>Prieto</td>
+                    <td>37</td>
+                    <td>Barcelona</td>
+                    <td>Sevilla</td>
+                    <td>2024-07-30</td>
+                    <td>3</td>
+                    <td>34.6</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>43</td>
+                    <td>Jana</td>
+                    <td>Méndez</td>
+                    <td>31</td>
+                    <td>Madrid</td>
+                    <td>Granada</td>
+                    <td>2024-06-18</td>
+                    <td>2</td>
+                    <td>25.1</td>
+                    <td>Turista</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>44</td>
+                    <td>Èric</td>
+                    <td>Gallego</td>
+                    <td>29</td>
+                    <td>Barcelona</td>
+                    <td>València</td>
+                    <td>2024-08-08</td>
+                    <td>1</td>
+                    <td>18.4</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>45</td>
+                    <td>Ona</td>
+                    <td>Parra</td>
+                    <td>41</td>
+                    <td>València</td>
+                    <td>Bilbao</td>
+                    <td>2024-09-20</td>
+                    <td>2</td>
+                    <td>28.7</td>
+                    <td>Primera</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>46</td>
+                    <td>Jan</td>
+                    <td>Bravo</td>
+                    <td>24</td>
+                    <td>Barcelona</td>
+                    <td>Sant Sebastià</td>
+                    <td>2024-07-15</td>
+                    <td>1</td>
+                    <td>17.2</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>47</td>
+                    <td>Queralt</td>
+                    <td>León</td>
+                    <td>38</td>
+                    <td>Lleida</td>
+                    <td>La Corunya</td>
+                    <td>2024-06-27</td>
+                    <td>2</td>
+                    <td>26.9</td>
+                    <td>Business</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>48</td>
+                    <td>Biel</td>
+                    <td>Ramos</td>
+                    <td>33</td>
+                    <td>Barcelona</td>
+                    <td>Santiago</td>
+                    <td>2024-08-12</td>
+                    <td>3</td>
+                    <td>31.8</td>
+                    <td>Turista</td>
+                    <td>No</td>
+                </tr><tr>
+                    <td>49</td>
+                    <td>Clàudia</td>
+                    <td>Soto</td>
+                    <td>26</td>
+                    <td>Girona</td>
+                    <td>Vigo</td>
+                    <td>2024-05-05</td>
+                    <td>1</td>
+                    <td>19.1</td>
+                    <td>Primera</td>
+                    <td>Sí</td>
+                </tr><tr>
+                    <td>50</td>
+                    <td>Lluc</td>
+                    <td>Alonso</td>
+                    <td>45</td>
+                    <td>Barcelona</td>
+                    <td>Santander</td>
+                    <td>2024-07-22</td>
+                    <td>2</td>
+                    <td>27.3</td>
+                    <td>Business</td>
+                    <td>No</td>
+                </tr></tbody>
+                    </table>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                    <p class="font-medium">Aquesta taula mostra tots els passatgers de la nostra base de dades. A la pestanya "Consultes" podràs filtrar aquestes dades segons diferents criteris.</p>
+                </div>
+            </div>
+
+            <div id="content-query" class="tab-content py-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Consulta les Dades</h2>
+                <p class="mb-4">Escriu una consulta per filtrar les dades. Utilitza la sintaxi similar a la que s'utilitza en Pandas.</p>
+                
+                <div class="mb-6">
+                    <label for="query-input" class="block text-sm font-medium text-gray-700 mb-2">La teva consulta:</label>
+                    <textarea id="query-input" class="code-editor" placeholder="edat > 30 and num_maletes >= 2"></textarea>
+                    <div class="flex justify-end mt-2">
+                        <button id="run-query" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md btn flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Executar Consulta
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Resultats de la consulta:</h3>
+                    <div class="table-container">
+                        <table id="results-table" class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th>ID<span class="field-name">id</span></th>
+                                    <th>Nom<span class="field-name">nom</span></th>
+                                    <th>Cognom<span class="field-name">cognom</span></th>
+                                    <th>Edat<span class="field-name">edat</span></th>
+                                    <th>Origen<span class="field-name">origen</span></th>
+                                    <th>Destí<span class="field-name">desti</span></th>
+                                    <th>Data<span class="field-name">data</span></th>
+                                    <th>Núm. Maletes<span class="field-name">num_maletes</span></th>
+                                    <th>Pes Total (kg)<span class="field-name">pes_total</span></th>
+                                    <th>Classe<span class="field-name">classe</span></th>
+                                    <th>Escala<span class="field-name">escala</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Els resultats es mostraran aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="results-count" class="mt-3 text-gray-600"></p>
+                </div>
+                
+                <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                    <p class="font-medium mb-2">Exemples de consultes:</p>
+                    <ul class="space-y-2">
+                        <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">edat &gt; 30</code> - Passatgers majors de 30 anys</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">desti == "París"</code> - Passatgers que viatgen a París</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">num_maletes &gt; 1 and pes_total &lt; 30</code> - Passatgers amb més d'una maleta i pes total menor a 30kg</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">classe == "Primera" or classe == "Business"</code> - Passatgers en Primera classe o Business</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">data &gt; "2024-05-15"</code> - Passatgers amb vols després del 15 de maig de 2024</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">desti contains "ona"</code> - Destins que contenen "ona" (com Barcelona)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="content-help" class="tab-content py-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Ajuda i Guia</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Com fer consultes</h3>
+                    <p class="mb-3">Per filtrar les dades, pots utilitzar diferents operadors i condicions:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-bold mb-2">Operadors de comparació:</h4>
+                            <ul class="space-y-1">
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">==</code> - Igual a</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">!=</code> - Diferent de</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">&gt;</code> - Major que</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">&lt;</code> - Menor que</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">&gt;=</code> - Major o igual que</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">&lt;=</code> - Menor o igual que</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-bold mb-2">Operadors lògics:</h4>
+                            <ul class="space-y-1">
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">and</code> - Les dues condicions han de ser certes</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">or</code> - Almenys una condició ha de ser certa</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">not</code> - Nega una condició</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">&amp;&amp;</code> - Les dues condicions han de ser certes</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">||</code> - Almenys una condició ha de ser certa</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">!</code> - Nega una condició</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-bold mb-2">Operadors de text:</h4>
+                            <ul class="space-y-1">
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">contains</code> - El text està dins d'una altra paraula</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">startsWith</code> - Comença amb aquest text</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">endsWith</code> - Acaba amb aquest text</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-bold mb-2">Altres operadors:</h4>
+                            <ul class="space-y-1">
+                                <li><code class="bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200">is null</code> - Si un camp està buit</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">is not null</code> - Si un camp no està buit</li>
+                                <li><code class="bg-gray-100 px-2 py-1 rounded">between</code> - Si un valor està entre dos valors</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Camps disponibles</h3>
+                    <p class="mb-3">Pots utilitzar els següents camps en les teves consultes:</p>
+                    
+                    <div class="bg-white border rounded-lg p-4 mb-6">
+                        <ul class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">id</code> - Identificador únic</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">nom</code> - Nom del passatger</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">cognom</code> - Cognom del passatger</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">edat</code> - Edat del passatger</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">origen</code> - Ciutat d'origen</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">desti</code> - Ciutat de destí</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">data</code> - Data del vol (YYYY-MM-DD)</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">num_maletes</code> - Nombre de maletes</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">pes_total</code> - Pes total de les maletes en kg</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">classe</code> - Classe del bitllet (Turista/Business/Primera)</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">escala</code> - Si el vol té escala ("Sí"/"No")</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Exemples de consultes complexes</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="font-medium mb-2">Passatgers joves amb poques maletes:</p>
+                            <code class="bg-gray-100 p-2 block rounded cursor-pointer hover:bg-gray-200">edat &lt; 25 and num_maletes &lt;= 2</code>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="font-medium mb-2">Passatgers que viatgen a Londres o París en Business:</p>
+                            <code class="bg-gray-100 p-2 block rounded cursor-pointer hover:bg-gray-200">(desti == "Londres" or desti == "París") and classe == "Business"</code>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="font-medium mb-2">Passatgers amb maletes pesades que no viatgen en Primera classe:</p>
+                            <code class="bg-gray-100 p-2 block rounded cursor-pointer hover:bg-gray-200">pes_total &gt; 25 and classe != "Primera"</code>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="font-medium mb-2">Passatgers que viatgen a destins que contenen "ona":</p>
+                            <code class="bg-gray-100 p-2 block rounded cursor-pointer hover:bg-gray-200">desti contains "ona"</code>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="font-medium mb-2">Passatgers amb vols durant l'estiu de 2024:</p>
+                            <code class="bg-gray-100 p-2 block rounded cursor-pointer hover:bg-gray-200">data &gt;= "2024-06-21" and data &lt;= "2024-09-22"</code>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="font-medium mb-2">Passatgers que viatgen des de Barcelona amb escala:</p>
+                            <code class="bg-gray-100 p-2 block rounded cursor-pointer hover:bg-gray-200">origen == "Barcelona" and escala == "Sí"</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-challenges" class="tab-content py-4 active">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Reptes d'Anàlisi de Dades</h2>
+                <p class="mb-6">Posa a prova les teves habilitats amb aquests reptes. Cada repte completat et donarà punts. Pots comprovar si la teva solució és correcta!</p>
+                
+                <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                    <p class="font-medium">Puntuació total: <span id="total-score" class="font-bold text-blue-700">0</span> punts</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Repte 1 -->
+                    <div id="challenge-1" class="challenge-card p-4 bg-white">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-semibold text-gray-800">Repte 1: Passatgers joves</h3>
+                            <span class="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full text-sm">10 punts</span>
+                        </div>
+                        <p class="my-3">Troba tots els passatgers menors de 25 anys que viatgen en classe Turista.</p>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">La teva consulta:</label>
+                            <textarea class="challenge-input code-editor h-16" data-challenge="1" placeholder="Escriu la teva consulta aquí..."></textarea>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Resultat esperat: <span class="font-medium">7 passatgers</span></span>
+                            <button class="check-challenge bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-4 rounded-md btn text-sm" data-challenge="1">Comprovar</button>
+                        </div>
+                        <div class="mt-2" id="challenge-1-feedback"><p class="text-yellow-600">Si us plau, escriu una consulta.</p></div>
+                    </div>
+                    
+                    <!-- Repte 2 -->
+                    <div id="challenge-2" class="challenge-card p-4 bg-white">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-semibold text-gray-800">Repte 2: Maletes pesades</h3>
+                            <span class="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full text-sm">15 punts</span>
+                        </div>
+                        <p class="my-3">Troba tots els passatgers que porten més d'una maleta amb un pes total superior a 25 kg.</p>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">La teva consulta:</label>
+                            <textarea class="challenge-input code-editor h-16" data-challenge="2" placeholder="Escriu la teva consulta aquí..."></textarea>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Resultat esperat: <span class="font-medium">14 passatgers</span></span>
+                            <button class="check-challenge bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-4 rounded-md btn text-sm" data-challenge="2">Comprovar</button>
+                        </div>
+                        <div class="mt-2 hidden" id="challenge-2-feedback"></div>
+                    </div>
+                    
+                    <!-- Repte 3 -->
+                    <div id="challenge-3" class="challenge-card p-4 bg-white">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-semibold text-gray-800">Repte 3: Destins europeus</h3>
+                            <span class="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full text-sm">20 punts</span>
+                        </div>
+                        <p class="my-3">Troba tots els passatgers que viatgen a Londres, París, Roma o Berlín durant el mes de juny de 2024.</p>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">La teva consulta:</label>
+                            <textarea class="challenge-input code-editor h-16" data-challenge="3" placeholder="Escriu la teva consulta aquí..."></textarea>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Resultat esperat: <span class="font-medium">4 passatgers</span></span>
+                            <button class="check-challenge bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-4 rounded-md btn text-sm" data-challenge="3">Comprovar</button>
+                        </div>
+                        <div class="mt-2 hidden" id="challenge-3-feedback"></div>
+                    </div>
+                    
+                    <!-- Repte 4 -->
+                    <div id="challenge-4" class="challenge-card p-4 bg-white">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-semibold text-gray-800">Repte 4: Viatges eficients</h3>
+                            <span class="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full text-sm">25 punts</span>
+                        </div>
+                        <p class="my-3">Troba tots els passatgers que viatgen en Business o Primera classe, sense escala, i amb un pes total de maletes inferior a 25 kg.</p>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">La teva consulta:</label>
+                            <textarea class="challenge-input code-editor h-16" data-challenge="4" placeholder="Escriu la teva consulta aquí..."></textarea>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Resultat esperat: <span class="font-medium">6 passatgers</span></span>
+                            <button class="check-challenge bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-4 rounded-md btn text-sm" data-challenge="4">Comprovar</button>
+                        </div>
+                        <div class="mt-2 hidden" id="challenge-4-feedback"></div>
+                    </div>
+                    
+                    <!-- Repte 5 -->
+                    <div id="challenge-5" class="challenge-card p-4 bg-white">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-semibold text-gray-800">Repte 5: El repte final</h3>
+                            <span class="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full text-sm">30 punts</span>
+                        </div>
+                        <p class="my-3">Troba tots els passatgers que compleixen TOTES aquestes condicions: viatgen des de Barcelona, tenen entre 30 i 40 anys (inclosos), viatgen a un destí que conté la lletra "a", i porten exactament 2 maletes.</p>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">La teva consulta:</label>
+                            <textarea class="challenge-input code-editor h-16" data-challenge="5" placeholder="Escriu la teva consulta aquí..."></textarea>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Resultat esperat: <span class="font-medium">5 passatgers</span></span>
+                            <button class="check-challenge bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-4 rounded-md btn text-sm" data-challenge="5">Comprovar</button>
+                        </div>
+                        <div class="mt-2 hidden" id="challenge-5-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center text-gray-600 mt-8">
+            <p>Creat per a l'alumnat de secundària - Anàlisi de Dades</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dades de passatgers ficticis
+        const passatgers = [
+            {id: 1, nom: "Maria", cognom: "Garcia", edat: 34, origen: "Barcelona", desti: "Londres", data: "2024-05-12", num_maletes: 2, pes_total: 23.5, classe: "Turista", escala: "No"},
+            {id: 2, nom: "Joan", cognom: "Martí", edat: 45, origen: "Madrid", desti: "Nova York", data: "2024-06-03", num_maletes: 1, pes_total: 18.2, classe: "Business", escala: "Sí"},
+            {id: 3, nom: "Anna", cognom: "López", edat: 28, origen: "València", desti: "París", data: "2024-05-20", num_maletes: 3, pes_total: 32.7, classe: "Turista", escala: "No"},
+            {id: 4, nom: "Pau", cognom: "Ferrer", edat: 52, origen: "Barcelona", desti: "Tòquio", data: "2024-07-15", num_maletes: 2, pes_total: 27.8, classe: "Primera", escala: "Sí"},
+            {id: 5, nom: "Laia", cognom: "Soler", edat: 19, origen: "Girona", desti: "Berlín", data: "2024-05-30", num_maletes: 1, pes_total: 15.3, classe: "Turista", escala: "No"},
+            {id: 6, nom: "Marc", cognom: "Vidal", edat: 37, origen: "Tarragona", desti: "Roma", data: "2024-06-10", num_maletes: 2, pes_total: 22.1, classe: "Business", escala: "No"},
+            {id: 7, nom: "Júlia", cognom: "Puig", edat: 24, origen: "Barcelona", desti: "Amsterdam", data: "2024-06-22", num_maletes: 1, pes_total: 19.5, classe: "Turista", escala: "Sí"},
+            {id: 8, nom: "Oriol", cognom: "Roca", edat: 41, origen: "Lleida", desti: "Londres", data: "2024-07-05", num_maletes: 3, pes_total: 34.2, classe: "Primera", escala: "No"},
+            {id: 9, nom: "Carla", cognom: "Bosch", edat: 31, origen: "Barcelona", desti: "París", data: "2024-05-18", num_maletes: 2, pes_total: 26.8, classe: "Business", escala: "Sí"},
+            {id: 10, nom: "Sergi", cognom: "Costa", edat: 22, origen: "Girona", desti: "Berlín", data: "2024-06-15", num_maletes: 1, pes_total: 17.4, classe: "Turista", escala: "No"},
+            {id: 11, nom: "Marta", cognom: "Pujol", edat: 48, origen: "Barcelona", desti: "Nova York", data: "2024-08-20", num_maletes: 2, pes_total: 29.3, classe: "Primera", escala: "Sí"},
+            {id: 12, nom: "Albert", cognom: "Serra", edat: 33, origen: "Tarragona", desti: "Roma", data: "2024-07-12", num_maletes: 1, pes_total: 20.7, classe: "Turista", escala: "No"},
+            {id: 13, nom: "Núria", cognom: "Font", edat: 27, origen: "Barcelona", desti: "Tòquio", data: "2024-09-05", num_maletes: 2, pes_total: 24.6, classe: "Business", escala: "Sí"},
+            {id: 14, nom: "Gerard", cognom: "Sala", edat: 39, origen: "València", desti: "Amsterdam", data: "2024-06-28", num_maletes: 3, pes_total: 31.5, classe: "Turista", escala: "No"},
+            {id: 15, nom: "Aina", cognom: "Roig", edat: 25, origen: "Barcelona", desti: "Londres", data: "2024-05-25", num_maletes: 1, pes_total: 16.8, classe: "Business", escala: "Sí"},
+            {id: 16, nom: "Jordi", cognom: "Casals", edat: 42, origen: "Madrid", desti: "Barcelona", data: "2024-06-05", num_maletes: 2, pes_total: 24.3, classe: "Turista", escala: "No"},
+            {id: 17, nom: "Elena", cognom: "Martínez", edat: 29, origen: "Sevilla", desti: "París", data: "2024-07-18", num_maletes: 1, pes_total: 19.8, classe: "Business", escala: "Sí"},
+            {id: 18, nom: "Miquel", cognom: "Sánchez", edat: 36, origen: "Barcelona", desti: "Milà", data: "2024-05-15", num_maletes: 2, pes_total: 26.5, classe: "Turista", escala: "No"},
+            {id: 19, nom: "Laura", cognom: "Gómez", edat: 31, origen: "València", desti: "Atenes", data: "2024-08-10", num_maletes: 3, pes_total: 33.2, classe: "Primera", escala: "Sí"},
+            {id: 20, nom: "David", cognom: "Fernández", edat: 27, origen: "Barcelona", desti: "Lisboa", data: "2024-06-20", num_maletes: 1, pes_total: 17.9, classe: "Turista", escala: "No"},
+            {id: 21, nom: "Cristina", cognom: "Pérez", edat: 44, origen: "Girona", desti: "Viena", data: "2024-07-25", num_maletes: 2, pes_total: 25.6, classe: "Business", escala: "Sí"},
+            {id: 22, nom: "Xavier", cognom: "Ruiz", edat: 38, origen: "Barcelona", desti: "Praga", data: "2024-09-12", num_maletes: 1, pes_total: 20.3, classe: "Turista", escala: "No"},
+            {id: 23, nom: "Sílvia", cognom: "Torres", edat: 26, origen: "Tarragona", desti: "Dublín", data: "2024-06-08", num_maletes: 2, pes_total: 27.4, classe: "Business", escala: "Sí"},
+            {id: 24, nom: "Àlex", cognom: "Navarro", edat: 33, origen: "Barcelona", desti: "Estocolm", data: "2024-08-15", num_maletes: 3, pes_total: 35.1, classe: "Primera", escala: "No"},
+            {id: 25, nom: "Montserrat", cognom: "Ortega", edat: 51, origen: "Lleida", desti: "Brussel·les", data: "2024-07-02", num_maletes: 1, pes_total: 18.7, classe: "Turista", escala: "Sí"},
+            {id: 26, nom: "Ferran", cognom: "Molina", edat: 29, origen: "Barcelona", desti: "Copenhaguen", data: "2024-05-28", num_maletes: 2, pes_total: 24.9, classe: "Business", escala: "No"},
+            {id: 27, nom: "Gemma", cognom: "Delgado", edat: 35, origen: "Madrid", desti: "Hèlsinki", data: "2024-06-17", num_maletes: 1, pes_total: 19.2, classe: "Turista", escala: "Sí"},
+            {id: 28, nom: "Arnau", cognom: "Serrano", edat: 40, origen: "Barcelona", desti: "Oslo", data: "2024-08-22", num_maletes: 2, pes_total: 28.3, classe: "Primera", escala: "No"},
+            {id: 29, nom: "Mireia", cognom: "Herrera", edat: 23, origen: "València", desti: "Varsòvia", data: "2024-07-10", num_maletes: 1, pes_total: 16.5, classe: "Turista", escala: "Sí"},
+            {id: 30, nom: "Pol", cognom: "Giménez", edat: 47, origen: "Barcelona", desti: "Budapest", data: "2024-09-03", num_maletes: 3, pes_total: 32.1, classe: "Business", escala: "No"},
+            {id: 31, nom: "Berta", cognom: "Medina", edat: 32, origen: "Girona", desti: "Cracòvia", data: "2024-06-25", num_maletes: 2, pes_total: 25.8, classe: "Turista", escala: "Sí"},
+            {id: 32, nom: "Roger", cognom: "Castillo", edat: 28, origen: "Barcelona", desti: "Munic", data: "2024-08-05", num_maletes: 1, pes_total: 18.9, classe: "Business", escala: "No"},
+            {id: 33, nom: "Ariadna", cognom: "Guerrero", edat: 36, origen: "Tarragona", desti: "Frankfurt", data: "2024-07-20", num_maletes: 2, pes_total: 26.2, classe: "Primera", escala: "Sí"},
+            {id: 34, nom: "Guillem", cognom: "Vega", edat: 30, origen: "Barcelona", desti: "Hamburg", data: "2024-05-22", num_maletes: 1, pes_total: 17.6, classe: "Turista", escala: "No"},
+            {id: 35, nom: "Mariona", cognom: "Campos", edat: 43, origen: "Lleida", desti: "Zuric", data: "2024-06-30", num_maletes: 2, pes_total: 29.4, classe: "Business", escala: "Sí"},
+            {id: 36, nom: "Adrià", cognom: "Fuentes", edat: 25, origen: "Barcelona", desti: "Ginebra", data: "2024-08-18", num_maletes: 3, pes_total: 33.8, classe: "Turista", escala: "No"},
+            {id: 37, nom: "Clara", cognom: "Carrasco", edat: 39, origen: "València", desti: "Nàpols", data: "2024-07-08", num_maletes: 1, pes_total: 20.5, classe: "Primera", escala: "Sí"},
+            {id: 38, nom: "Martí", cognom: "Caballero", edat: 34, origen: "Barcelona", desti: "Florència", data: "2024-09-15", num_maletes: 2, pes_total: 27.9, classe: "Business", escala: "No"},
+            {id: 39, nom: "Judit", cognom: "Reyes", edat: 27, origen: "Girona", desti: "Venècia", data: "2024-06-12", num_maletes: 1, pes_total: 19.7, classe: "Turista", escala: "Sí"},
+            {id: 40, nom: "Bernat", cognom: "Nieto", edat: 46, origen: "Barcelona", desti: "Palerm", data: "2024-08-28", num_maletes: 2, pes_total: 30.2, classe: "Primera", escala: "No"},
+            {id: 41, nom: "Abril", cognom: "Santana", edat: 22, origen: "Tarragona", desti: "Màlaga", data: "2024-05-10", num_maletes: 1, pes_total: 16.3, classe: "Turista", escala: "Sí"},
+            {id: 42, nom: "Nil", cognom: "Prieto", edat: 37, origen: "Barcelona", desti: "Sevilla", data: "2024-07-30", num_maletes: 3, pes_total: 34.6, classe: "Business", escala: "No"},
+            {id: 43, nom: "Jana", cognom: "Méndez", edat: 31, origen: "Madrid", desti: "Granada", data: "2024-06-18", num_maletes: 2, pes_total: 25.1, classe: "Turista", escala: "Sí"},
+            {id: 44, nom: "Èric", cognom: "Gallego", edat: 29, origen: "Barcelona", desti: "València", data: "2024-08-08", num_maletes: 1, pes_total: 18.4, classe: "Business", escala: "No"},
+            {id: 45, nom: "Ona", cognom: "Parra", edat: 41, origen: "València", desti: "Bilbao", data: "2024-09-20", num_maletes: 2, pes_total: 28.7, classe: "Primera", escala: "Sí"},
+            {id: 46, nom: "Jan", cognom: "Bravo", edat: 24, origen: "Barcelona", desti: "Sant Sebastià", data: "2024-07-15", num_maletes: 1, pes_total: 17.2, classe: "Turista", escala: "No"},
+            {id: 47, nom: "Queralt", cognom: "León", edat: 38, origen: "Lleida", desti: "La Corunya", data: "2024-06-27", num_maletes: 2, pes_total: 26.9, classe: "Business", escala: "Sí"},
+            {id: 48, nom: "Biel", cognom: "Ramos", edat: 33, origen: "Barcelona", desti: "Santiago", data: "2024-08-12", num_maletes: 3, pes_total: 31.8, classe: "Turista", escala: "No"},
+            {id: 49, nom: "Clàudia", cognom: "Soto", edat: 26, origen: "Girona", desti: "Vigo", data: "2024-05-05", num_maletes: 1, pes_total: 19.1, classe: "Primera", escala: "Sí"},
+            {id: 50, nom: "Lluc", cognom: "Alonso", edat: 45, origen: "Barcelona", desti: "Santander", data: "2024-07-22", num_maletes: 2, pes_total: 27.3, classe: "Business", escala: "No"}
+        ];
+
+        // Funció per carregar les dades a la taula
+        function carregarDades(taula, dades) {
+            const tbody = document.querySelector(`#${taula} tbody`);
+            tbody.innerHTML = '';
+            
+            if (dades.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="11" class="text-center py-4 text-gray-500">No s'han trobat resultats</td>`;
+                tbody.appendChild(tr);
+                return;
+            }
+            
+            dades.forEach(passatger => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${passatger.id}</td>
+                    <td>${passatger.nom}</td>
+                    <td>${passatger.cognom}</td>
+                    <td>${passatger.edat}</td>
+                    <td>${passatger.origen}</td>
+                    <td>${passatger.desti}</td>
+                    <td>${passatger.data}</td>
+                    <td>${passatger.num_maletes}</td>
+                    <td>${passatger.pes_total}</td>
+                    <td>${passatger.classe}</td>
+                    <td>${passatger.escala}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Pas 1: Preprocessar la consulta per canviar 'and', 'or', 'not', 'contains', etc. per paraules que entenem millor
+        function preprocessConsulta(consulta) {
+            return consulta
+                .replace(/\band\b/gi, '&&')
+                .replace(/\bor\b/gi, '||')
+                .replace(/\bnot\b/gi, '!')
+                .replace(/\bcontains\b/gi, 'CONTAINS')
+                .replace(/\bstartsWith\b/gi, 'STARTSWITH')
+                .replace(/\bendsWith\b/gi, 'ENDSWITH')
+                .replace(/\bbetween\b/gi, 'BETWEEN');
+        }
+
+        // Pas 2: Separar la consulta en paraules i símbols (tokenitzar)
+        function tokenize(consulta) {
+            const regex = /\s*(=>|==|!=|>=|<=|&&|\|\||[()!<>]|[\w.]+|'[^']*'|"[^"]*")\s*/g;
+            return consulta.match(regex).map(t => t.trim());
+        }
+
+        // Pas 3: Parser: transforma la consulta en un arbre que sabem interpretar
+        function parseConsulta(consulta) {
+            const tokens = tokenize(consulta);
+            let i = 0;
+
+            function parseExpression() {
+                let left = parseTerm();
+                while (tokens[i] === '||') {
+                    const operator = tokens[i++];
+                    const right = parseTerm();
+                    left = { type: 'LogicalExpression', operator, left, right };
+                }
+                return left;
+            }
+
+            function parseTerm() {
+                let left = parseFactor();
+                while (tokens[i] === '&&') {
+                    const operator = tokens[i++];
+                    const right = parseFactor();
+                    left = { type: 'LogicalExpression', operator, left, right };
+                }
+                return left;
+            }
+
+            function parseFactor() {
+                if (tokens[i] === '!') {
+                    i++;
+                    const argument = parseFactor();
+                    return { type: 'UnaryExpression', operator: '!', argument };
+                } else if (tokens[i] === '(') {
+                    i++;
+                    const node = parseExpression();
+                    if (tokens[i] !== ')') throw new Error("Falta un parèntesi ')'");
+                    i++;
+                    return node;
+                } else {
+                    return parseComparison();
+                }
+            }
+
+            function parseComparison() {
+                const left = { type: 'Identifier', name: tokens[i++] };
+
+                // Detectem si és un "is null" o "is not null"
+                if (tokens[i]?.toLowerCase() === 'is') {
+                    i++;
+                    if (tokens[i]?.toLowerCase() === 'not') {
+                        i++;
+                        if (tokens[i]?.toLowerCase() === 'null') {
+                            i++;
+                            return { type: 'IsNotNullExpression', field: left.name };
+                        } else throw new Error("Esperat 'null' després de 'is not'");
+                    } else if (tokens[i]?.toLowerCase() === 'null') {
+                        i++;
+                        return { type: 'IsNullExpression', field: left.name };
+                    } else throw new Error("Esperat 'null' o 'not null' després de 'is'");
+                }
+
+                const operator = tokens[i++].toUpperCase();
+
+                if (operator === 'CONTAINS' || operator === 'STARTSWITH' || operator === 'ENDSWITH') {
+                    const raw = tokens[i++];
+                    const value = raw.slice(1, -1);
+                    return { type: operator, field: left.name, value };
+                }
+                if (operator === 'BETWEEN') {
+                    const lowerRaw = tokens[i++];
+                    const lower = isNaN(lowerRaw) ? lowerRaw : Number(lowerRaw);
+
+                    // Esperem "and" aquí (normalitzat a &&)
+                    if (tokens[i++] !== '&&') throw new Error("Esperat 'and' entre valors de BETWEEN");
+
+                    const upperRaw = tokens[i++];
+                    const upper = isNaN(upperRaw) ? upperRaw : Number(upperRaw);
+
+                    return { type: 'BetweenExpression', field: left.name, lower, upper };
+                }
+                const raw = tokens[i++];
+                const value = (raw.startsWith("'") || raw.startsWith('"')) ? raw.slice(1, -1) : isNaN(raw) ? raw : Number(raw);
+                return {
+                    type: 'BinaryExpression',
+                    operator,
+                    left,
+                    right: { type: 'Literal', value }
+                };
+            }
+            const result = parseExpression();
+            if (i !== tokens.length) throw new Error("Consulta incompleta o mal formada");
+            return result;
+        }
+
+        // Pas 4: Avaluador: donat l'arbre i un objecte de dades, decideix si l'objecte compleix la consulta
+        function avaluarNode(node, context) {
+            switch (node.type) {
+                case 'BinaryExpression': {
+                    let leftVal = context[node.left.name];
+                    let rightVal = node.right.value;
+
+                    // Comparació de dates (format YYYY-MM-DD)
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                    if (typeof leftVal === 'string' && dateRegex.test(leftVal)) {
+                        const leftDate = new Date(leftVal);
+                        const rightDate = dateRegex.test(rightVal) ? new Date(rightVal) : null;
+                        if (rightDate) {
+                            switch (node.operator) {
+                                case '==': return leftDate.getTime() === rightDate.getTime();
+                                case '!=': return leftDate.getTime() !== rightDate.getTime();
+                                case '>': return leftDate > rightDate;
+                                case '<': return leftDate < rightDate;
+                                case '>=': return leftDate >= rightDate;
+                                case '<=': return leftDate <= rightDate;
+                            }
+                        }
+                    }
+
+                    switch (node.operator) {
+                        case '==': return leftVal == rightVal;
+                        case '!=': return leftVal != rightVal;
+                        case '>': return leftVal > rightVal;
+                        case '<': return leftVal < rightVal;
+                        case '>=': return leftVal >= rightVal;
+                        case '<=': return leftVal <= rightVal;
+                        default: throw new Error("Operador no suportat: " + node.operator);
+                    }
+                }
+                case 'LogicalExpression': {
+                    const left = avaluarNode(node.left, context);
+                    const right = avaluarNode(node.right, context);
+                    return node.operator === '&&' ? left && right : left || right;
+                }
+                case 'UnaryExpression': {
+                    return !avaluarNode(node.argument, context);
+                }
+                case 'CONTAINS': {
+                    const value = context[node.field];
+                    return typeof value === 'string' && value.includes(node.value);
+                }
+                case 'STARTSWITH': {
+                    const value = context[node.field];
+                    return typeof value === 'string' && value.startsWith(node.value);
+                }
+                case 'ENDSWITH': {
+                    const value = context[node.field];
+                    return typeof value === 'string' && value.endsWith(node.value);
+                }
+                case 'BetweenExpression': {
+                    const val = context[node.field];
+                    return typeof val === 'number' && val >= node.lower && val <= node.upper;
+                }
+                case 'IsNullExpression': {
+                    return context[node.field] == null;
+                }
+                case 'IsNotNullExpression': {
+                    return context[node.field] != null;
+                }
+                default:
+                    throw new Error("Node desconegut: " + node.type);
+            }
+        }
+
+        // Funció que posa tot junt per filtrar les dades segons la consulta
+        function avaluarConsulta(consultaOriginal, dades) {
+            try {
+                const consultaNormalitzada = preprocessConsulta(consultaOriginal);
+                const ast = parseConsulta(consultaNormalitzada);
+                return dades.filter(p => avaluarNode(ast, p));
+            } catch (e) {
+                alert("Error a la consulta: " + e.message);
+                return [];
+            }
+        }
+
+        // Solucions dels reptes
+        const solucionsReptes = {
+            1: {
+                resultatEsperat: 7,
+                possiblesSolucions: [
+                    "edat < 25 and classe == \"Turista\"",
+                    "classe == \"Turista\" and edat < 25"
+                ]
+            },
+            2: {
+                resultatEsperat: 14,
+                possiblesSolucions: [
+                    "num_maletes > 1 and pes_total > 25"
+                ]
+            },
+            3: {
+                resultatEsperat: 4,
+                possiblesSolucions: [
+                    "(desti == \"Londres\" or desti == \"París\" or desti == \"Roma\" or desti == \"Berlín\") and data >= \"2024-06-01\" and data <= \"2024-06-30\"",
+                    "data >= \"2024-06-01\" and data <= \"2024-06-30\" and (desti == \"Londres\" or desti == \"París\" or desti == \"Roma\" or desti == \"Berlín\")"
+                ]
+            },
+            4: {
+                resultatEsperat: 6,
+                possiblesSolucions: [
+                    "(classe == \"Business\" or classe == \"Primera\") and escala == \"No\" and pes_total < 25",
+                    "escala == \"No\" and pes_total < 25 and (classe == \"Business\" or classe == \"Primera\")"
+                ]
+            },
+            5: {
+                resultatEsperat: 5,
+                possiblesSolucions: [
+                    "origen == \"Barcelona\" and edat >= 30 and edat <= 40 and desti contains \"a\" and num_maletes == 2",
+                    "origen == \"Barcelona\" and edat between 30 and 40 and desti contains \"a\" and num_maletes == 2"
+                ]
+            }
+        };
+
+        // Inicialitzar la pàgina
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carregar dades inicials
+            carregarDades('data-table', passatgers);
+            
+            // Gestionar pestanyes
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Desactivar totes les pestanyes
+                    tabs.forEach(t => {
+                        t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                        t.classList.add('text-gray-500');
+                    });
+                    
+                    // Activar la pestanya clicada
+                    tab.classList.remove('text-gray-500');
+                    tab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                    
+                    // Mostrar el contingut corresponent
+                    const contentId = 'content-' + tab.id.split('-')[1];
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(contentId).classList.add('active');
+                });
+            });
+            
+            // Gestionar el botó d'executar consulta
+            document.getElementById('run-query').addEventListener('click', () => {
+                const consulta = document.getElementById('query-input').value.trim();
+                if (!consulta) {
+                    alert("Si us plau, escriu una consulta.");
+                    return;
+                }
+                
+                const resultats = avaluarConsulta(consulta, passatgers);
+                carregarDades('results-table', resultats);
+                document.getElementById('results-count').textContent = `S'han trobat ${resultats.length} resultats de ${passatgers.length} passatgers.`;
+            });
+            
+            // Exemples de consultes clicables
+            document.querySelectorAll('code').forEach(code => {
+                if (code.textContent.includes('==') || code.textContent.includes('>') || code.textContent.includes('<') || 
+                    code.textContent.includes('contains') || code.textContent.includes('startsWith') || 
+                    code.textContent.includes('endsWith') || code.textContent.includes('is null')) {
+                    code.classList.add('cursor-pointer', 'hover:bg-gray-200');
+                    code.addEventListener('click', () => {
+                        document.getElementById('query-input').value = code.textContent;
+                        document.getElementById('tab-query').click();
+                        setTimeout(() => {
+                            document.getElementById('run-query').click();
+                        }, 100);
+                    });
+                }
+            });
+
+            // Gestionar els reptes
+            let puntuacioTotal = 0;
+            const reptesSuperats = new Set();
+
+            document.querySelectorAll('.check-challenge').forEach(button => {
+                button.addEventListener('click', () => {
+                    const repteId = button.getAttribute('data-challenge');
+                    const consulta = document.querySelector(`.challenge-input[data-challenge="${repteId}"]`).value.trim();
+                    const feedbackElement = document.getElementById(`challenge-${repteId}-feedback`);
+                    
+                    if (!consulta) {
+                        feedbackElement.innerHTML = `<p class="text-yellow-600">Si us plau, escriu una consulta.</p>`;
+                        feedbackElement.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    try {
+                        const resultats = avaluarConsulta(consulta, passatgers);
+                        const solucio = solucionsReptes[repteId];
+                        
+                        if (resultats.length === solucio.resultatEsperat) {
+                            if (!reptesSuperats.has(repteId)) {
+                                const punts = parseInt(button.previousElementSibling.textContent);
+                                puntuacioTotal += punts;
+                                document.getElementById('total-score').textContent = puntuacioTotal;
+                                reptesSuperats.add(repteId);
+                            }
+                            
+                            feedbackElement.innerHTML = `
+                                <div class="bg-green-100 border-l-4 border-green-500 p-3">
+                                    <p class="text-green-700">Correcte! Has trobat ${resultats.length} passatgers.</p>
+                                </div>
+                            `;
+                            document.getElementById(`challenge-${repteId}`).classList.add('completed');
+                        } else {
+                            feedbackElement.innerHTML = `
+                                <div class="bg-red-100 border-l-4 border-red-500 p-3">
+                                    <p class="text-red-700">Incorrecte. Has trobat ${resultats.length} passatgers, però s'esperaven ${solucio.resultatEsperat}.</p>
+                                </div>
+                            `;
+                        }
+                        feedbackElement.classList.remove('hidden');
+                    } catch (e) {
+                        feedbackElement.innerHTML = `
+                            <div class="bg-red-100 border-l-4 border-red-500 p-3">
+                                <p class="text-red-700">Error a la consulta: ${e.message}</p>
+                            </div>
+                        `;
+                        feedbackElement.classList.remove('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'941d0974b23e28ee',t:'MTc0NzU4ODk0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
