@@ -1255,7 +1255,7 @@ Missatge desencapsulat: "${message}"`);
                     
                     addLogEntry(`Paquet UDP passant per la connexió cap a ${nextDevice.name}`, 'step');
 
-                    addTableEntry(timestamp, sourceDevice.ip, nextDevice.ip, messageLength, message);
+                    addTableEntry(timestamp, prevDevice.ip, nextDevice.ip, messageLength, message);
                     
                     // After delay, move to next device
                     setTimeout(() => {
