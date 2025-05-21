@@ -1223,6 +1223,8 @@ Missatge desencapsulat: "${message}"`);
                         const prevDeviceId = path[currentStep - 1].deviceId;
                         const prevDevice = devices.find(d => d.id === prevDeviceId);
                         prevDevice.element.classList.remove('highlight');
+
+                        addTableEntry(timestamp, prevDevice.ip, nextDevice.ip, messageLength, message);
                         
                         // Remove active from previous connection
                         const prevConnectionId = path[currentStep - 1].connectionId;
@@ -1254,8 +1256,6 @@ Missatge desencapsulat: "${message}"`);
                     tooltip.style.top = `${midY - 30}px`;
                     
                     addLogEntry(`Paquet UDP passant per la connexió cap a ${nextDevice.name}`, 'step');
-
-                    addTableEntry(timestamp, prevDevice.ip, nextDevice.ip, messageLength, message);
                     
                     // After delay, move to next device
                     setTimeout(() => {
