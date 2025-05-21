@@ -1,0 +1,1515 @@
+<html lang="ca"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de xarxes i enviament de paquets UDP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f7ff;
+            overflow-x: hidden;
+        }
+        
+        .device {
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        
+        .device:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        .device-port {
+            width: 12px;
+            height: 12px;
+            background-color: #555;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .cable {
+            position: absolute;
+            height: 3px;
+            background-color: #333;
+            transform-origin: left center;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .cable.active {
+            background-color: #4CAF50;
+            height: 4px;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
+        }
+        
+        .message-packet {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.8);
+            transition: all 0.5s linear;
+        }
+        
+        .workspace {
+            background-image: 
+                linear-gradient(rgba(200, 220, 240, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 220, 240, 0.5) 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+        }
+        
+        .highlight {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        .log-entry {
+            transition: all 0.3s ease;
+        }
+        
+        .log-entry.new {
+            background-color: #e6fffa;
+        }
+        
+        .tab {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid #4299e1;
+            color: #2b6cb0;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .timestamp {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #718096;
+            margin-right: 4px;
+        }
+        
+        .no-ip {
+            font-style: italic;
+            color: #a0aec0;
+        }
+        
+        table.packet-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        
+        table.packet-table th {
+            background-color: #e2e8f0;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        table.packet-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        table.packet-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.absolute{position:absolute}.relative{position:relative}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mr-3{margin-right:0.75rem}.mt-6{margin-top:1.5rem}.mt-1{margin-top:0.25rem}.block{display:block}.flex{display:flex}.h-6{height:1.5rem}.h-full{height:100%}.h-12{height:3rem}.min-h-\[500px\]{min-height:500px}.min-h-screen{min-height:100vh}.w-6{width:1.5rem}.w-full{width:100%}.w-12{width:3rem}.flex-1{flex:1 1 0%}.cursor-pointer{cursor:pointer}.flex-col{flex-direction:column}.items-center{align-items:center}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-600{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-indigo-700{--tw-gradient-to:#4338ca var(--tw-gradient-to-position)}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-blue-50:hover{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-600:hover{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.hover\:bg-red-600:hover{--tw-bg-opacity:1;background-color:rgb(220 38 38 / var(--tw-bg-opacity, 1))}@media (min-width: 768px){.md\:w-64{width:16rem}.md\:w-96{width:24rem}.md\:flex-row{flex-direction:row}}</style></head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-lg">
+            <h1 class="text-2xl font-bold text-center">Simulador de xarxes i enviament de paquets UDP</h1>
+        </header>
+        
+        <main class="flex flex-col md:flex-row flex-1">
+            <!-- Toolbox -->
+            <div class="w-full md:w-64 bg-gray-100 p-4 shadow-md">
+                <h2 class="text-lg font-semibold mb-4 text-gray-700">Dispositius</h2>
+                
+                <div class="space-y-4">
+                    <div class="bg-white p-3 rounded-lg shadow-sm flex items-center cursor-pointer hover:bg-blue-50 transition-colors" id="add-computer">
+                        <div class="bg-blue-100 p-2 rounded-md mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <span>Ordinador</span>
+                    </div>
+                    
+                    <div class="bg-white p-3 rounded-lg shadow-sm flex items-center cursor-pointer hover:bg-blue-50 transition-colors" id="add-router">
+                        <div class="bg-green-100 p-2 rounded-md mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                            </svg>
+                        </div>
+                        <span>Router</span>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h2 class="text-lg font-semibold mb-2 text-gray-700">Instruccions</h2>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>• Arrossega dispositius a l'àrea de treball</li>
+                        <li>• Connecta'ls fent clic als ports i arrossegant</li>
+                        <li>• Desconnecta arrossegant un port cap a fora</li>
+                        <li>• Els ordinadors obtenen IP en connectar-se a un router</li>
+                        <li>• Envia missatges UDP des del panell dret</li>
+                        <li>• Observa com canvia la IP en el recorregut</li>
+                    </ul>
+                </div>
+                
+                <button id="reset-btn" class="mt-6 w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors">
+                    Reiniciar Simulació
+                </button>
+            </div>
+            
+            <!-- Workspace -->
+            <div class="flex-1 flex flex-col">
+                <div id="workspace" class="workspace flex-1 min-h-[500px] border-2 border-gray-300 relative">
+                    <!-- Devices will be added here dynamically -->
+                <div class="device absolute bg-blue-100 rounded-lg shadow-md p-2 flex flex-col items-center" id="computer-1" data-type="computer" data-has-ip="false" style="left: 100px; top: 100px; width: 120px; z-index: 10;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="text-xs font-semibold mt-1">PC 1</div>
+                    <div class="text-xs no-ip">Sense connexió</div>
+                <div class="device-port" data-port-id="computer-1-port-1" data-device-id="computer-1" style="left: -6px; top: 50%; transform: translateY(-50%);"></div><div class="device-port" data-port-id="computer-1-port-2" data-device-id="computer-1" style="left: 50%; top: -6px; transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-1-port-3" data-device-id="computer-1" style="left: 50%; top: calc(100% - 6px); transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-1-port-4" data-device-id="computer-1" style="left: calc(100% - 6px); top: 50%; transform: translateY(-50%);"></div></div><div class="device absolute bg-green-100 rounded-lg shadow-md p-2 flex flex-col items-center" id="router-1" data-type="router" data-ip="192.168.143.1" style="left: 300px; top: 200px; width: 120px; z-index: 10;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                    </svg>
+                    <div class="text-xs font-semibold mt-1">Router 1</div>
+                    <div class="text-xs text-gray-600">192.168.143.1</div>
+                <div class="device-port" data-port-id="router-1-port-1" data-device-id="router-1" style="left: -6px; top: 50%; transform: translateY(-50%);"></div><div class="device-port" data-port-id="router-1-port-2" data-device-id="router-1" style="left: 50%; top: -6px; transform: translateX(-50%);"></div><div class="device-port" data-port-id="router-1-port-3" data-device-id="router-1" style="left: 50%; top: calc(100% - 6px); transform: translateX(-50%);"></div><div class="device-port" data-port-id="router-1-port-4" data-device-id="router-1" style="left: calc(100% - 6px); top: 50%; transform: translateY(-50%);"></div></div><div class="device absolute bg-blue-100 rounded-lg shadow-md p-2 flex flex-col items-center" id="computer-2" data-type="computer" data-has-ip="false" style="left: 500px; top: 100px; width: 120px; z-index: 10;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="text-xs font-semibold mt-1">PC 2</div>
+                    <div class="text-xs no-ip">Sense connexió</div>
+                <div class="device-port" data-port-id="computer-2-port-1" data-device-id="computer-2" style="left: -6px; top: 50%; transform: translateY(-50%);"></div><div class="device-port" data-port-id="computer-2-port-2" data-device-id="computer-2" style="left: 50%; top: -6px; transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-2-port-3" data-device-id="computer-2" style="left: 50%; top: calc(100% - 6px); transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-2-port-4" data-device-id="computer-2" style="left: calc(100% - 6px); top: 50%; transform: translateY(-50%);"></div></div></div>
+            </div>
+            
+            <!-- Message Panel -->
+            <div class="w-full md:w-96 bg-gray-100 p-4 shadow-md flex flex-col">
+                <h2 class="text-lg font-semibold mb-4 text-gray-700">Missatges UDP</h2>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Origen</label>
+                        <select id="source-device" class="w-full p-2 border border-gray-300 rounded-md"><option value="">Selecciona un dispositiu</option><option value="router-1">Router 1 (192.168.143.1)</option></select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Destinació</label>
+                        <select id="target-device" class="w-full p-2 border border-gray-300 rounded-md"><option value="">Selecciona un dispositiu</option><option value="router-1">Router 1 (192.168.143.1)</option></select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Missatge</label>
+                        <input type="text" id="message-content" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Escriu el teu missatge...">
+                    </div>
+                    
+                    <button id="send-message" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors">
+                        Enviar Missatge
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-hidden flex flex-col">
+                    <h3 class="text-md font-semibold mb-2 text-gray-700">Registre de Transmissió</h3>
+                    
+                    <!-- Tabs -->
+                    <div class="flex border-b border-gray-200 mb-2">
+                        <div class="tab active px-4 py-2" data-tab="basic">Bàsic</div>
+                        <div class="tab px-4 py-2" data-tab="advanced">Avançat</div>
+                        <div class="tab px-4 py-2" data-tab="table">Capçaleres</div>
+                    </div>
+                    
+                    <!-- Tab Content -->
+                    <div class="flex-1 overflow-hidden">
+                        <div id="basic-log" class="tab-content active bg-white rounded-lg shadow-sm p-3 overflow-y-auto h-full text-sm" style="height: 177px;">
+                            <div class="text-gray-500 italic text-center">El registre de transmissió apareixerà aquí</div>
+                        </div>
+                        
+                        <div id="advanced-log" class="tab-content bg-white rounded-lg shadow-sm p-3 overflow-y-auto h-full text-sm font-mono" style="height: 177px;">
+                            <div class="text-gray-500 italic text-center">El registre avançat amb capçaleres UDP apareixerà aquí</div>
+                        </div>
+                        
+                        <div id="table-log" class="tab-content bg-white rounded-lg shadow-sm p-3 overflow-y-auto h-full text-sm" style="height: 177px;">
+                            <table class="packet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Hora</th>
+                                        <th>IP Origen</th>
+                                        <th>IP Destí</th>
+                                        <th>Longitud</th>
+                                        <th>Missatge</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="packet-table-body">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-gray-500 italic">No hi ha dades disponibles</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const workspace = document.getElementById('workspace');
+            const addComputer = document.getElementById('add-computer');
+            const addRouter = document.getElementById('add-router');
+            const sourceDeviceSelect = document.getElementById('source-device');
+            const targetDeviceSelect = document.getElementById('target-device');
+            const messageContent = document.getElementById('message-content');
+            const sendMessageBtn = document.getElementById('send-message');
+            const basicLog = document.getElementById('basic-log');
+            const tableLog = document.getElementById('table-log');
+            const packetTableBody = document.getElementById('packet-table-body');
+            const advancedLog = document.getElementById('advanced-log');
+            const resetBtn = document.getElementById('reset-btn');
+            const tabs = document.querySelectorAll('.tab');
+            
+            let devices = [];
+            let connections = [];
+            let deviceCounter = 1;
+            let routerCounter = 1;
+            let isDragging = false;
+            let currentDevice = null;
+            let offset = { x: 0, y: 0 };
+            let isConnecting = false;
+            let startPort = null;
+            let tempLine = null;
+            let messageInTransit = false;
+            let activePackets = [];
+            let activeTooltips = [];
+            
+            // Set log container height to fill available space
+            function adjustLogHeight() {
+                const tabContainers = document.querySelectorAll('.tab-content');
+                const windowHeight = window.innerHeight;
+                const headerHeight = document.querySelector('header').offsetHeight;
+                const messageFormHeight = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-4.mb-4').offsetHeight;
+                const tabsHeight = document.querySelector('.flex.border-b.border-gray-200.mb-2').offsetHeight;
+                const titleHeight = document.querySelector('.text-md.font-semibold.mb-2.text-gray-700').offsetHeight;
+                
+                const availableHeight = windowHeight - headerHeight - messageFormHeight - tabsHeight - titleHeight - 80; // padding and margins
+                
+                tabContainers.forEach(container => {
+                    container.style.height = `${availableHeight}px`;
+                });
+            }
+            
+            // Call on load and resize
+            adjustLogHeight();
+            window.addEventListener('resize', adjustLogHeight);
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and contents
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-log`).classList.add('active');
+                });
+            });
+            
+            // Generate random IP address for router
+            function generateRouterIP() {
+                return `192.168.${Math.floor(Math.random() * 254) + 1}.1`;
+            }
+            
+            // Generate IP from router subnet
+            function generateIPFromRouter(routerIP) {
+                const parts = routerIP.split('.');
+                return `${parts[0]}.${parts[1]}.${parts[2]}.${Math.floor(Math.random() * 253) + 2}`;
+            }
+            
+            // Create a computer device
+            function createComputer(x, y) {
+                const id = `computer-${deviceCounter++}`;
+                
+                const computer = document.createElement('div');
+                computer.className = 'device absolute bg-blue-100 rounded-lg shadow-md p-2 flex flex-col items-center';
+                computer.id = id;
+                computer.style.left = `${x}px`;
+                computer.style.top = `${y}px`;
+                computer.style.width = '120px';
+                computer.style.zIndex = '10';
+                computer.dataset.type = 'computer';
+                computer.dataset.hasIp = 'false';
+                
+                computer.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <div class="text-xs font-semibold mt-1">PC ${deviceCounter-1}</div>
+                    <div class="text-xs no-ip">Sense connexió</div>
+                `;
+                
+                // Add ports (4 ports for computer like router)
+                const positions = [
+                    { x: '-6px', y: '50%', transform: 'translateY(-50%)' }, // Left
+                    { x: '50%', y: '-6px', transform: 'translateX(-50%)' }, // Top
+                    { x: '50%', y: 'calc(100% - 6px)', transform: 'translateX(-50%)' }, // Bottom
+                    { x: 'calc(100% - 6px)', y: '50%', transform: 'translateY(-50%)' }  // Right
+                ];
+                
+                const ports = [];
+                
+                positions.forEach((pos, index) => {
+                    const port = document.createElement('div');
+                    port.className = 'device-port';
+                    port.style.left = pos.x;
+                    port.style.top = pos.y;
+                    port.style.transform = pos.transform;
+                    port.dataset.portId = `${id}-port-${index + 1}`;
+                    port.dataset.deviceId = id;
+                    computer.appendChild(port);
+                    
+                    ports.push({
+                        id: `${id}-port-${index + 1}`,
+                        element: port,
+                        connected: false,
+                        connectedTo: null
+                    });
+                    
+                    setupPortEvents(port);
+                });
+                
+                workspace.appendChild(computer);
+                
+                devices.push({
+                    id,
+                    element: computer,
+                    type: 'computer',
+                    ip: null,
+                    name: `PC ${deviceCounter-1}`,
+                    ports
+                });
+                
+                updateDeviceSelects();
+                setupDeviceEvents(computer);
+                
+                return computer;
+            }
+            
+            // Create a router device
+            function createRouter(x, y) {
+                const id = `router-${routerCounter++}`;
+                const ip = generateRouterIP();
+                
+                const router = document.createElement('div');
+                router.className = 'device absolute bg-green-100 rounded-lg shadow-md p-2 flex flex-col items-center';
+                router.id = id;
+                router.style.left = `${x}px`;
+                router.style.top = `${y}px`;
+                router.style.width = '120px';
+                router.style.zIndex = '10';
+                router.dataset.type = 'router';
+                router.dataset.ip = ip;
+                
+                router.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                    </svg>
+                    <div class="text-xs font-semibold mt-1">Router ${routerCounter-1}</div>
+                    <div class="text-xs text-gray-600">${ip}</div>
+                `;
+                
+                // Add ports (4 ports for router)
+                const positions = [
+                    { x: '-6px', y: '50%', transform: 'translateY(-50%)' }, // Left
+                    { x: '50%', y: '-6px', transform: 'translateX(-50%)' }, // Top
+                    { x: '50%', y: 'calc(100% - 6px)', transform: 'translateX(-50%)' }, // Bottom
+                    { x: 'calc(100% - 6px)', y: '50%', transform: 'translateY(-50%)' }  // Right
+                ];
+                
+                const ports = [];
+                
+                positions.forEach((pos, index) => {
+                    const port = document.createElement('div');
+                    port.className = 'device-port';
+                    port.style.left = pos.x;
+                    port.style.top = pos.y;
+                    port.style.transform = pos.transform;
+                    port.dataset.portId = `${id}-port-${index + 1}`;
+                    port.dataset.deviceId = id;
+                    router.appendChild(port);
+                    
+                    ports.push({
+                        id: `${id}-port-${index + 1}`,
+                        element: port,
+                        connected: false,
+                        connectedTo: null
+                    });
+                    
+                    setupPortEvents(port);
+                });
+                
+                workspace.appendChild(router);
+                
+                devices.push({
+                    id,
+                    element: router,
+                    type: 'router',
+                    ip,
+                    name: `Router ${routerCounter-1}`,
+                    ports
+                });
+                
+                updateDeviceSelects();
+                setupDeviceEvents(router);
+                
+                return router;
+            }
+            
+            // Setup events for devices (drag & drop)
+            function setupDeviceEvents(device) {
+                device.addEventListener('mousedown', function(e) {
+                    if (isConnecting) return;
+                    
+                    isDragging = true;
+                    currentDevice = device;
+                    
+                    const rect = device.getBoundingClientRect();
+                    offset.x = e.clientX - rect.left;
+                    offset.y = e.clientY - rect.top;
+                    
+                    device.style.zIndex = '20';
+                });
+            }
+            
+            // Setup events for ports (connection)
+            function setupPortEvents(port) {
+                port.addEventListener('mousedown', function(e) {
+                    e.stopPropagation();
+                    
+                    if (isDragging || messageInTransit) return;
+                    
+                    // Check if port is already connected
+                    const portId = port.dataset.portId;
+                    const deviceId = port.dataset.deviceId;
+                    const device = devices.find(d => d.id === deviceId);
+                    const portObj = device.ports.find(p => p.id === portId);
+                    
+                    if (portObj.connected) {
+                        // Start disconnection
+                        isConnecting = true;
+                        startPort = port;
+                        
+                        // Find the connection
+                        const connection = connections.find(c => 
+                            c.port1 === portId || c.port2 === portId
+                        );
+                        
+                        if (connection) {
+                            // Create temp line for visual feedback
+                            const rect = port.getBoundingClientRect();
+                            const workspaceRect = workspace.getBoundingClientRect();
+                            
+                            const startX = rect.left + rect.width / 2 - workspaceRect.left;
+                            const startY = rect.top + rect.height / 2 - workspaceRect.top;
+                            
+                            tempLine = document.createElement('div');
+                            tempLine.className = 'cable';
+                            tempLine.style.left = `${startX}px`;
+                            tempLine.style.top = `${startY}px`;
+                            tempLine.style.width = '0px';
+                            tempLine.style.transform = 'rotate(0deg)';
+                            
+                            workspace.appendChild(tempLine);
+                            
+                            document.addEventListener('mousemove', handleMouseMoveDisconnection);
+                            document.addEventListener('mouseup', handleMouseUpDisconnection);
+                        }
+                    } else {
+                        // Start new connection
+                        isConnecting = true;
+                        startPort = port;
+                        
+                        const rect = port.getBoundingClientRect();
+                        const workspaceRect = workspace.getBoundingClientRect();
+                        
+                        const startX = rect.left + rect.width / 2 - workspaceRect.left;
+                        const startY = rect.top + rect.height / 2 - workspaceRect.top;
+                        
+                        tempLine = document.createElement('div');
+                        tempLine.className = 'cable';
+                        tempLine.style.left = `${startX}px`;
+                        tempLine.style.top = `${startY}px`;
+                        tempLine.style.width = '0px';
+                        tempLine.style.transform = 'rotate(0deg)';
+                        
+                        workspace.appendChild(tempLine);
+                        
+                        document.addEventListener('mousemove', handleMouseMoveConnection);
+                        document.addEventListener('mouseup', handleMouseUpConnection);
+                    }
+                });
+            }
+            
+            // Handle mouse move during connection
+            function handleMouseMoveConnection(e) {
+                if (!isConnecting || !startPort || !tempLine) return;
+                
+                const workspaceRect = workspace.getBoundingClientRect();
+                const startRect = startPort.getBoundingClientRect();
+                
+                const startX = startRect.left + startRect.width / 2 - workspaceRect.left;
+                const startY = startRect.top + startRect.height / 2 - workspaceRect.top;
+                
+                const endX = e.clientX - workspaceRect.left;
+                const endY = e.clientY - workspaceRect.top;
+                
+                const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+                
+                tempLine.style.width = `${length}px`;
+                tempLine.style.transform = `rotate(${angle}deg)`;
+            }
+            
+            // Handle mouse move during disconnection
+            function handleMouseMoveDisconnection(e) {
+                if (!isConnecting || !startPort || !tempLine) return;
+                
+                const workspaceRect = workspace.getBoundingClientRect();
+                const startRect = startPort.getBoundingClientRect();
+                
+                const startX = startRect.left + startRect.width / 2 - workspaceRect.left;
+                const startY = startRect.top + startRect.height / 2 - workspaceRect.top;
+                
+                const endX = e.clientX - workspaceRect.left;
+                const endY = e.clientY - workspaceRect.top;
+                
+                const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+                
+                tempLine.style.width = `${length}px`;
+                tempLine.style.transform = `rotate(${angle}deg)`;
+            }
+            
+            // Handle mouse up during connection
+            function handleMouseUpConnection(e) {
+                if (!isConnecting || !startPort || !tempLine) return;
+                
+                document.removeEventListener('mousemove', handleMouseMoveConnection);
+                document.removeEventListener('mouseup', handleMouseUpConnection);
+                
+                const workspaceRect = workspace.getBoundingClientRect();
+                const mouseX = e.clientX - workspaceRect.left;
+                const mouseY = e.clientY - workspaceRect.top;
+                
+                // Check if mouse is over a port
+                let endPort = null;
+                
+                devices.forEach(device => {
+                    device.ports.forEach(port => {
+                        const portRect = port.element.getBoundingClientRect();
+                        const portCenterX = portRect.left + portRect.width / 2 - workspaceRect.left;
+                        const portCenterY = portRect.top + portRect.height / 2 - workspaceRect.top;
+                        
+                        const distance = Math.sqrt(Math.pow(mouseX - portCenterX, 2) + Math.pow(mouseY - portCenterY, 2));
+                        
+                        if (distance < 15 && port.element !== startPort) {
+                            endPort = port.element;
+                        }
+                    });
+                });
+                
+                if (endPort) {
+                    createConnection(startPort, endPort);
+                } else {
+                    workspace.removeChild(tempLine);
+                }
+                
+                tempLine = null;
+                startPort = null;
+                isConnecting = false;
+            }
+            
+            // Handle mouse up during disconnection
+            function handleMouseUpDisconnection(e) {
+                if (!isConnecting || !startPort || !tempLine) return;
+                
+                document.removeEventListener('mousemove', handleMouseMoveDisconnection);
+                document.removeEventListener('mouseup', handleMouseUpDisconnection);
+                
+                const workspaceRect = workspace.getBoundingClientRect();
+                const mouseX = e.clientX - workspaceRect.left;
+                const mouseY = e.clientY - workspaceRect.top;
+                
+                // Check if mouse is far enough from the port to disconnect
+                const portRect = startPort.getBoundingClientRect();
+                const portCenterX = portRect.left + portRect.width / 2 - workspaceRect.left;
+                const portCenterY = portRect.top + portRect.height / 2 - workspaceRect.top;
+                
+                const distance = Math.sqrt(Math.pow(mouseX - portCenterX, 2) + Math.pow(mouseY - portCenterY, 2));
+                
+                if (distance > 30) {
+                    // Disconnect the port
+                    disconnectPort(startPort);
+                }
+                
+                workspace.removeChild(tempLine);
+                tempLine = null;
+                startPort = null;
+                isConnecting = false;
+            }
+            
+            // Disconnect a port
+            function disconnectPort(port) {
+                const portId = port.dataset.portId;
+                const deviceId = port.dataset.deviceId;
+                
+                // Find the connection
+                const connectionIndex = connections.findIndex(c => 
+                    c.port1 === portId || c.port2 === portId
+                );
+                
+                if (connectionIndex !== -1) {
+                    const connection = connections[connectionIndex];
+                    
+                    // Get the connected devices
+                    const device1 = devices.find(d => d.id === connection.device1);
+                    const device2 = devices.find(d => d.id === connection.device2);
+                    
+                    // Update port status
+                    const port1Obj = device1.ports.find(p => p.id === connection.port1);
+                    const port2Obj = device2.ports.find(p => p.id === connection.port2);
+                    
+                    port1Obj.connected = false;
+                    port1Obj.connectedTo = null;
+                    port2Obj.connected = false;
+                    port2Obj.connectedTo = null;
+                    
+                    // Remove the connection element
+                    if (connection.element.parentNode === workspace) {
+                        workspace.removeChild(connection.element);
+                    } else if (connection.element.parentNode) {
+                        connection.element.parentNode.removeChild(connection.element);
+                    }
+                    
+                    // Remove the connection from the array
+                    connections.splice(connectionIndex, 1);
+                    
+                    // If computer was connected to router, remove IP
+                    if (device1.type === 'computer' && device2.type === 'router') {
+                        removeIPFromComputer(device1);
+                    } else if (device1.type === 'router' && device2.type === 'computer') {
+                        removeIPFromComputer(device2);
+                    }
+                    
+                    // Show all ports for computer if it was a computer
+                    if (device1.type === 'computer') {
+                        showAllPorts(device1);
+                    }
+                    if (device2.type === 'computer') {
+                        showAllPorts(device2);
+                    }
+                    
+                    addLogEntry(`Connexió desconnectada entre ${device1.name} i ${device2.name}`, 'info');
+                    updateDeviceSelects();
+                }
+            }
+            
+            // Show all ports for a computer
+            function showAllPorts(device) {
+                if (device.type === 'computer') {
+                    // Check if any port is still connected
+                    const hasConnectedPort = device.ports.some(p => p.connected);
+                    
+                    if (!hasConnectedPort) {
+                        device.ports.forEach(port => {
+                            if (port.element) {
+                                port.element.style.display = 'block';
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Remove IP from computer
+            function removeIPFromComputer(computer) {
+                // Check if computer is still connected to any router
+                let stillConnectedToRouter = false;
+                
+                connections.forEach(connection => {
+                    if (connection.device1 === computer.id) {
+                        const otherDevice = devices.find(d => d.id === connection.device2);
+                        if (otherDevice && otherDevice.type === 'router') {
+                            stillConnectedToRouter = true;
+                        }
+                    } else if (connection.device2 === computer.id) {
+                        const otherDevice = devices.find(d => d.id === connection.device1);
+                        if (otherDevice && otherDevice.type === 'router') {
+                            stillConnectedToRouter = true;
+                        }
+                    }
+                });
+                
+                if (!stillConnectedToRouter) {
+                    computer.ip = null;
+                    computer.element.dataset.hasIp = 'false';
+                    delete computer.element.dataset.ip;
+                    
+                    // Update the IP display
+                    const ipDisplay = computer.element.querySelector('.text-gray-600, .no-ip');
+                    ipDisplay.textContent = 'Sense connexió';
+                    ipDisplay.classList.remove('text-gray-600');
+                    ipDisplay.classList.add('no-ip');
+                    
+                    addLogEntry(`${computer.name} ha perdut la seva adreça IP`, 'info');
+                }
+            }
+            
+            // Create a connection between two ports
+            function createConnection(port1, port2) {
+                workspace.removeChild(tempLine);
+                
+                // Get device information
+                const device1 = devices.find(d => d.id === port1.dataset.deviceId);
+                const device2 = devices.find(d => d.id === port2.dataset.deviceId);
+                
+                // Create cable with proper routing
+                const cable = createRoutedCable(port1, port2);
+                
+                // Update port status
+                const port1Obj = device1.ports.find(p => p.id === port1.dataset.portId);
+                const port2Obj = device2.ports.find(p => p.id === port2.dataset.portId);
+                
+                port1Obj.connected = true;
+                port1Obj.connectedTo = port2.dataset.deviceId;
+                port2Obj.connected = true;
+                port2Obj.connectedTo = port1.dataset.deviceId;
+                
+                connections.push({
+                    id: `connection-${connections.length + 1}`,
+                    element: cable,
+                    port1: port1.dataset.portId,
+                    port2: port2.dataset.portId,
+                    device1: port1.dataset.deviceId,
+                    device2: port2.dataset.deviceId
+                });
+                
+                // If computer connects to router, assign IP from router's subnet
+                if (device1.type === 'computer' && device2.type === 'router') {
+                    assignIPToComputer(device1, device2);
+                } else if (device1.type === 'router' && device2.type === 'computer') {
+                    assignIPToComputer(device2, device1);
+                }
+                
+                // Hide other ports if it's a computer
+                if (device1.type === 'computer') {
+                    hideOtherPorts(device1, port1Obj.id);
+                }
+                if (device2.type === 'computer') {
+                    hideOtherPorts(device2, port2Obj.id);
+                }
+                
+                updateDeviceSelects();
+            }
+            
+            // Hide other ports for a computer
+            function hideOtherPorts(device, connectedPortId) {
+                if (device.type === 'computer') {
+                    device.ports.forEach(port => {
+                        if (port.id !== connectedPortId && port.element) {
+                            port.element.style.display = 'none';
+                        }
+                    });
+                }
+            }
+            
+            // Assign IP to computer from router's subnet
+            function assignIPToComputer(computer, router) {
+                const ip = generateIPFromRouter(router.ip);
+                computer.ip = ip;
+                computer.element.dataset.hasIp = 'true';
+                computer.element.dataset.ip = ip;
+                
+                // Update the IP display
+                const ipDisplay = computer.element.querySelector('.no-ip');
+                ipDisplay.textContent = ip;
+                ipDisplay.classList.remove('no-ip');
+                ipDisplay.classList.add('text-gray-600');
+                
+                addLogEntry(`${computer.name} ha obtingut l'adreça IP ${ip} del ${router.name}`, 'info');
+            }
+            
+            // Create a cable with proper routing
+            function createRoutedCable(port1, port2) {
+                const port1Rect = port1.getBoundingClientRect();
+                const port2Rect = port2.getBoundingClientRect();
+                const workspaceRect = workspace.getBoundingClientRect();
+                
+                const x1 = port1Rect.left + port1Rect.width / 2 - workspaceRect.left;
+                const y1 = port1Rect.top + port1Rect.height / 2 - workspaceRect.top;
+                const x2 = port2Rect.left + port2Rect.width / 2 - workspaceRect.left;
+                const y2 = port2Rect.top + port2Rect.height / 2 - workspaceRect.top;
+                
+                // Create the cable container
+                const cableContainer = document.createElement('div');
+                cableContainer.className = 'absolute';
+                cableContainer.style.left = '0';
+                cableContainer.style.top = '0';
+                cableContainer.style.width = '100%';
+                cableContainer.style.height = '100%';
+                cableContainer.style.pointerEvents = 'none';
+                cableContainer.style.zIndex = '5'; // Lower than devices (back to original)
+                
+                // Create the cable segments
+                const cable = document.createElement('div');
+                cable.className = 'cable';
+                cable.style.left = `${x1}px`;
+                cable.style.top = `${y1}px`;
+                cable.style.width = `${Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))}px`;
+                cable.style.transform = `rotate(${Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI}deg)`;
+                cable.dataset.port1 = port1.dataset.portId;
+                cable.dataset.port2 = port2.dataset.portId;
+                cable.dataset.device1 = port1.dataset.deviceId;
+                cable.dataset.device2 = port2.dataset.deviceId;
+                
+                cableContainer.appendChild(cable);
+                workspace.appendChild(cableContainer);
+                
+                return cable;
+            }
+            
+            // Update device positions and connections
+            function updateConnections() {
+                connections.forEach(connection => {
+                    const port1 = document.querySelector(`[data-port-id="${connection.port1}"]`);
+                    const port2 = document.querySelector(`[data-port-id="${connection.port2}"]`);
+                    
+                    if (port1 && port2) {
+                        const port1Rect = port1.getBoundingClientRect();
+                        const port2Rect = port2.getBoundingClientRect();
+                        const workspaceRect = workspace.getBoundingClientRect();
+                        
+                        const x1 = port1Rect.left + port1Rect.width / 2 - workspaceRect.left;
+                        const y1 = port1Rect.top + port1Rect.height / 2 - workspaceRect.top;
+                        const x2 = port2Rect.left + port2Rect.width / 2 - workspaceRect.left;
+                        const y2 = port2Rect.top + port2Rect.height / 2 - workspaceRect.top;
+                        
+                        const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                        
+                        connection.element.style.left = `${x1}px`;
+                        connection.element.style.top = `${y1}px`;
+                        connection.element.style.width = `${length}px`;
+                        connection.element.style.transform = `rotate(${angle}deg)`;
+                    }
+                });
+            }
+            
+            // Update device select options
+            function updateDeviceSelects() {
+                sourceDeviceSelect.innerHTML = '<option value="">Selecciona un dispositiu</option>';
+                targetDeviceSelect.innerHTML = '<option value="">Selecciona un dispositiu</option>';
+                
+                devices.forEach(device => {
+                    // Only add devices with IP addresses to the selects
+                    if (device.ip) {
+                        const option1 = document.createElement('option');
+                        option1.value = device.id;
+                        option1.textContent = `${device.name} (${device.ip})`;
+                        
+                        const option2 = document.createElement('option');
+                        option2.value = device.id;
+                        option2.textContent = `${device.name} (${device.ip})`;
+                        
+                        sourceDeviceSelect.appendChild(option1);
+                        targetDeviceSelect.appendChild(option2);
+                    }
+                });
+            }
+            
+            // Find a path between two devices
+            function findPath(sourceId, targetId) {
+                const visited = new Set();
+                const queue = [{
+                    deviceId: sourceId,
+                    path: []
+                }];
+                
+                while (queue.length > 0) {
+                    const { deviceId, path } = queue.shift();
+                    
+                    if (deviceId === targetId) {
+                        return path;
+                    }
+                    
+                    if (visited.has(deviceId)) {
+                        continue;
+                    }
+                    
+                    visited.add(deviceId);
+                    
+                    // Find all connections for this device
+                    connections.forEach(connection => {
+                        if (connection.device1 === deviceId && !visited.has(connection.device2)) {
+                            queue.push({
+                                deviceId: connection.device2,
+                                path: [...path, {
+                                    connectionId: connection.id,
+                                    deviceId: connection.device2
+                                }]
+                            });
+                        } else if (connection.device2 === deviceId && !visited.has(connection.device1)) {
+                            queue.push({
+                                deviceId: connection.device1,
+                                path: [...path, {
+                                    connectionId: connection.id,
+                                    deviceId: connection.device1
+                                }]
+                            });
+                        }
+                    });
+                }
+                
+                return null; // No path found
+            }
+            
+            // Generate timestamp
+            function getTimestamp() {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
+                
+                return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+            }
+            
+            // Generate UDP header
+            function generateUDPHeader(sourceIP, targetIP, sourcePort, targetPort, message) {
+                const messageLength = message.length;
+                const checksum = Math.floor(Math.random() * 65535).toString(16).padStart(4, '0');
+                
+                return `
+IP Header:
+  Source IP: ${sourceIP}
+  Dest IP: ${targetIP}
+  Protocol: UDP
+  TTL: 64
+
+UDP Header:
+  Source Port: ${sourcePort}
+  Dest Port: ${targetPort}
+  Length: ${messageLength + 8} bytes
+  Checksum: 0x${checksum}
+
+Payload:
+  "${message}"
+`;
+            }
+            
+            // Add table entry
+            function addTableEntry(timestamp, sourceIP, targetIP, length, message) {
+                // Check if "No data available" row exists and remove it
+                const noDataRow = packetTableBody.querySelector('.text-center.text-gray-500.italic');
+                if (noDataRow && packetTableBody.contains(noDataRow)) {
+                    packetTableBody.removeChild(noDataRow);
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${timestamp}</td>
+                    <td>${sourceIP}</td>
+                    <td>${targetIP}</td>
+                    <td>${length} bytes</td>
+                    <td class="truncate max-w-[100px]" title="${message}">${message}</td>
+                `;
+                
+                // Insert at the top
+                if (packetTableBody.firstChild) {
+                    packetTableBody.insertBefore(row, packetTableBody.firstChild);
+                } else {
+                    packetTableBody.appendChild(row);
+                }
+            }
+            
+            // Clean up any existing packets and tooltips
+            function cleanupVisualElements() {
+                // Remove any existing packets
+                activePackets.forEach(packet => {
+                    if (packet && packet.parentNode) {
+                        packet.parentNode.removeChild(packet);
+                    }
+                });
+                activePackets = [];
+                
+                // Remove any existing tooltips
+                activeTooltips.forEach(tooltip => {
+                    if (tooltip && tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                });
+                activeTooltips = [];
+                
+                // Remove highlights from devices
+                devices.forEach(device => {
+                    device.element.classList.remove('highlight');
+                });
+                
+                // Remove active state from connections
+                connections.forEach(connection => {
+                    connection.element.classList.remove('active');
+                });
+            }
+            
+            // Send a message from source to target
+            function sendMessage(sourceId, targetId, message) {
+                if (messageInTransit) {
+                    addLogEntry('Espera a que finalitzi el missatge actual', 'warning');
+                    return;
+                }
+                
+                const path = findPath(sourceId, targetId);
+                
+                if (!path) {
+                    addLogEntry('No hi ha cap ruta disponible entre els dispositius seleccionats', 'error');
+                    return;
+                }
+                
+                // Clean up any existing visual elements first
+                cleanupVisualElements();
+                
+                messageInTransit = true;
+                
+                const sourceDevice = devices.find(d => d.id === sourceId);
+                const targetDevice = devices.find(d => d.id === targetId);
+                
+                // Generate random ports for UDP
+                const sourcePort = Math.floor(Math.random() * 16384) + 49152; // Ephemeral port range
+                const targetPort = 8080; // Common application port
+                const messageLength = message.length + 8; // UDP header (8 bytes) + message length
+                
+                // Add table entry
+                const timestamp = getTimestamp();
+                addTableEntry(timestamp, sourceDevice.ip, targetDevice.ip, messageLength, message);
+                
+                addLogEntry(`Enviant missatge des de ${sourceDevice.name} (${sourceDevice.ip}) a ${targetDevice.name} (${targetDevice.ip})`, 'info');
+                addLogEntry(`Contingut del missatge: "${message}"`, 'message');
+                
+                // Add advanced log entry with UDP headers
+                const udpHeader = generateUDPHeader(sourceDevice.ip, targetDevice.ip, sourcePort, targetPort, message);
+                addAdvancedLogEntry(`Iniciant transmissió UDP:
+${udpHeader}`);
+                
+                // Create message packet
+                const sourceRect = sourceDevice.element.getBoundingClientRect();
+                const workspaceRect = workspace.getBoundingClientRect();
+                
+                const packet = document.createElement('div');
+                packet.className = 'message-packet';
+                packet.textContent = 'UDP';
+                packet.style.left = `${sourceRect.left + sourceRect.width / 2 - workspaceRect.left - 10}px`;
+                packet.style.top = `${sourceRect.top + sourceRect.height / 2 - workspaceRect.top - 10}px`;
+                
+                workspace.appendChild(packet);
+                activePackets.push(packet);
+                
+                // Highlight source device
+                sourceDevice.element.classList.add('highlight');
+                
+                // Show tooltip with source IP
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = `IP Origen: ${sourceDevice.ip}`;
+                tooltip.style.left = `${sourceRect.left - workspaceRect.left}px`;
+                tooltip.style.top = `${sourceRect.top - workspaceRect.top - 30}px`;
+                workspace.appendChild(tooltip);
+                activeTooltips.push(tooltip);
+                
+                addLogEntry(`Paquet UDP sortint de ${sourceDevice.name} amb IP origen: ${sourceDevice.ip}`, 'step');
+                
+                // Animate through the path
+                let currentStep = 0;
+                
+                function animateNextStep() {
+                    if (currentStep >= path.length) {
+                        // Reached the target
+                        const targetRect = targetDevice.element.getBoundingClientRect();
+                        
+                        packet.style.left = `${targetRect.left + targetRect.width / 2 - workspaceRect.left - 10}px`;
+                        packet.style.top = `${targetRect.top + targetRect.height / 2 - workspaceRect.top - 10}px`;
+                        
+                        // Remove highlight from previous device
+                        if (currentStep > 0) {
+                            const prevDeviceId = path[currentStep - 1].deviceId;
+                            const prevDevice = devices.find(d => d.id === prevDeviceId);
+                            prevDevice.element.classList.remove('highlight');
+                            
+                            // Remove active from previous connection
+                            const prevConnectionId = path[currentStep - 1].connectionId;
+                            const prevConnection = connections.find(c => c.id === prevConnectionId);
+                            prevConnection.element.classList.remove('active');
+                        } else {
+                            sourceDevice.element.classList.remove('highlight');
+                        }
+                        
+                        // Highlight target device
+                        targetDevice.element.classList.add('highlight');
+                        
+                        // Update tooltip
+                        tooltip.textContent = `IP Destí: ${targetDevice.ip}`;
+                        tooltip.style.left = `${targetRect.left - workspaceRect.left}px`;
+                        tooltip.style.top = `${targetRect.top - workspaceRect.top - 30}px`;
+                        
+                        addLogEntry(`Paquet UDP arribant a ${targetDevice.name} amb IP destí: ${targetDevice.ip}`, 'success');
+                        addLogEntry(`Missatge rebut: "${message}"`, 'message');
+                        
+                        // Add final advanced log entry
+                        addAdvancedLogEntry(`Paquet rebut a destinació ${targetDevice.ip}:${targetPort}
+Missatge desencapsulat: "${message}"`);
+                        
+                        // Clean up after delay
+                        setTimeout(() => {
+                            cleanupVisualElements();
+                            messageInTransit = false;
+                        }, 2000);
+                        
+                        return;
+                    }
+                    
+                    const step = path[currentStep];
+                    const connectionId = step.connectionId;
+                    const nextDeviceId = step.deviceId;
+                    
+                    // Find the connection
+                    const connection = connections.find(c => c.id === connectionId);
+                    
+                    // Find the next device
+                    const nextDevice = devices.find(d => d.id === nextDeviceId);
+                    
+                    // Remove highlight from previous device
+                    if (currentStep > 0) {
+                        const prevDeviceId = path[currentStep - 1].deviceId;
+                        const prevDevice = devices.find(d => d.id === prevDeviceId);
+                        prevDevice.element.classList.remove('highlight');
+                        
+                        // Remove active from previous connection
+                        const prevConnectionId = path[currentStep - 1].connectionId;
+                        const prevConnection = connections.find(c => c.id === prevConnectionId);
+                        prevConnection.element.classList.remove('active');
+                    } else {
+                        sourceDevice.element.classList.remove('highlight');
+                    }
+                    
+                    // Highlight current connection
+                    connection.element.classList.add('active');
+                    
+                    // Calculate midpoint of connection for packet animation
+                    const port1 = document.querySelector(`[data-port-id="${connection.port1}"]`);
+                    const port2 = document.querySelector(`[data-port-id="${connection.port2}"]`);
+                    
+                    const port1Rect = port1.getBoundingClientRect();
+                    const port2Rect = port2.getBoundingClientRect();
+                    
+                    const midX = (port1Rect.left + port2Rect.left) / 2 + port1Rect.width / 2 - workspaceRect.left - 10;
+                    const midY = (port1Rect.top + port2Rect.top) / 2 + port1Rect.height / 2 - workspaceRect.top - 10;
+                    
+                    // Move packet to midpoint
+                    packet.style.left = `${midX}px`;
+                    packet.style.top = `${midY}px`;
+                    
+                    // Update tooltip position to midpoint
+                    tooltip.style.left = `${midX}px`;
+                    tooltip.style.top = `${midY - 30}px`;
+                    
+                    addLogEntry(`Paquet UDP passant per la connexió cap a ${nextDevice.name}`, 'step');
+                    
+                    // After delay, move to next device
+                    setTimeout(() => {
+                        const nextDeviceRect = nextDevice.element.getBoundingClientRect();
+                        
+                        packet.style.left = `${nextDeviceRect.left + nextDeviceRect.width / 2 - workspaceRect.left - 10}px`;
+                        packet.style.top = `${nextDeviceRect.top + nextDeviceRect.height / 2 - workspaceRect.top - 10}px`;
+                        
+                        // Highlight next device
+                        nextDevice.element.classList.add('highlight');
+                        
+                        // Update tooltip
+                        tooltip.textContent = `IP Actual: ${nextDevice.ip}`;
+                        tooltip.style.left = `${nextDeviceRect.left - workspaceRect.left}px`;
+                        tooltip.style.top = `${nextDeviceRect.top - workspaceRect.top - 30}px`;
+                        
+                        if (nextDevice.type === 'router') {
+                            addLogEntry(`Paquet UDP arribant al ${nextDevice.name} (${nextDevice.ip}) - Redirigint...`, 'routing');
+                            
+                            // Add advanced log for router
+                            addAdvancedLogEntry(`Router ${nextDevice.ip} processant paquet:
+  Comprovant taula d'enrutament...
+  Modificant TTL: 63
+  Reenviament a següent salt`);
+                        } else {
+                            addLogEntry(`Paquet UDP passant per ${nextDevice.name} (${nextDevice.ip})`, 'step');
+                        }
+                        
+                        // Move to next step after delay
+                        setTimeout(() => {
+                            currentStep++;
+                            animateNextStep();
+                        }, 1500);
+                    }, 1000);
+                }
+                
+                // Start animation
+                setTimeout(animateNextStep, 1000);
+            }
+            
+            // Add log entry to basic log
+            function addLogEntry(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry new p-2 border-b border-gray-100 text-sm';
+                
+                let icon = '';
+                let textColor = 'text-gray-700';
+                
+                switch (type) {
+                    case 'info':
+                        icon = '<span class="text-blue-500">ℹ️</span> ';
+                        break;
+                    case 'success':
+                        icon = '<span class="text-green-500">✅</span> ';
+                        textColor = 'text-green-700';
+                        break;
+                    case 'error':
+                        icon = '<span class="text-red-500">❌</span> ';
+                        textColor = 'text-red-700';
+                        break;
+                    case 'warning':
+                        icon = '<span class="text-yellow-500">⚠️</span> ';
+                        textColor = 'text-yellow-700';
+                        break;
+                    case 'step':
+                        icon = '<span class="text-purple-500">➡️</span> ';
+                        textColor = 'text-purple-700';
+                        break;
+                    case 'routing':
+                        icon = '<span class="text-green-500">🔄</span> ';
+                        textColor = 'text-green-700';
+                        break;
+                    case 'message':
+                        icon = '<span class="text-blue-500">💬</span> ';
+                        textColor = 'text-blue-700';
+                        break;
+                }
+                
+                const timestamp = getTimestamp();
+                
+                entry.innerHTML = `
+                    <div class="${textColor}">
+                        <span class="timestamp">[${timestamp}]</span>
+                        ${icon}${message}
+                    </div>
+                `;
+                
+                if (basicLog.firstChild && basicLog.firstChild.className !== 'text-gray-500 italic text-center') {
+                    basicLog.insertBefore(entry, basicLog.firstChild);
+                } else {
+                    basicLog.innerHTML = '';
+                    basicLog.appendChild(entry);
+                }
+                
+                setTimeout(() => {
+                    entry.classList.remove('new');
+                }, 1000);
+            }
+            
+            // Add log entry to advanced log
+            function addAdvancedLogEntry(message) {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry new p-2 border-b border-gray-100 text-xs';
+                
+                const timestamp = getTimestamp();
+                
+                entry.innerHTML = `
+                    <div class="text-gray-800">
+                        <span class="timestamp">[${timestamp}]</span>
+                        <pre class="whitespace-pre-wrap">${message}</pre>
+                    </div>
+                `;
+                
+                if (advancedLog.firstChild && advancedLog.firstChild.className !== 'text-gray-500 italic text-center') {
+                    advancedLog.insertBefore(entry, advancedLog.firstChild);
+                } else {
+                    advancedLog.innerHTML = '';
+                    advancedLog.appendChild(entry);
+                }
+                
+                setTimeout(() => {
+                    entry.classList.remove('new');
+                }, 1000);
+            }
+            
+            // Event listeners
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging || !currentDevice) return;
+                
+                const workspaceRect = workspace.getBoundingClientRect();
+                const x = e.clientX - workspaceRect.left - offset.x;
+                const y = e.clientY - workspaceRect.top - offset.y;
+                
+                // Keep device within workspace bounds
+                const deviceWidth = currentDevice.offsetWidth;
+                const deviceHeight = currentDevice.offsetHeight;
+                const workspaceWidth = workspace.offsetWidth;
+                const workspaceHeight = workspace.offsetHeight;
+                
+                const boundedX = Math.max(0, Math.min(x, workspaceWidth - deviceWidth));
+                const boundedY = Math.max(0, Math.min(y, workspaceHeight - deviceHeight));
+                
+                currentDevice.style.left = `${boundedX}px`;
+                currentDevice.style.top = `${boundedY}px`;
+                
+                updateConnections();
+            });
+            
+            document.addEventListener('mouseup', function() {
+                if (isDragging && currentDevice) {
+                    currentDevice.style.zIndex = '10';
+                    currentDevice = null;
+                    isDragging = false;
+                }
+            });
+            
+            addComputer.addEventListener('click', function() {
+                createComputer(50, 50);
+            });
+            
+            addRouter.addEventListener('click', function() {
+                createRouter(50, 150);
+            });
+            
+            sendMessageBtn.addEventListener('click', function() {
+                const sourceId = sourceDeviceSelect.value;
+                const targetId = targetDeviceSelect.value;
+                const message = messageContent.value.trim();
+                
+                if (!sourceId) {
+                    addLogEntry('Selecciona un dispositiu d\'origen', 'warning');
+                    return;
+                }
+                
+                if (!targetId) {
+                    addLogEntry('Selecciona un dispositiu de destinació', 'warning');
+                    return;
+                }
+                
+                if (sourceId === targetId) {
+                    addLogEntry('L\'origen i la destinació no poden ser el mateix dispositiu', 'warning');
+                    return;
+                }
+                
+                if (!message) {
+                    addLogEntry('Escriu un missatge per enviar', 'warning');
+                    return;
+                }
+                
+                sendMessage(sourceId, targetId, message);
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                if (messageInTransit) {
+                    addLogEntry('No es pot reiniciar mentre hi ha un missatge en trànsit', 'warning');
+                    return;
+                }
+                
+                // Clean up any existing visual elements
+                cleanupVisualElements();
+                
+                // Remove all devices and connections
+                devices.forEach(device => {
+                    if (device.element.parentNode === workspace) {
+                        workspace.removeChild(device.element);
+                    }
+                });
+                
+                connections.forEach(connection => {
+                    if (connection.element.parentNode === workspace) {
+                        workspace.removeChild(connection.element);
+                    } else if (connection.element.parentNode) {
+                        connection.element.parentNode.removeChild(connection.element);
+                    }
+                });
+                
+                // Clear arrays
+                devices = [];
+                connections = [];
+                deviceCounter = 1;
+                routerCounter = 1;
+                
+                // Clear selects
+                sourceDeviceSelect.innerHTML = '<option value="">Selecciona un dispositiu</option>';
+                targetDeviceSelect.innerHTML = '<option value="">Selecciona un dispositiu</option>';
+                
+                // Clear message input
+                messageContent.value = '';
+                
+                // Clear logs
+                basicLog.innerHTML = '<div class="text-gray-500 italic text-center">El registre de transmissió apareixerà aquí</div>';
+                advancedLog.innerHTML = '<div class="text-gray-500 italic text-center">El registre avançat amb capçaleres UDP apareixerà aquí</div>';
+                packetTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 italic">No hi ha dades disponibles</td></tr>';
+                
+                addLogEntry('Simulació reiniciada', 'info');
+            });
+            
+            // Create initial devices
+            createComputer(100, 100);
+            createRouter(300, 200);
+            createComputer(500, 100);
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94353670e598589a',t:'MTc0Nzg0MjQ1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+</body></html>
