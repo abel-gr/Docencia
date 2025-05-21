@@ -1122,7 +1122,7 @@ Payload:
                 
                 // Add table entry
                 const timestamp = getTimestamp();
-                addTableEntry(timestamp, sourceDevice.ip, targetDevice.ip, messageLength, message);
+                //addTableEntry(timestamp, sourceDevice.ip, targetDevice.ip, messageLength, message);
                 
                 addLogEntry(`Enviant missatge des de ${sourceDevice.name} (${sourceDevice.ip}) a ${targetDevice.name} (${targetDevice.ip})`, 'info');
                 addLogEntry(`Contingut del missatge: "${message}"`, 'message');
@@ -1191,6 +1191,8 @@ ${udpHeader}`);
                         tooltip.textContent = `IP Destí: ${targetDevice.ip}`;
                         tooltip.style.left = `${targetRect.left - workspaceRect.left}px`;
                         tooltip.style.top = `${targetRect.top - workspaceRect.top - 30}px`;
+
+                        addTableEntry(timestamp, sourceDevice.ip, targetDevice.ip, messageLength, message);
                         
                         addLogEntry(`Paquet UDP arribant a ${targetDevice.name} amb IP destí: ${targetDevice.ip}`, 'success');
                         addLogEntry(`Missatge rebut: "${message}"`, 'message');
