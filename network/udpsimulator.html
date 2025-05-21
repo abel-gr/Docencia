@@ -209,26 +209,7 @@
             <div class="flex-1 flex flex-col">
                 <div id="workspace" class="workspace flex-1 min-h-[500px] border-2 border-gray-300 relative">
                     <!-- Devices will be added here dynamically -->
-                <div class="device absolute bg-blue-100 rounded-lg shadow-md p-2 flex flex-col items-center" id="computer-1" data-type="computer" data-has-ip="false" style="left: 100px; top: 100px; width: 120px; z-index: 10;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    <div class="text-xs font-semibold mt-1">PC 1</div>
-                    <div class="text-xs no-ip">Sense connexió</div>
-                <div class="device-port" data-port-id="computer-1-port-1" data-device-id="computer-1" style="left: -6px; top: 50%; transform: translateY(-50%);"></div><div class="device-port" data-port-id="computer-1-port-2" data-device-id="computer-1" style="left: 50%; top: -6px; transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-1-port-3" data-device-id="computer-1" style="left: 50%; top: calc(100% - 6px); transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-1-port-4" data-device-id="computer-1" style="left: calc(100% - 6px); top: 50%; transform: translateY(-50%);"></div></div><div class="device absolute bg-green-100 rounded-lg shadow-md p-2 flex flex-col items-center" id="router-1" data-type="router" data-ip="192.168.143.1" style="left: 300px; top: 200px; width: 120px; z-index: 10;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
-                    </svg>
-                    <div class="text-xs font-semibold mt-1">Router 1</div>
-                    <div class="text-xs text-gray-600">192.168.143.1</div>
-                <div class="device-port" data-port-id="router-1-port-1" data-device-id="router-1" style="left: -6px; top: 50%; transform: translateY(-50%);"></div><div class="device-port" data-port-id="router-1-port-2" data-device-id="router-1" style="left: 50%; top: -6px; transform: translateX(-50%);"></div><div class="device-port" data-port-id="router-1-port-3" data-device-id="router-1" style="left: 50%; top: calc(100% - 6px); transform: translateX(-50%);"></div><div class="device-port" data-port-id="router-1-port-4" data-device-id="router-1" style="left: calc(100% - 6px); top: 50%; transform: translateY(-50%);"></div></div><div class="device absolute bg-blue-100 rounded-lg shadow-md p-2 flex flex-col items-center" id="computer-2" data-type="computer" data-has-ip="false" style="left: 500px; top: 100px; width: 120px; z-index: 10;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    <div class="text-xs font-semibold mt-1">PC 2</div>
-                    <div class="text-xs no-ip">Sense connexió</div>
-                <div class="device-port" data-port-id="computer-2-port-1" data-device-id="computer-2" style="left: -6px; top: 50%; transform: translateY(-50%);"></div><div class="device-port" data-port-id="computer-2-port-2" data-device-id="computer-2" style="left: 50%; top: -6px; transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-2-port-3" data-device-id="computer-2" style="left: 50%; top: calc(100% - 6px); transform: translateX(-50%);"></div><div class="device-port" data-port-id="computer-2-port-4" data-device-id="computer-2" style="left: calc(100% - 6px); top: 50%; transform: translateY(-50%);"></div></div></div>
-            </div>
+                </div>
             
             <!-- Message Panel -->
             <div class="w-full md:w-96 bg-gray-100 p-4 shadow-md flex flex-col">
@@ -288,7 +269,7 @@
                                 </thead>
                                 <tbody id="packet-table-body">
                                     <tr>
-                                        <td colspan="5" class="text-center text-gray-500 italic">No hi ha dades disponibles</td>
+                                        <td colspan="5" class="text-center text-gray-500 italic" id="no-dades-disponibles">No hi ha dades disponibles</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -311,6 +292,7 @@
             const basicLog = document.getElementById('basic-log');
             const tableLog = document.getElementById('table-log');
             const packetTableBody = document.getElementById('packet-table-body');
+            const noDadesDisponibles = document.getElementById('no-dades-disponibles');
             const advancedLog = document.getElementById('advanced-log');
             const resetBtn = document.getElementById('reset-btn');
             const tabs = document.querySelectorAll('.tab');
@@ -1056,10 +1038,13 @@ Payload:
             // Add table entry
             function addTableEntry(timestamp, sourceIP, targetIP, length, message) {
                 // Check if "No data available" row exists and remove it
-                const noDataRow = packetTableBody.querySelector('.text-center.text-gray-500.italic');
-                /*if (noDataRow && packetTableBody.contains(noDataRow)) {
+                /*const noDataRow = packetTableBody.querySelector('.text-center.text-gray-500.italic');
+                if (noDataRow && packetTableBody.contains(noDataRow)) {
                     packetTableBody.removeChild(noDataRow);
                 }*/
+                if (noDadesDisponibles){
+                    noDadesDisponibles.remove();
+                }
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
