@@ -1191,8 +1191,6 @@ ${udpHeader}`);
                         tooltip.textContent = `IP Destí: ${targetDevice.ip}`;
                         tooltip.style.left = `${targetRect.left - workspaceRect.left}px`;
                         tooltip.style.top = `${targetRect.top - workspaceRect.top - 30}px`;
-
-                        addTableEntry(timestamp, sourceDevice.ip, targetDevice.ip, messageLength, message);
                         
                         addLogEntry(`Paquet UDP arribant a ${targetDevice.name} amb IP destí: ${targetDevice.ip}`, 'success');
                         addLogEntry(`Missatge rebut: "${message}"`, 'message');
@@ -1256,6 +1254,8 @@ Missatge desencapsulat: "${message}"`);
                     tooltip.style.top = `${midY - 30}px`;
                     
                     addLogEntry(`Paquet UDP passant per la connexió cap a ${nextDevice.name}`, 'step');
+
+                    addTableEntry(timestamp, sourceDevice.ip, nextDevice.ip, messageLength, message);
                     
                     // After delay, move to next device
                     setTimeout(() => {
