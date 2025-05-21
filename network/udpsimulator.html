@@ -1231,6 +1231,8 @@ Missatge desencapsulat: "${message}"`);
                         const prevConnection = connections.find(c => c.id === prevConnectionId);
                         prevConnection.element.classList.remove('active');
                     } else {
+                        addTableEntry(timestamp, sourceDevice.ip, nextDevice.ip, messageLength, message);
+                        
                         sourceDevice.element.classList.remove('highlight');
                     }
                     
