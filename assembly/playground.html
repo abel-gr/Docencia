@@ -620,6 +620,7 @@ SUB R4, R2, R1"></textarea>
                         const address = parseInt(parts[1]) - 1; // -1 because line numbers start at 1
                         if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                             currentLine = address;
+                            addLogEntry(`Jumped to the address:  ${adress}`, logId);
                         } else {
                             addLogEntry(`Error: JMP instruction must have a valid address as a parameter:  ${line}`, logId);
                         }
@@ -634,6 +635,7 @@ SUB R4, R2, R1"></textarea>
                         if (registersObj['CMP'] === 0){
                             if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
+                                addLogEntry(`Jumped to the address:  ${adress}`, logId);
                             } else {
                                 addLogEntry(`Error: JE instruction must have a valid address as a parameter:  ${line}`, logId);
                             }
@@ -649,6 +651,7 @@ SUB R4, R2, R1"></textarea>
                         if (registersObj['CMP'] !== 0){
                             if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
+                                addLogEntry(`Jumped to the address:  ${adress}`, logId);
                             } else {
                                 addLogEntry(`Error: JNE instruction must have a valid address as a parameter:  ${line}`, logId);
                             }
@@ -665,6 +668,7 @@ SUB R4, R2, R1"></textarea>
                         if(registersObj['ZF'] !== undefined && registersObj['ZF'] === 0){
                             if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
+                                addLogEntry(`Jumped to the address:  ${adress}`, logId);
                             } else {
                                 addLogEntry(`Error: JZ instruction must have a valid address as a parameter:  ${line}`, logId);
                             }
@@ -680,6 +684,7 @@ SUB R4, R2, R1"></textarea>
                         if(registersObj['CMP'] <= 0){
                             if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
+                                addLogEntry(`Jumped to the address:  ${adress}`, logId);
                             } else {
                                 addLogEntry(`Error: JLE instruction must have a valid address as a parameter:  ${line}`, logId);
                             }
@@ -695,6 +700,7 @@ SUB R4, R2, R1"></textarea>
                         if(registersObj['CMP'] >= 0){
                             if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
+                                addLogEntry(`Jumped to the address:  ${adress}`, logId);
                             } else {
                                 addLogEntry(`Error: JGE instruction must have a valid address as a parameter:  ${line}`, logId);
                             }
@@ -710,6 +716,7 @@ SUB R4, R2, R1"></textarea>
                         if(registersObj['CMP'] > 0){
                             if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
+                                addLogEntry(`Jumped to the address:  ${adress}`, logId);
                             } else {
                                 addLogEntry(`Error: JG instruction must have a valid address as a parameter:  ${line}`, logId);
                             }
@@ -725,6 +732,7 @@ SUB R4, R2, R1"></textarea>
                         if(registersObj['CMP'] < 0){
                             if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
+                                addLogEntry(`Jumped to the address:  ${adress}`, logId);
                             } else {
                                 addLogEntry(`Error: JL instruction must have a valid address as a parameter:  ${line}`, logId);
                             }
