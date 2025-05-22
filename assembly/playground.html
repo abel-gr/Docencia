@@ -766,6 +766,8 @@ SUB R4, R2, R1"></textarea>
                 if (!executeLine(lines[currentLine], registersObj, logId)) {
                     success = false;
                     currentLine = lines.length;
+                }else{
+                    currentLine++;
                 }
             }
             
