@@ -606,9 +606,128 @@ SUB R4, R2, R1"></textarea>
                         return false;
                     }
                     break;
+
+                // Jump instructions
+                case 'JMP':                    
+                    if (parts.length === 2) {
+                        const address = parseInt(parts[1]) - 1; // -1 because line numbers start at 1
+                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JMP instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JMP instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
+                    break;
                     
-                case 'JMP':
-                    addLogEntry(`Jump instructions not implemented yet: ${line}`, logId);
+                case 'JE':
+                    if (parts.length === 2 && this.compareFlag === 0) {
+                        const address = parseInt(parts[1]) - 1;
+                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JE instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JE instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
+                    break;
+                    
+                case 'JNE':
+                    if (parts.length === 2 && this.compareFlag !== 0) {
+                        const address = parseInt(parts[1]) - 1;
+                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JNE instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JNE instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
+                    break;
+                    
+                case 'JZ':
+                    if (parts.length === 3) {
+                        const reg = parts[1].replace(',', '');
+                        const address = parseInt(parts[2]) - 1;
+                        
+                        if (this.registers[reg] !== undefined && this.registers[reg] === 0 && !isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JZ instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JZ instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
+                    break;
+                    
+                case 'JLE':
+                    if (parts.length === 2 && this.compareFlag <= 0) {
+                        const address = parseInt(parts[1]) - 1;
+                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JLE instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JLE instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
+                    break;
+                    
+                case 'JGE':
+                    if (parts.length === 2 && this.compareFlag >= 0) {
+                        const address = parseInt(parts[1]) - 1;
+                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JGE instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JGE instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
+                    break;
+                    
+                case 'JG':
+                    if (parts.length === 2 && this.compareFlag > 0) {
+                        const address = parseInt(parts[1]) - 1;
+                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JG instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JG instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
+                    break;
+                    
+                case 'JL':
+                    if (parts.length === 2 && this.compareFlag < 0) {
+                        const address = parseInt(parts[1]) - 1;
+                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            this.currentLine = address;
+                        } else {
+                            addLogEntry(`Error: JL instruction must have a valid address as a parameter:  ${line}`, logId);
+                            this.currentLine++;
+                        }
+                    } else {
+                        addLogEntry(`Error: JL instruction must have only one parameter:  ${line}`, logId);
+                        this.currentLine++;
+                    }
                     break;
                     
                 default:
