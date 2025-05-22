@@ -776,7 +776,7 @@ SUB R4, R2, R1"></textarea>
             while (currentLine < code_length) {
                 if (!executeLine(lines[currentLine], registersObj, logId)) {
                     success = false;
-                    currentLine = ;
+                    currentLine = code_length;
                 }else{
                     currentLine++;
                 }
