@@ -755,10 +755,16 @@ SUB R4, R2, R1"></textarea>
             
             // Execute each line
             let success = true;
-            for (const line of lines) {
+            /*for (const line of lines) {
                 if (!executeLine(line, registersObj, logId)) {
                     success = false;
                     break;
+                }
+            }*/
+            while (currentLine < lines.length) {
+                if (!executeLine(lines[currentLine], registersObj, logId)) {
+                    success = false;
+                    currentLine = lines.length;
                 }
             }
             
