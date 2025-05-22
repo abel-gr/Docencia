@@ -472,7 +472,9 @@ SUB R4, R2, R1"></textarea>
         
         // Add log entry
         function addLogEntry(message, logId) {
-            message = 'Line '.concat(currentLine + 1).concat(": ").concat(message);
+            if (currentLine < code_length){
+                message = 'Line '.concat(currentLine + 1).concat(": ").concat(message);
+            }
             
             const log = document.getElementById(logId);
             const entry = document.createElement('div');
