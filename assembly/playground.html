@@ -808,14 +808,14 @@ SUB R4, R2, R1"></textarea>
                 return false;
             }
             
-            // Execute current line
-            const success = executeLine(codeLines[currentLine], registersObj, logId);
-            
             // Update register display
             updateRegisterDisplay(registersObj, tableId);
             
             // Update code highlighting
             updateCodeHighlighting(code, currentLine);
+
+            // Execute current line
+            const success = executeLine(codeLines[currentLine], registersObj, logId);
             
             return success;
         }
