@@ -618,7 +618,7 @@ SUB R4, R2, R1"></textarea>
                 case 'JMP':                    
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1; // -1 because line numbers start at 1
-                        if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                        if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                             currentLine = address;
                         } else {
                             addLogEntry(`Error: JMP instruction must have a valid address as a parameter:  ${line}`, logId);
@@ -632,7 +632,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if (registersObj['CMP'] === 0){
-                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
                             } else {
                                 addLogEntry(`Error: JE instruction must have a valid address as a parameter:  ${line}`, logId);
@@ -647,7 +647,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if (registersObj['CMP'] !== 0){
-                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
                             } else {
                                 addLogEntry(`Error: JNE instruction must have a valid address as a parameter:  ${line}`, logId);
@@ -663,7 +663,7 @@ SUB R4, R2, R1"></textarea>
                         const reg = parts[1].replace(',', '');
                         const address = parseInt(parts[2]) - 1;
                         if(registersObj['ZF'] !== undefined && registersObj['ZF'] === 0){
-                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
                             } else {
                                 addLogEntry(`Error: JZ instruction must have a valid address as a parameter:  ${line}`, logId);
@@ -678,7 +678,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] <= 0){
-                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
                             } else {
                                 addLogEntry(`Error: JLE instruction must have a valid address as a parameter:  ${line}`, logId);
@@ -693,7 +693,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] >= 0){
-                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
                             } else {
                                 addLogEntry(`Error: JGE instruction must have a valid address as a parameter:  ${line}`, logId);
@@ -708,7 +708,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] > 0){
-                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
                             } else {
                                 addLogEntry(`Error: JG instruction must have a valid address as a parameter:  ${line}`, logId);
@@ -723,7 +723,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] < 0){
-                            if (!isNaN(address) && address >= 0 && address < this.code.length) {
+                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
                                 currentLine = address;
                             } else {
                                 addLogEntry(`Error: JL instruction must have a valid address as a parameter:  ${line}`, logId);
