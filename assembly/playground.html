@@ -677,7 +677,7 @@ SUB R4, R2, R1"></textarea>
                 case 'JLE':
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
-                        if(this.compareFlag <= 0){
+                        if(registersObj['CMP'] <= 0){
                             if (!isNaN(address) && address >= 0 && address < this.code.length) {
                                 currentLine = address;
                             } else {
@@ -692,7 +692,7 @@ SUB R4, R2, R1"></textarea>
                 case 'JGE':
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
-                        if(this.compareFlag >= 0){
+                        if(registersObj['CMP'] >= 0){
                             if (!isNaN(address) && address >= 0 && address < this.code.length) {
                                 currentLine = address;
                             } else {
@@ -707,7 +707,7 @@ SUB R4, R2, R1"></textarea>
                 case 'JG':
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
-                        if(this.compareFlag > 0){
+                        if(registersObj['CMP'] > 0){
                             if (!isNaN(address) && address >= 0 && address < this.code.length) {
                                 currentLine = address;
                             } else {
@@ -722,7 +722,7 @@ SUB R4, R2, R1"></textarea>
                 case 'JL':
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
-                        if(this.compareFlag < 0){
+                        if(registersObj['CMP'] < 0){
                             if (!isNaN(address) && address >= 0 && address < this.code.length) {
                                 currentLine = address;
                             } else {
