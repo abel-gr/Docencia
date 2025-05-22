@@ -422,6 +422,7 @@ SUB R4, R2, R1"></textarea>
         let challengeRegisters = {};
         let currentLine = -1;
         let codeLines = [];
+        let code_length = 0;
         let challengeCodeLines = [];
         let userPoints = 0;
         let userLevel = 1;
@@ -618,7 +619,7 @@ SUB R4, R2, R1"></textarea>
                 case 'JMP':                    
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1; // -1 because line numbers start at 1
-                        if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                        if (!isNaN(address) && address >= 0 && address < code_length) {
                             currentLine = address;
                             addLogEntry(`Jumped to the address:  ${address}`, logId);
                         } else {
@@ -633,7 +634,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if (registersObj['CMP'] === 0){
-                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                            if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
                                 addLogEntry(`Jumped to the address:  ${address}`, logId);
                             } else {
@@ -649,7 +650,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if (registersObj['CMP'] !== 0){
-                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                            if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
                                 addLogEntry(`Jumped to the address:  ${address}`, logId);
                             } else {
@@ -666,7 +667,7 @@ SUB R4, R2, R1"></textarea>
                         const reg = parts[1].replace(',', '');
                         const address = parseInt(parts[2]) - 1;
                         if(registersObj['ZF'] !== undefined && registersObj['ZF'] === 0){
-                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                            if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
                                 addLogEntry(`Jumped to the address:  ${address}`, logId);
                             } else {
@@ -682,7 +683,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] <= 0){
-                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                            if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
                                 addLogEntry(`Jumped to the address:  ${address}`, logId);
                             } else {
@@ -698,7 +699,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] >= 0){
-                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                            if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
                                 addLogEntry(`Jumped to the address:  ${address}`, logId);
                             } else {
@@ -714,7 +715,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] > 0){
-                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                            if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
                                 addLogEntry(`Jumped to the address:  ${address}`, logId);
                             } else {
@@ -730,7 +731,7 @@ SUB R4, R2, R1"></textarea>
                     if (parts.length === 2) {
                         const address = parseInt(parts[1]) - 1;
                         if(registersObj['CMP'] < 0){
-                            if (!isNaN(address) && address >= 0 && address < codeLines.length) {
+                            if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
                                 addLogEntry(`Jumped to the address:  ${address}`, logId);
                             } else {
@@ -760,6 +761,8 @@ SUB R4, R2, R1"></textarea>
             
             // Parse code
             const lines = parseCode(code, registersObj, logId);
+
+            code_length = lines.length;
             
             // Execute each line
             let success = true;
@@ -770,10 +773,10 @@ SUB R4, R2, R1"></textarea>
                 }
             }*/
             currentLine = 0;
-            while (currentLine < lines.length) {
+            while (currentLine < code_length) {
                 if (!executeLine(lines[currentLine], registersObj, logId)) {
                     success = false;
-                    currentLine = lines.length;
+                    currentLine = ;
                 }else{
                     currentLine++;
                 }
@@ -799,6 +802,8 @@ SUB R4, R2, R1"></textarea>
                 
                 // Parse code
                 codeLines = parseCode(code, registersObj, logId);
+
+                code_length = codeLines.length;
                 
                 // Reset line counter
                 currentLine = 0;
@@ -811,7 +816,7 @@ SUB R4, R2, R1"></textarea>
             }
             
             // Check if we've reached the end
-            if (currentLine >= codeLines.length) {
+            if (currentLine >= code_length) {
                 addLogEntry('✅ Program execution completed', logId);
                 currentLine = -1;
                 updateCodeHighlighting(code, -1);
