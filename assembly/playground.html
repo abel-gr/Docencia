@@ -618,7 +618,7 @@ SUB R4, R2, R1"></textarea>
                 // Jump instructions
                 case 'JMP':                    
                     if (parts.length === 2) {
-                        const address = parseInt(parts[1]) - 1; // -1 because line numbers start at 1
+                        const address = parseInt(parts[1]) - 2; // -1 because line numbers start at 1
                         if (!isNaN(address) && address >= 0 && address < code_length) {
                             currentLine = address;
                             addLogEntry(`Jumped to the address:  ${address + 1}`, logId);
@@ -632,7 +632,7 @@ SUB R4, R2, R1"></textarea>
                     
                 case 'JE':
                     if (parts.length === 2) {
-                        const address = parseInt(parts[1]) - 1;
+                        const address = parseInt(parts[1]) - 2;
                         if (registersObj['CMP'] === 0){
                             if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
@@ -648,7 +648,7 @@ SUB R4, R2, R1"></textarea>
                     
                 case 'JNE':
                     if (parts.length === 2) {
-                        const address = parseInt(parts[1]) - 1;
+                        const address = parseInt(parts[1]) - 2;
                         if (registersObj['CMP'] !== 0){
                             if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
@@ -681,7 +681,7 @@ SUB R4, R2, R1"></textarea>
                     
                 case 'JLE':
                     if (parts.length === 2) {
-                        const address = parseInt(parts[1]) - 1;
+                        const address = parseInt(parts[1]) - 2;
                         if(registersObj['CMP'] <= 0){
                             if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
@@ -697,7 +697,7 @@ SUB R4, R2, R1"></textarea>
                     
                 case 'JGE':
                     if (parts.length === 2) {
-                        const address = parseInt(parts[1]) - 1;
+                        const address = parseInt(parts[1]) - 2;
                         if(registersObj['CMP'] >= 0){
                             if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
@@ -713,7 +713,7 @@ SUB R4, R2, R1"></textarea>
                     
                 case 'JG':
                     if (parts.length === 2) {
-                        const address = parseInt(parts[1]) - 1;
+                        const address = parseInt(parts[1]) - 2;
                         if(registersObj['CMP'] > 0){
                             if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
@@ -729,7 +729,7 @@ SUB R4, R2, R1"></textarea>
                     
                 case 'JL':
                     if (parts.length === 2) {
-                        const address = parseInt(parts[1]) - 1;
+                        const address = parseInt(parts[1]) - 2;
                         if(registersObj['CMP'] < 0){
                             if (!isNaN(address) && address >= 0 && address < code_length) {
                                 currentLine = address;
