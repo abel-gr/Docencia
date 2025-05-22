@@ -760,6 +760,8 @@ SUB R4, R2, R1"></textarea>
             
             // Update register display
             updateRegisterDisplay(registersObj, tableId);
+
+            addLogEntry('✅ Program execution completed', logId);
             
             return success;
         }
@@ -789,7 +791,7 @@ SUB R4, R2, R1"></textarea>
             
             // Check if we've reached the end
             if (currentLine >= codeLines.length) {
-                addLogEntry('Program execution completed', logId);
+                addLogEntry('✅ Program execution completed', logId);
                 currentLine = -1;
                 updateCodeHighlighting(code, -1);
                 return false;
