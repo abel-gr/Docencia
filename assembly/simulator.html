@@ -1035,6 +1035,11 @@
                 registerTable.innerHTML = '';
                 
                 Object.entries(this.registers).forEach(([reg, value]) => {
+
+                    if (typeof value === 'number' && !Number.isInteger(value) && Number.isFinite(value)) {
+                        value = Number(value.toFixed(4));  // Round and convert back to number
+                    }
+                    
                     const row = document.createElement('tr');
                     
                     // Highlight modified registers
