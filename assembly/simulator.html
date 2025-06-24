@@ -957,6 +957,33 @@
                         // Unknown instruction, just move to next line
                         this.currentLine++;
                         break;
+
+                    // Move floating point value to register
+                    case 'FMOV':
+                        if (parts.length === 3) {
+                            const dest = parts[1].replace(',', '');
+                            const src = parts[2];
+                            
+                            if (this.registers[dest] !== undefined) {
+                                // Check if source is a register or immediate value
+                                if (this.registers[src] !== undefined) {
+                                    this.registers[dest] = this.registers[src];
+                                } else {
+                                    const value = parseFloat(src);
+                                    if (!isNaN(value)) {
+                                        this.registers[dest] = value;
+                                    }
+                                }
+                                this.modifiedRegisters.add(dest);
+                            }
+                        }
+                        this.currentLine++;
+                        break;
+                        
+                    default:
+                        // Unknown instruction, just move to next line
+                        this.currentLine++;
+                        break;
                 }
                 
                 // Update UI
