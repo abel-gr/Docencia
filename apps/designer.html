@@ -1,0 +1,1549 @@
+<html lang="ca"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dissenya la teva App Mòbil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            min-height: 100vh;
+        }
+        
+        .phone-container {
+            width: 420px;
+            height: 85vh;
+            max-height: 900px;
+            background-color: #f8fafc;
+            border-radius: 36px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 8px solid #334155;
+            transform-origin: top left;
+        }
+        
+        .phone-notch {
+            width: 150px;
+            height: 25px;
+            background-color: #334155;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+        
+        .component {
+            cursor: move;
+            position: absolute;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .component-palette .component {
+            position: relative;
+            margin: 10px;
+        }
+        
+        .component[data-type="label"] {
+            box-shadow: none;
+            background: transparent !important;
+            border: none !important;
+        }
+        
+        .color-picker {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .color-picker::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border-radius: 50%;
+        }
+        
+        .color-picker::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+        
+        .dragging {
+            opacity: 0.8;
+            z-index: 1000;
+        }
+        
+        .phone-screen {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        
+        .selected {
+            outline: 2px dashed #3b82f6;
+        }
+        
+        .component-settings {
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .component[data-type="input"] {
+            padding: 0 10px;
+            justify-content: flex-start;
+        }
+        
+        .component[data-type="checkbox"], .component[data-type="radio"] {
+            justify-content: flex-start;
+            padding: 0 10px;
+            width: 150px !important;
+        }
+        
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .confirm-dialog-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border-top: 4px solid #ef4444;
+        }
+        
+        .alignment-guide {
+            position: absolute;
+            background-color: rgba(59, 130, 246, 0.5);
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .alignment-guide-v {
+            width: 1px;
+            height: 100%;
+            top: 0;
+        }
+        
+        .alignment-guide-h {
+            height: 1px;
+            width: 100%;
+            left: 0;
+        }
+        
+        @media (max-width: 1280px) {
+            .phone-container {
+                transform: scale(0.9);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .phone-container {
+                transform: scale(0.8);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .phone-container {
+                transform: scale(0.7);
+                margin: 0 auto;
+            }
+        }
+        
+        @media (max-height: 900px) {
+            .phone-container {
+                height: 80vh;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .phone-container {
+                height: 75vh;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .phone-container {
+                height: 70vh;
+            }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-2{margin-left:0.5rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mt-1{margin-top:0.25rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-12{height:3rem}.h-24{height:6rem}.h-40{height:10rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.w-10{width:2.5rem}.w-12{width:3rem}.w-24{width:6rem}.w-32{width:8rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-full{width:100%}.max-w-7xl{max-width:80rem}.flex-1{flex:1 1 0%}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-gray-400{--tw-border-opacity:1;border-color:rgb(156 163 175 / var(--tw-border-opacity, 1))}.border-yellow-300{--tw-border-opacity:1;border-color:rgb(253 224 71 / var(--tw-border-opacity, 1))}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-100{--tw-bg-opacity:1;background-color:rgb(254 249 195 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(239 246 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-purple-50{--tw-gradient-to:#faf5ff var(--tw-gradient-to-position)}.p-2{padding:0.5rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.opacity-50{opacity:0.5}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-blue-600:hover{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-100:hover{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-300:hover{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.hover\:bg-green-600:hover{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:bg-red-600:hover{--tw-bg-opacity:1;background-color:rgb(220 38 38 / var(--tw-bg-opacity, 1))}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}@media (min-width: 1024px){.lg\:flex-row{flex-direction:row}}</style></head>
+<body class="p-4">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold text-white text-center mb-6">Dissenya la teva App Mòbil</h1>
+        
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Phone Preview -->
+            <div class="flex-1 flex justify-center">
+                <div class="phone-container" style="transform: scale(1);">
+                    <div class="phone-notch"></div>
+                    <div id="phone-screen" class="phone-screen bg-gradient-to-br from-blue-50 to-purple-50"></div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="flex-1 bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">Components</h2>
+                
+                <!-- Component Palette -->
+                <div class="component-palette flex flex-wrap mb-6">
+                    <div class="component bg-blue-500 text-white rounded-lg w-24 h-12" data-type="button">Botó</div>
+                    <div class="component bg-gray-100 border border-gray-300 rounded-lg w-24 h-12" data-type="input">Entrada</div>
+                    <div class="component bg-white border border-gray-300 rounded-lg w-24 h-24 flex items-center justify-center" data-type="image">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="component bg-white border border-gray-300 rounded-lg w-24 h-12 flex items-center justify-center" data-type="text">Text</div>
+                    <div class="component text-gray-800 w-24 h-12 flex items-center justify-center" data-type="label">Etiqueta</div>
+                    <div class="component bg-yellow-100 border border-yellow-300 rounded-lg w-24 h-24" data-type="card">Targeta</div>
+                    <div class="component bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center" data-type="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </div>
+                    <div class="component bg-white border border-gray-300 rounded-lg w-32 h-12 flex items-center" data-type="checkbox">
+                        <input type="checkbox" class="mr-2">
+                        <span>Checkbox</span>
+                    </div>
+                    <div class="component bg-white border border-gray-300 rounded-lg w-32 h-12 flex items-center" data-type="radio">
+                        <input type="radio" name="radio-demo" class="mr-2">
+                        <span>Radio</span>
+                    </div>
+                </div>
+                
+                <!-- Component Settings -->
+                <div id="component-settings" class="hidden component-settings">
+                    <h3 class="text-lg font-medium mb-3">Personalitza</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Text</label>
+                            <input type="text" id="text-input" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        
+                        <div id="image-url-container" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">URL de la imatge</label>
+                            <input type="text" id="image-url-input" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                            <input type="color" id="color-picker" class="color-picker" value="#3b82f6">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Color de fons</label>
+                            <input type="color" id="bg-color-picker" class="color-picker" value="#ffffff">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Forma</label>
+                            <select id="shape-select" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                                <option value="rounded-none">Quadrat</option>
+                                <option value="rounded-lg" selected="">Arrodonit</option>
+                                <option value="rounded-full">Circular</option>
+                            </select>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Posició X <span id="position-x-unit">%</span></label>
+                                <input type="number" id="position-x" min="0" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Posició Y <span id="position-y-unit">%</span></label>
+                                <input type="number" id="position-y" min="0" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Amplada <span id="width-unit">%</span></label>
+                                <input type="range" id="width-range" min="30" max="400" value="100" class="w-full">
+                                <div class="text-xs text-gray-500 text-center mt-1"><span id="width-value">100</span><span id="width-value-unit">%</span></div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Alçada <span id="height-unit">%</span></label>
+                                <input type="range" id="height-range" min="30" max="800" value="50" class="w-full">
+                                <div class="text-xs text-gray-500 text-center mt-1"><span id="height-value">50</span><span id="height-value-unit">%</span></div>
+                            </div>
+                        </div>
+                        
+                        <div id="font-size-container">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mida del text</label>
+                            <input type="range" id="font-size-range" min="10" max="72" value="16" class="w-full">
+                            <div class="text-xs text-gray-500 text-center mt-1"><span id="font-size-value">16</span>px</div>
+                        </div>
+                        
+                        <button id="delete-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md transition">Eliminar</button>
+                    </div>
+                </div>
+                
+                <div id="no-selection" class="text-center py-8 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p>Arrossega components a la pantalla del mòbil o selecciona un component per personalitzar-lo</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-center">
+            <div class="flex flex-wrap justify-center items-center gap-2">
+                <button id="undo-btn" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow flex items-center opacity-50" disabled="">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                    Desfer
+                </button>
+                <button id="reset-btn" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+                    Reiniciar
+                </button>
+                <button id="save-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded shadow">
+                    Desar Disseny
+                </button>
+                <button id="load-btn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow">
+                    Carregar Disseny
+                </button>
+                <div class="flex items-center ml-2">
+                    <input type="checkbox" id="show-guides" class="mr-2" checked="">
+                    <label for="show-guides" class="text-white">Mostrar guies</label>
+                </div>
+                <div class="flex items-center ml-2">
+                    <input type="checkbox" id="use-percentage" class="mr-2" checked="">
+                    <label for="use-percentage" class="text-white">Usar percentatges</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Save Design Modal -->
+    <div id="save-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Desar Disseny</h3>
+                <button id="close-save-modal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <p class="mb-4">Copia el següent codi JSON per desar el teu disseny:</p>
+            <textarea id="save-json" class="w-full h-40 border border-gray-300 rounded-md p-2 mb-4 font-mono text-sm" readonly=""></textarea>
+            <div class="flex justify-end">
+                <button id="copy-json" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md">Copiar al portapapers</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Design Modal -->
+    <div id="load-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Carregar Disseny</h3>
+                <button id="close-load-modal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <p class="mb-4">Enganxa el codi JSON del teu disseny:</p>
+            <textarea id="load-json" class="w-full h-40 border border-gray-300 rounded-md p-2 mb-4 font-mono text-sm"></textarea>
+            <div class="flex justify-end">
+                <button id="load-json-btn" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md">Carregar Disseny</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirm Reset Dialog -->
+    <div id="confirm-reset-dialog" class="confirm-dialog hidden">
+        <div class="confirm-dialog-content">
+            <div class="flex items-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-red-500">Confirmar reinici</h3>
+            </div>
+            <p class="mb-6">Estàs segur que vols reiniciar el disseny? Es perdran tots els components i canvis.</p>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-reset" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md">Cancel·lar</button>
+                <button id="confirm-reset" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md">Reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneScreen = document.getElementById('phone-screen');
+            const phoneContainer = document.querySelector('.phone-container');
+            const componentSettings = document.getElementById('component-settings');
+            const noSelection = document.getElementById('no-selection');
+            const textInput = document.getElementById('text-input');
+            const imageUrlContainer = document.getElementById('image-url-container');
+            const imageUrlInput = document.getElementById('image-url-input');
+            const colorPicker = document.getElementById('color-picker');
+            const bgColorPicker = document.getElementById('bg-color-picker');
+            const shapeSelect = document.getElementById('shape-select');
+            const positionX = document.getElementById('position-x');
+            const positionY = document.getElementById('position-y');
+            const positionXUnit = document.getElementById('position-x-unit');
+            const positionYUnit = document.getElementById('position-y-unit');
+            const widthRange = document.getElementById('width-range');
+            const heightRange = document.getElementById('height-range');
+            const widthValue = document.getElementById('width-value');
+            const heightValue = document.getElementById('height-value');
+            const widthUnit = document.getElementById('width-unit');
+            const heightUnit = document.getElementById('height-unit');
+            const widthValueUnit = document.getElementById('width-value-unit');
+            const heightValueUnit = document.getElementById('height-value-unit');
+            const fontSizeContainer = document.getElementById('font-size-container');
+            const fontSizeRange = document.getElementById('font-size-range');
+            const fontSizeValue = document.getElementById('font-size-value');
+            const deleteBtn = document.getElementById('delete-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const undoBtn = document.getElementById('undo-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const loadBtn = document.getElementById('load-btn');
+            const saveModal = document.getElementById('save-modal');
+            const loadModal = document.getElementById('load-modal');
+            const saveJson = document.getElementById('save-json');
+            const loadJson = document.getElementById('load-json');
+            const copyJsonBtn = document.getElementById('copy-json');
+            const loadJsonBtn = document.getElementById('load-json-btn');
+            const closeSaveModal = document.getElementById('close-save-modal');
+            const closeLoadModal = document.getElementById('close-load-modal');
+            const confirmResetDialog = document.getElementById('confirm-reset-dialog');
+            const cancelReset = document.getElementById('cancel-reset');
+            const confirmReset = document.getElementById('confirm-reset');
+            const showGuidesCheckbox = document.getElementById('show-guides');
+            const usePercentageCheckbox = document.getElementById('use-percentage');
+            
+            let selectedComponent = null;
+            let componentCounter = 0;
+            let isDragging = false;
+            let dragOffsetX = 0;
+            let dragOffsetY = 0;
+            let showGuides = showGuidesCheckbox.checked;
+            let usePercentage = usePercentageCheckbox.checked;
+            let alignmentGuides = {
+                vertical: [],
+                horizontal: []
+            };
+            let phoneScale = 1;
+            let undoHistory = [];
+            let maxUndoSteps = 20;
+            
+            // Update units based on percentage mode
+            function updateUnits() {
+                const unit = usePercentage ? '%' : 'px';
+                positionXUnit.textContent = unit;
+                positionYUnit.textContent = unit;
+                widthUnit.textContent = unit;
+                heightUnit.textContent = unit;
+                widthValueUnit.textContent = unit;
+                heightValueUnit.textContent = unit;
+                
+                // If a component is selected, update its displayed values
+                if (selectedComponent) {
+                    updateSettingsControls();
+                }
+            }
+            
+            // Calculate and apply phone scale based on window size
+            function updatePhoneScale() {
+                const containerWidth = phoneContainer.parentElement.offsetWidth;
+                const phoneWidth = 420; // Original phone width
+                
+                if (containerWidth < phoneWidth) {
+                    phoneScale = containerWidth / phoneWidth;
+                    phoneScale = Math.max(0.5, phoneScale); // Don't go below 50%
+                } else {
+                    phoneScale = 1;
+                }
+                
+                // Apply scale only through CSS transform to maintain component coordinates
+                phoneContainer.style.transform = `scale(${phoneScale})`;
+            }
+            
+            // Call once on load
+            updatePhoneScale();
+            updateUnits();
+            
+            // Get phone screen dimensions dynamically
+            function getPhoneScreenDimensions() {
+                const rect = phoneScreen.getBoundingClientRect();
+                // Return the actual dimensions, not the scaled ones
+                return {
+                    width: rect.width / phoneScale,
+                    height: rect.height / phoneScale
+                };
+            }
+            
+            // Save state for undo
+            function saveStateForUndo() {
+                const components = [];
+                
+                document.querySelectorAll('#phone-screen .component').forEach(comp => {
+                    const type = comp.getAttribute('data-type');
+                    const style = comp.style;
+                    const classList = Array.from(comp.classList).filter(cls => cls !== 'component' && cls !== 'selected' && cls !== 'dragging');
+                    
+                    let content = '';
+                    if (type === 'input') {
+                        const inputElement = comp.querySelector('input');
+                        content = inputElement ? inputElement.placeholder : '';
+                    } else if (type === 'image') {
+                        const imgElement = comp.querySelector('img');
+                        content = imgElement ? imgElement.src : '';
+                    } else if (type === 'checkbox' || type === 'radio') {
+                        const spanElement = comp.querySelector('span');
+                        content = spanElement ? spanElement.textContent : '';
+                        if (type === 'radio') {
+                            content = {
+                                text: content,
+                                group: comp.getAttribute('data-radio-group') || ''
+                            };
+                        }
+                    } else {
+                        content = comp.innerText;
+                    }
+                    
+                    components.push({
+                        type,
+                        style: {
+                            left: style.left,
+                            top: style.top,
+                            width: style.width,
+                            height: style.height,
+                            color: style.color,
+                            backgroundColor: style.backgroundColor,
+                            fontSize: style.fontSize
+                        },
+                        classList,
+                        content,
+                        id: comp.id
+                    });
+                });
+                
+                // Add to undo history
+                undoHistory.push(components);
+                
+                // Limit history size
+                if (undoHistory.length > maxUndoSteps) {
+                    undoHistory.shift();
+                }
+                
+                // Enable/disable undo button
+                undoBtn.disabled = undoHistory.length <= 1;
+                undoBtn.classList.toggle('opacity-50', undoHistory.length <= 1);
+            }
+            
+            // Convert between pixels and percentages
+            function pxToPercent(px, dimension) {
+                const dimensions = getPhoneScreenDimensions();
+                const total = dimension === 'width' ? dimensions.width : dimensions.height;
+                return (px / total) * 100;
+            }
+            
+            function percentToPx(percent, dimension) {
+                const dimensions = getPhoneScreenDimensions();
+                const total = dimension === 'width' ? dimensions.width : dimensions.height;
+                return (percent * total) / 100;
+            }
+            
+            // Format number to always be an integer
+            function formatNumber(num) {
+                return Math.round(num);
+            }
+            
+            // Initialize component palette
+            document.querySelectorAll('.component-palette .component').forEach(component => {
+                component.addEventListener('mousedown', startDragNewComponent);
+                component.addEventListener('touchstart', startDragNewComponent, { passive: false });
+            });
+            
+            function startDragNewComponent(e) {
+                e.preventDefault();
+                
+                // Save state before adding new component
+                saveStateForUndo();
+                
+                const type = this.getAttribute('data-type');
+                const rect = this.getBoundingClientRect();
+                
+                // Create a new component
+                const newComponent = document.createElement('div');
+                newComponent.className = `component ${this.className}`;
+                newComponent.classList.remove('component-palette');
+                newComponent.setAttribute('data-type', type);
+                newComponent.id = `component-${componentCounter++}`;
+                
+                // Handle special component types
+                if (type === 'input') {
+                    newComponent.innerHTML = '<input type="text" placeholder="Entrada de text" class="w-full h-full bg-transparent outline-none">';
+                } else if (type === 'checkbox') {
+                    newComponent.innerHTML = '<input type="checkbox" class="mr-2"><span>Checkbox</span>';
+                } else if (type === 'radio') {
+                    const radioGroupId = 'radio-group-' + Date.now();
+                    newComponent.innerHTML = `<input type="radio" name="${radioGroupId}" class="mr-2"><span>Radio</span>`;
+                    newComponent.setAttribute('data-radio-group', radioGroupId);
+                } else if (type === 'label') {
+                    newComponent.innerHTML = 'Etiqueta de text';
+                    newComponent.style.boxShadow = 'none';
+                    newComponent.style.background = 'transparent';
+                    newComponent.style.border = 'none';
+                    newComponent.style.fontSize = '16px';
+                } else {
+                    newComponent.innerHTML = this.innerHTML;
+                }
+                
+                newComponent.style.position = 'absolute';
+                newComponent.style.width = `${this.offsetWidth}px`;
+                newComponent.style.height = `${this.offsetHeight}px`;
+                
+                // Position at center of phone screen initially
+                const phoneRect = phoneScreen.getBoundingClientRect();
+                newComponent.style.left = '50%';
+                newComponent.style.top = '50%';
+                newComponent.style.transform = 'translate(-50%, -50%)';
+                
+                phoneScreen.appendChild(newComponent);
+                
+                // Set up event listeners for the new component
+                newComponent.addEventListener('mousedown', startDragExistingComponent);
+                newComponent.addEventListener('touchstart', startDragExistingComponent, { passive: false });
+                newComponent.addEventListener('click', selectComponent);
+                
+                // Prevent input fields from triggering drag
+                if (type === 'input') {
+                    const inputField = newComponent.querySelector('input');
+                    inputField.addEventListener('mousedown', function(e) {
+                        e.stopPropagation();
+                    });
+                    inputField.addEventListener('touchstart', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+                
+                // Prevent checkbox/radio from triggering drag when clicked
+                if (type === 'checkbox' || type === 'radio') {
+                    const inputField = newComponent.querySelector('input');
+                    inputField.addEventListener('mousedown', function(e) {
+                        e.stopPropagation();
+                    });
+                    inputField.addEventListener('touchstart', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+                
+                // Select the new component
+                selectComponent.call(newComponent);
+                
+                // Start dragging the new component
+                isDragging = true;
+                selectedComponent = newComponent;
+                
+                // Calculate drag offset
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                dragOffsetX = rect.width / 2;
+                dragOffsetY = rect.height / 2;
+                
+                newComponent.classList.add('dragging');
+                
+                // Trigger a move immediately to position the component under the cursor
+                const moveEvent = e.touches ? e.touches[0] : e;
+                moveComponent(moveEvent);
+            }
+            
+            function startDragExistingComponent(e) {
+                // Don't start drag if we clicked on an input, checkbox, or radio
+                if (e.target.tagName.toLowerCase() === 'input') {
+                    return;
+                }
+                
+                e.stopPropagation();
+                e.preventDefault(); // Prevent default to fix image drag issue
+                
+                if (e.button === 0 || e.touches) {
+                    // Save state before moving component
+                    saveStateForUndo();
+                    
+                    isDragging = true;
+                    selectedComponent = this;
+                    
+                    const rect = this.getBoundingClientRect();
+                    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    
+                    dragOffsetX = (clientX - rect.left) / phoneScale;
+                    dragOffsetY = (clientY - rect.top) / phoneScale;
+                    
+                    this.classList.add('dragging');
+                    
+                    // Clear existing alignment guides
+                    clearAlignmentGuides();
+                    
+                    // Select this component
+                    selectComponent.call(this, null);
+                }
+            }
+            
+            function moveComponent(e) {
+                if (isDragging && selectedComponent) {
+                    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    
+                    const phoneRect = phoneScreen.getBoundingClientRect();
+                    const dimensions = getPhoneScreenDimensions();
+                    
+                    // Calculate position relative to phone screen, accounting for scale
+                    let left = (clientX - phoneRect.left) / phoneScale - dragOffsetX;
+                    let top = (clientY - phoneRect.top) / phoneScale - dragOffsetY;
+                    
+                    // Keep component within phone screen bounds
+                    const compWidth = selectedComponent.offsetWidth;
+                    const compHeight = selectedComponent.offsetHeight;
+                    
+                    left = Math.max(0, Math.min(dimensions.width - compWidth, left));
+                    top = Math.max(0, Math.min(dimensions.height - compHeight, top));
+                    
+                    // Check for alignment with other components and screen center if guides are enabled
+                    if (showGuides) {
+                        const centerX = dimensions.width / 2;
+                        const centerY = dimensions.height / 2;
+                        const compCenterX = left + compWidth / 2;
+                        const compCenterY = top + compHeight / 2;
+                        const snapThreshold = 5; // pixels
+                        
+                        // Clear existing guides
+                        clearAlignmentGuides();
+                        
+                        // Check for center alignment with screen
+                        if (Math.abs(compCenterX - centerX) < snapThreshold) {
+                            left = centerX - compWidth / 2;
+                            showVerticalGuide(centerX);
+                        }
+                        
+                        if (Math.abs(compCenterY - centerY) < snapThreshold) {
+                            top = centerY - compHeight / 2;
+                            showHorizontalGuide(centerY);
+                        }
+                        
+                        // Check for alignment with other components
+                        document.querySelectorAll('#phone-screen .component').forEach(comp => {
+                            if (comp !== selectedComponent) {
+                                const compRect = comp.getBoundingClientRect();
+                                const phoneRect = phoneScreen.getBoundingClientRect();
+                                
+                                const otherLeft = parseInt(comp.style.left) || 0;
+                                const otherTop = parseInt(comp.style.top) || 0;
+                                const otherWidth = comp.offsetWidth;
+                                const otherHeight = comp.offsetHeight;
+                                const otherCenterX = otherLeft + otherWidth / 2;
+                                const otherCenterY = otherTop + otherHeight / 2;
+                                
+                                // Center alignment
+                                if (Math.abs(compCenterX - otherCenterX) < snapThreshold) {
+                                    left = otherCenterX - compWidth / 2;
+                                    showVerticalGuide(otherCenterX);
+                                }
+                                
+                                if (Math.abs(compCenterY - otherCenterY) < snapThreshold) {
+                                    top = otherCenterY - compHeight / 2;
+                                    showHorizontalGuide(otherCenterY);
+                                }
+                                
+                                // Edge alignment
+                                if (Math.abs(left - otherLeft) < snapThreshold) {
+                                    left = otherLeft;
+                                    showVerticalGuide(otherLeft);
+                                }
+                                
+                                if (Math.abs(top - otherTop) < snapThreshold) {
+                                    top = otherTop;
+                                    showHorizontalGuide(otherTop);
+                                }
+                                
+                                if (Math.abs((left + compWidth) - (otherLeft + otherWidth)) < snapThreshold) {
+                                    left = otherLeft + otherWidth - compWidth;
+                                    showVerticalGuide(otherLeft + otherWidth);
+                                }
+                                
+                                if (Math.abs((top + compHeight) - (otherTop + otherHeight)) < snapThreshold) {
+                                    top = otherTop + otherHeight - compHeight;
+                                    showHorizontalGuide(otherTop + otherHeight);
+                                }
+                            }
+                        });
+                    }
+                    
+                    selectedComponent.style.left = `${left}px`;
+                    selectedComponent.style.top = `${top}px`;
+                    selectedComponent.style.transform = 'none';
+                    
+                    // Update position inputs if component is selected
+                    if (selectedComponent.classList.contains('selected')) {
+                        if (usePercentage) {
+                            positionX.value = formatNumber(pxToPercent(left, 'width'));
+                            positionY.value = formatNumber(pxToPercent(top, 'height'));
+                        } else {
+                            positionX.value = formatNumber(left);
+                            positionY.value = formatNumber(top);
+                        }
+                    }
+                }
+            }
+            
+            function showVerticalGuide(x) {
+                const guide = document.createElement('div');
+                guide.className = 'alignment-guide alignment-guide-v';
+                guide.style.left = `${x}px`;
+                phoneScreen.appendChild(guide);
+                alignmentGuides.vertical.push(guide);
+            }
+            
+            function showHorizontalGuide(y) {
+                const guide = document.createElement('div');
+                guide.className = 'alignment-guide alignment-guide-h';
+                guide.style.top = `${y}px`;
+                phoneScreen.appendChild(guide);
+                alignmentGuides.horizontal.push(guide);
+            }
+            
+            function clearAlignmentGuides() {
+                [...alignmentGuides.vertical, ...alignmentGuides.horizontal].forEach(guide => {
+                    if (guide && guide.parentNode) {
+                        guide.parentNode.removeChild(guide);
+                    }
+                });
+                alignmentGuides.vertical = [];
+                alignmentGuides.horizontal = [];
+            }
+            
+            function endDrag() {
+                if (isDragging && selectedComponent) {
+                    selectedComponent.classList.remove('dragging');
+                    isDragging = false;
+                    
+                    // Clear alignment guides after a short delay
+                    setTimeout(clearAlignmentGuides, 500);
+                }
+            }
+            
+            function selectComponent(e) {
+                if (e) {
+                    // Don't select if we clicked on an input field
+                    if (e.target.tagName.toLowerCase() === 'input') {
+                        return;
+                    }
+                    e.stopPropagation();
+                }
+                
+                // Deselect previous component
+                document.querySelectorAll('.component').forEach(comp => {
+                    comp.classList.remove('selected');
+                });
+                
+                // Select this component
+                this.classList.add('selected');
+                selectedComponent = this;
+                
+                // Show component settings
+                componentSettings.classList.remove('hidden');
+                noSelection.classList.add('hidden');
+                
+                // Update settings controls to match the selected component
+                updateSettingsControls();
+            }
+            
+            function updateSettingsControls() {
+                if (!selectedComponent) return;
+                
+                const type = selectedComponent.getAttribute('data-type');
+                
+                // Show/hide image URL input based on component type
+                if (type === 'image') {
+                    imageUrlContainer.classList.remove('hidden');
+                    const imgElement = selectedComponent.querySelector('img');
+                    imageUrlInput.value = imgElement ? imgElement.src : '';
+                } else {
+                    imageUrlContainer.classList.add('hidden');
+                }
+                
+                // Show/hide font size control based on component type
+                if (type === 'text' || type === 'label' || type === 'button') {
+                    fontSizeContainer.classList.remove('hidden');
+                    const fontSize = parseInt(window.getComputedStyle(selectedComponent).fontSize) || 16;
+                    fontSizeRange.value = fontSize;
+                    fontSizeValue.textContent = fontSize;
+                } else {
+                    fontSizeContainer.classList.add('hidden');
+                }
+                
+                // Update text input
+                if (type === 'input') {
+                    const inputElement = selectedComponent.querySelector('input');
+                    textInput.value = inputElement ? inputElement.placeholder : '';
+                } else if (type === 'checkbox' || type === 'radio') {
+                    const spanElement = selectedComponent.querySelector('span');
+                    textInput.value = spanElement ? spanElement.textContent : '';
+                } else {
+                    textInput.value = selectedComponent.innerText;
+                }
+                
+                // Update color picker
+                const computedStyle = window.getComputedStyle(selectedComponent);
+                const color = rgbToHex(computedStyle.color);
+                const bgColor = rgbToHex(computedStyle.backgroundColor);
+                
+                colorPicker.value = color;
+                bgColorPicker.value = bgColor;
+                
+                // Update shape select
+                if (selectedComponent.classList.contains('rounded-none')) {
+                    shapeSelect.value = 'rounded-none';
+                } else if (selectedComponent.classList.contains('rounded-full')) {
+                    shapeSelect.value = 'rounded-full';
+                } else {
+                    shapeSelect.value = 'rounded-lg';
+                }
+                
+                // Update position inputs
+                const left = parseInt(selectedComponent.style.left) || 0;
+                const top = parseInt(selectedComponent.style.top) || 0;
+                
+                if (usePercentage) {
+                    positionX.value = formatNumber(pxToPercent(left, 'width'));
+                    positionY.value = formatNumber(pxToPercent(top, 'height'));
+                } else {
+                    positionX.value = formatNumber(left);
+                    positionY.value = formatNumber(top);
+                }
+                
+                // Update size ranges
+                const width = selectedComponent.offsetWidth;
+                const height = selectedComponent.offsetHeight;
+                
+                if (usePercentage) {
+                    widthRange.value = formatNumber(pxToPercent(width, 'width'));
+                    heightRange.value = formatNumber(pxToPercent(height, 'height'));
+                    widthValue.textContent = formatNumber(pxToPercent(width, 'width'));
+                    heightValue.textContent = formatNumber(pxToPercent(height, 'height'));
+                } else {
+                    widthRange.value = formatNumber(width);
+                    heightRange.value = formatNumber(height);
+                    widthValue.textContent = formatNumber(width);
+                    heightValue.textContent = formatNumber(height);
+                }
+                
+                // Update max values for width and height ranges based on phone dimensions
+                const dimensions = getPhoneScreenDimensions();
+                if (usePercentage) {
+                    widthRange.max = 100;
+                    heightRange.max = 100;
+                } else {
+                    widthRange.max = dimensions.width;
+                    heightRange.max = dimensions.height;
+                }
+            }
+            
+            // Helper function to convert RGB to HEX
+            function rgbToHex(rgb) {
+                if (!rgb || rgb === 'rgba(0, 0, 0, 0)' || rgb === 'transparent') {
+                    return '#ffffff';
+                }
+                
+                // Extract RGB values
+                const rgbValues = rgb.match(/\d+/g);
+                if (!rgbValues || rgbValues.length < 3) return '#ffffff';
+                
+                const r = parseInt(rgbValues[0]);
+                const g = parseInt(rgbValues[1]);
+                const b = parseInt(rgbValues[2]);
+                
+                return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+            }
+            
+            // Settings controls event listeners
+            textInput.addEventListener('input', function() {
+                if (selectedComponent) {
+                    // Save state before changing text
+                    saveStateForUndo();
+                    
+                    const type = selectedComponent.getAttribute('data-type');
+                    
+                    if (type === 'image' || type === 'icon') {
+                        // Don't change text for these types
+                        return;
+                    } else if (type === 'input') {
+                        const inputElement = selectedComponent.querySelector('input');
+                        if (inputElement) {
+                            inputElement.placeholder = this.value;
+                        }
+                    } else if (type === 'checkbox' || type === 'radio') {
+                        const spanElement = selectedComponent.querySelector('span');
+                        if (spanElement) {
+                            spanElement.textContent = this.value;
+                        }
+                    } else {
+                        selectedComponent.textContent = this.value;
+                    }
+                }
+            });
+            
+            imageUrlInput.addEventListener('input', function() {
+                if (selectedComponent && selectedComponent.getAttribute('data-type') === 'image') {
+                    // Save state before changing image
+                    saveStateForUndo();
+                    
+                    let imgElement = selectedComponent.querySelector('img');
+                    
+                    if (this.value.trim() !== '') {
+                        if (!imgElement) {
+                            // Remove the SVG icon
+                            selectedComponent.innerHTML = '';
+                            
+                            // Create and add the image
+                            imgElement = document.createElement('img');
+                            imgElement.style.width = '100%';
+                            imgElement.style.height = '100%';
+                            imgElement.style.objectFit = 'cover';
+                            selectedComponent.appendChild(imgElement);
+                        }
+                        
+                        imgElement.src = this.value;
+                        imgElement.onerror = function() {
+                            this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItYWxlcnQtY2lyY2xlIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PHBhdGggZD0iTTEyIDh2NCI+PC9wYXRoPjxwYXRoIGQ9Ik0xMiAxNmguMDEiPjwvcGF0aD48L3N2Zz4=';
+                            alert('Error carregant la imatge. Comprova la URL.');
+                        };
+                    } else if (imgElement) {
+                        // Restore the default SVG icon
+                        selectedComponent.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        `;
+                    }
+                }
+            });
+            
+            colorPicker.addEventListener('input', function() {
+                if (selectedComponent) {
+                    // Save state before changing color
+                    saveStateForUndo();
+                    
+                    selectedComponent.style.color = this.value;
+                }
+            });
+            
+            bgColorPicker.addEventListener('input', function() {
+                if (selectedComponent) {
+                    // Save state before changing background color
+                    saveStateForUndo();
+                    
+                    const type = selectedComponent.getAttribute('data-type');
+                    if (type !== 'label') { // Don't change background for label type
+                        selectedComponent.style.backgroundColor = this.value;
+                    }
+                }
+            });
+            
+            shapeSelect.addEventListener('change', function() {
+                if (selectedComponent) {
+                    // Save state before changing shape
+                    saveStateForUndo();
+                    
+                    const type = selectedComponent.getAttribute('data-type');
+                    if (type !== 'label') { // Don't change shape for label type
+                        selectedComponent.classList.remove('rounded-none', 'rounded-lg', 'rounded-full');
+                        selectedComponent.classList.add(this.value);
+                    }
+                }
+            });
+            
+            // Font size range input
+            fontSizeRange.addEventListener('input', function() {
+                if (selectedComponent) {
+                    const fontSize = parseInt(this.value);
+                    selectedComponent.style.fontSize = `${fontSize}px`;
+                    fontSizeValue.textContent = formatNumber(fontSize);
+                }
+            });
+            
+            fontSizeRange.addEventListener('change', function() {
+                // Save state after changing font size (when user releases slider)
+                if (selectedComponent) {
+                    saveStateForUndo();
+                }
+            });
+            
+            // Position X and Y inputs
+            positionX.addEventListener('input', function() {
+                if (selectedComponent) {
+                    const dimensions = getPhoneScreenDimensions();
+                    let x;
+                    
+                    if (usePercentage) {
+                        const percent = Math.max(0, Math.min(parseInt(this.value) || 0, 100));
+                        x = percentToPx(percent, 'width');
+                        this.value = formatNumber(percent); // Update input if value was clamped
+                    } else {
+                        const maxX = dimensions.width - selectedComponent.offsetWidth;
+                        x = Math.max(0, Math.min(parseInt(this.value) || 0, maxX));
+                        this.value = formatNumber(x); // Update input if value was clamped
+                    }
+                    
+                    selectedComponent.style.left = `${x}px`;
+                    selectedComponent.style.transform = 'none';
+                }
+            });
+            
+            positionX.addEventListener('change', function() {
+                // Save state after changing position (when user finishes typing)
+                if (selectedComponent) {
+                    saveStateForUndo();
+                }
+            });
+            
+            positionY.addEventListener('input', function() {
+                if (selectedComponent) {
+                    const dimensions = getPhoneScreenDimensions();
+                    let y;
+                    
+                    if (usePercentage) {
+                        const percent = Math.max(0, Math.min(parseInt(this.value) || 0, 100));
+                        y = percentToPx(percent, 'height');
+                        this.value = formatNumber(percent); // Update input if value was clamped
+                    } else {
+                        const maxY = dimensions.height - selectedComponent.offsetHeight;
+                        y = Math.max(0, Math.min(parseInt(this.value) || 0, maxY));
+                        this.value = formatNumber(y); // Update input if value was clamped
+                    }
+                    
+                    selectedComponent.style.top = `${y}px`;
+                    selectedComponent.style.transform = 'none';
+                }
+            });
+            
+            positionY.addEventListener('change', function() {
+                // Save state after changing position (when user finishes typing)
+                if (selectedComponent) {
+                    saveStateForUndo();
+                }
+            });
+            
+            widthRange.addEventListener('input', function() {
+                if (selectedComponent) {
+                    const dimensions = getPhoneScreenDimensions();
+                    let width;
+                    
+                    if (usePercentage) {
+                        const percent = Math.max(5, Math.min(parseInt(this.value) || 0, 100));
+                        width = percentToPx(percent, 'width');
+                        widthValue.textContent = formatNumber(percent);
+                    } else {
+                        const left = parseInt(selectedComponent.style.left) || 0;
+                        const maxWidth = dimensions.width - left;
+                        width = Math.min(parseInt(this.value), maxWidth);
+                        widthValue.textContent = formatNumber(width);
+                    }
+                    
+                    selectedComponent.style.width = `${width}px`;
+                }
+            });
+            
+            widthRange.addEventListener('change', function() {
+                // Save state after changing width (when user releases slider)
+                if (selectedComponent) {
+                    saveStateForUndo();
+                }
+            });
+            
+            heightRange.addEventListener('input', function() {
+                if (selectedComponent) {
+                    const dimensions = getPhoneScreenDimensions();
+                    let height;
+                    
+                    if (usePercentage) {
+                        const percent = Math.max(5, Math.min(parseInt(this.value) || 0, 100));
+                        height = percentToPx(percent, 'height');
+                        heightValue.textContent = formatNumber(percent);
+                    } else {
+                        const top = parseInt(selectedComponent.style.top) || 0;
+                        const maxHeight = dimensions.height - top;
+                        height = Math.min(parseInt(this.value), maxHeight);
+                        heightValue.textContent = formatNumber(height);
+                    }
+                    
+                    selectedComponent.style.height = `${height}px`;
+                }
+            });
+            
+            heightRange.addEventListener('change', function() {
+                // Save state after changing height (when user releases slider)
+                if (selectedComponent) {
+                    saveStateForUndo();
+                }
+            });
+            
+            deleteBtn.addEventListener('click', function() {
+                if (selectedComponent) {
+                    // Save state before deleting component
+                    saveStateForUndo();
+                    
+                    selectedComponent.remove();
+                    selectedComponent = null;
+                    componentSettings.classList.add('hidden');
+                    noSelection.classList.remove('hidden');
+                }
+            });
+            
+            // Show/hide alignment guides
+            showGuidesCheckbox.addEventListener('change', function() {
+                showGuides = this.checked;
+                if (!showGuides) {
+                    clearAlignmentGuides();
+                }
+            });
+            
+            // Toggle between pixels and percentages
+            usePercentageCheckbox.addEventListener('change', function() {
+                usePercentage = this.checked;
+                updateUnits();
+            });
+            
+            // Undo functionality
+            undoBtn.addEventListener('click', function() {
+                if (undoHistory.length > 1) {
+                    // Remove current state
+                    undoHistory.pop();
+                    
+                    // Get previous state
+                    const previousState = undoHistory[undoHistory.length - 1];
+                    
+                    // Clear current components
+                    phoneScreen.innerHTML = '';
+                    
+                    // Restore previous state
+                    loadComponentsFromState(previousState);
+                    
+                    // Update undo button state
+                    undoBtn.disabled = undoHistory.length <= 1;
+                    undoBtn.classList.toggle('opacity-50', undoHistory.length <= 1);
+                    
+                    // Clear selection
+                    selectedComponent = null;
+                    componentSettings.classList.add('hidden');
+                    noSelection.classList.remove('hidden');
+                }
+            });
+            
+            function loadComponentsFromState(state) {
+                state.forEach(comp => {
+                    const newComponent = document.createElement('div');
+                    newComponent.className = 'component';
+                    newComponent.setAttribute('data-type', comp.type);
+                    newComponent.id = comp.id || `component-${componentCounter++}`;
+                    
+                    // Add classes
+                    comp.classList.forEach(cls => {
+                        newComponent.classList.add(cls);
+                    });
+                    
+                    // Set styles
+                    Object.keys(comp.style).forEach(key => {
+                        if (comp.style[key]) {
+                            newComponent.style[key] = comp.style[key];
+                        }
+                    });
+                    
+                    // Set content based on type
+                    if (comp.type === 'input') {
+                        newComponent.innerHTML = `<input type="text" placeholder="${comp.content}" class="w-full h-full bg-transparent outline-none">`;
+                    } else if (comp.type === 'image') {
+                        if (comp.content) {
+                            newComponent.innerHTML = `<img src="${comp.content}" style="width:100%;height:100%;object-fit:cover;">`;
+                        } else {
+                            newComponent.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            `;
+                        }
+                    } else if (comp.type === 'checkbox') {
+                        newComponent.innerHTML = `<input type="checkbox" class="mr-2"><span>${comp.content}</span>`;
+                    } else if (comp.type === 'radio') {
+                        const radioGroupId = typeof comp.content === 'object' ? 
+                            (comp.content.group || ('radio-group-' + Date.now())) : 
+                            ('radio-group-' + Date.now());
+                        const radioText = typeof comp.content === 'object' ? comp.content.text : comp.content;
+                        newComponent.innerHTML = `<input type="radio" name="${radioGroupId}" class="mr-2"><span>${radioText}</span>`;
+                        newComponent.setAttribute('data-radio-group', radioGroupId);
+                    } else if (comp.type === 'icon') {
+                        newComponent.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                        `;
+                    } else if (comp.type === 'label') {
+                        newComponent.innerHTML = comp.content;
+                        newComponent.style.boxShadow = 'none';
+                        newComponent.style.background = 'transparent';
+                        newComponent.style.border = 'none';
+                    } else {
+                        newComponent.textContent = comp.content;
+                    }
+                    
+                    // Add event listeners
+                    newComponent.addEventListener('mousedown', startDragExistingComponent);
+                    newComponent.addEventListener('touchstart', startDragExistingComponent, { passive: false });
+                    newComponent.addEventListener('click', selectComponent);
+                    
+                    // Prevent input fields from triggering drag
+                    if (comp.type === 'input' || comp.type === 'checkbox' || comp.type === 'radio') {
+                        const inputField = newComponent.querySelector('input');
+                        if (inputField) {
+                            inputField.addEventListener('mousedown', function(e) {
+                                e.stopPropagation();
+                            });
+                            inputField.addEventListener('touchstart', function(e) {
+                                e.stopPropagation();
+                            });
+                        }
+                    }
+                    
+                    phoneScreen.appendChild(newComponent);
+                });
+            }
+            
+            // Reset button with custom confirm dialog
+            resetBtn.addEventListener('click', function() {
+                confirmResetDialog.classList.remove('hidden');
+            });
+            
+            cancelReset.addEventListener('click', function() {
+                confirmResetDialog.classList.add('hidden');
+            });
+            
+            confirmReset.addEventListener('click', function() {
+                // Save state before resetting
+                saveStateForUndo();
+                
+                phoneScreen.innerHTML = '';
+                selectedComponent = null;
+                componentSettings.classList.add('hidden');
+                noSelection.classList.remove('hidden');
+                confirmResetDialog.classList.add('hidden');
+                clearAlignmentGuides();
+            });
+            
+            // Save design functionality
+            saveBtn.addEventListener('click', function() {
+                const components = [];
+                
+                document.querySelectorAll('#phone-screen .component').forEach(comp => {
+                    const type = comp.getAttribute('data-type');
+                    const style = comp.style;
+                    const classList = Array.from(comp.classList).filter(cls => cls !== 'component' && cls !== 'selected' && cls !== 'dragging');
+                    
+                    let content = '';
+                    if (type === 'input') {
+                        const inputElement = comp.querySelector('input');
+                        content = inputElement ? inputElement.placeholder : '';
+                    } else if (type === 'image') {
+                        const imgElement = comp.querySelector('img');
+                        content = imgElement ? imgElement.src : '';
+                    } else if (type === 'checkbox' || type === 'radio') {
+                        const spanElement = comp.querySelector('span');
+                        content = spanElement ? spanElement.textContent : '';
+                        if (type === 'radio') {
+                            content = {
+                                text: content,
+                                group: comp.getAttribute('data-radio-group') || ''
+                            };
+                        }
+                    } else {
+                        content = comp.innerText;
+                    }
+                    
+                    components.push({
+                        type,
+                        style: {
+                            left: style.left,
+                            top: style.top,
+                            width: style.width,
+                            height: style.height,
+                            color: style.color,
+                            backgroundColor: style.backgroundColor,
+                            fontSize: style.fontSize
+                        },
+                        classList,
+                        content
+                    });
+                });
+                
+                saveJson.value = JSON.stringify(components, null, 2);
+                saveModal.classList.remove('hidden');
+            });
+            
+            // Load design functionality
+            loadBtn.addEventListener('click', function() {
+                loadJson.value = ''; // Clear the textarea
+                loadModal.classList.remove('hidden');
+            });
+            
+            loadJsonBtn.addEventListener('click', function() {
+                try {
+                    const components = JSON.parse(loadJson.value);
+                    
+                    // Save state before loading new design
+                    saveStateForUndo();
+                    
+                    // Clear existing components
+                    phoneScreen.innerHTML = '';
+                    
+                    // Load components
+                    loadComponentsFromState(components);
+                    
+                    loadModal.classList.add('hidden');
+                    alert('Disseny carregat correctament!');
+                    
+                    // Clear selection
+                    selectedComponent = null;
+                    componentSettings.classList.add('hidden');
+                    noSelection.classList.remove('hidden');
+                    
+                } catch (error) {
+                    alert('Error al carregar el disseny. Comprova el format JSON.');
+                    console.error(error);
+                }
+            });
+            
+            // Copy JSON to clipboard
+            copyJsonBtn.addEventListener('click', function() {
+                saveJson.select();
+                document.execCommand('copy');
+                alert('JSON copiat al portapapers!');
+            });
+            
+            // Modal close buttons
+            closeSaveModal.addEventListener('click', function() {
+                saveModal.classList.add('hidden');
+            });
+            
+            closeLoadModal.addEventListener('click', function() {
+                loadModal.classList.add('hidden');
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === saveModal) {
+                    saveModal.classList.add('hidden');
+                }
+                if (e.target === loadModal) {
+                    loadModal.classList.add('hidden');
+                }
+                if (e.target === confirmResetDialog) {
+                    confirmResetDialog.classList.add('hidden');
+                }
+            });
+            
+            // Deselect when clicking on the phone screen background
+            phoneScreen.addEventListener('click', function(e) {
+                if (e.target === phoneScreen) {
+                    document.querySelectorAll('.component').forEach(comp => {
+                        comp.classList.remove('selected');
+                    });
+                    selectedComponent = null;
+                    componentSettings.classList.add('hidden');
+                    noSelection.classList.remove('hidden');
+                }
+            });
+            
+            // Global mouse/touch events for dragging
+            document.addEventListener('mousemove', moveComponent);
+            document.addEventListener('touchmove', moveComponent, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            
+            // Update phone scale when window is resized
+            window.addEventListener('resize', function() {
+                updatePhoneScale();
+                
+                // Update max values for width and height ranges
+                if (selectedComponent) {
+                    const dimensions = getPhoneScreenDimensions();
+                    if (!usePercentage) {
+                        widthRange.max = dimensions.width;
+                        heightRange.max = dimensions.height;
+                    }
+                }
+            });
+            
+            // Open load modal button - clear the textarea
+            loadBtn.addEventListener('click', function() {
+                loadJson.value = '';
+                loadModal.classList.remove('hidden');
+            });
+            
+            // Initialize undo history with empty state
+            saveStateForUndo();
+            
+            // Initialize undo button state
+            undoBtn.disabled = true;
+            undoBtn.classList.add('opacity-50');
+        });
+    </script>
+</body></html>
