@@ -95,7 +95,7 @@
                             <input type="checkbox" id="custom-x-labels" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2">
                             <span class="text-lg font-semibold text-gray-700">🏷️ Etiquetes X genèriques</span>
                         </label>
-                        <p class="text-sm text-gray-500 mt-1 ml-8">Si està activat, cada conjunt pot tenir les seves pròpies etiquetes X</p>
+                        <p class="text-sm text-gray-500 mt-1 ml-8">Si està desactivat, cada conjunt pot tenir les seves pròpies etiquetes X</p>
                     </div>
 
                     <!-- Generic X-axis Labels (only when custom is disabled) -->
@@ -299,8 +299,8 @@
                     throw new Error('Si us plau, introdueix almenys un conjunt de dades!');
                 }
                 
-                if (maxDataLength > 20) {
-                    throw new Error('Màxim 20 valors per conjunt, si us plau!');
+                if (maxDataLength > 40) {
+                    throw new Error('Màxim 40 valors per conjunt, si us plau!');
                 }
 
                 // Get labels
@@ -361,7 +361,8 @@
 
                 // Hide placeholder, show chart
                 document.getElementById('chart-placeholder').style.display = 'none';
-                document.querySelector('.chart-container').style.display = 'block';
+                //document.querySelector('.chart-container').style.display = 'block';
+                document.getElementById('myChart').style.display = 'block';
 
                 const ctx = document.getElementById('myChart').getContext('2d');
                 
@@ -520,8 +521,9 @@
         // Show error function
         function showError(message) {
             document.getElementById('chart-placeholder').style.display = 'flex';
-            document.querySelector('.chart-container').style.display = 'none';
+            //document.querySelector('.chart-container').style.display = 'none';
             document.getElementById('download-btn').style.display = 'none';
+            document.getElementById('myChart').style.display = 'none';
             
             document.getElementById('chart-placeholder').innerHTML = `
                 <div class="text-center">
@@ -696,8 +698,9 @@
                 currentChart = null;
             }
             document.getElementById('chart-placeholder').style.display = 'flex';
-            document.querySelector('.chart-container').style.display = 'none';
+            //document.querySelector('.chart-container').style.display = 'none';
             document.getElementById('download-btn').style.display = 'none';
+            document.getElementById('myChart').style.display = 'none';
             
             document.getElementById('chart-placeholder').innerHTML = `
                 <div class="text-center">
@@ -740,7 +743,7 @@
             
             // Custom X labels checkbox change
             document.getElementById('custom-x-labels').addEventListener('change', function() {
-                const isCustom = this.checked;
+                const isCustom = !this.checked;
                 const genericLabelsSection = document.getElementById('generic-labels-section');
                 const datasetXLabels = document.querySelectorAll('.dataset-x-labels');
                 
