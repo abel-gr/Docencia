@@ -1,0 +1,1339 @@
+<html lang="ca"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eina de Visió per Computador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step-container {
+            border: 2px dashed #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        .step-container.active {
+            border-color: #3b82f6;
+            background-color: #f8fafc;
+        }
+        .image-display {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}.mt-4{margin-top:1rem}.block{display:block}.flex{display:flex}.min-h-\[200px\]{min-height:200px}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-4xl{max-width:56rem}.items-center{align-items:center}.justify-center{justify-content:center}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.rounded-lg{border-radius:0.5rem}.border-2{border-width:2px}.border-dashed{border-style:dashed}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(239 246 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-indigo-100{--tw-gradient-to:#e0e7ff var(--tw-gradient-to-position)}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-indigo-800{--tw-text-opacity:1;color:rgb(55 48 163 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.file\:mr-4::file-selector-button{margin-right:1rem}.file\:rounded-full::file-selector-button{border-radius:9999px}.file\:border-0::file-selector-button{border-width:0px}.file\:bg-indigo-50::file-selector-button{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.file\:px-4::file-selector-button{padding-left:1rem;padding-right:1rem}.file\:py-2::file-selector-button{padding-top:0.5rem;padding-bottom:0.5rem}.file\:text-sm::file-selector-button{font-size:0.875rem;line-height:1.25rem}.file\:font-semibold::file-selector-button{font-weight:600}.file\:text-indigo-700::file-selector-button{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:file\:bg-indigo-100::file-selector-button:hover{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.disabled\:cursor-not-allowed:disabled{cursor:not-allowed}.disabled\:opacity-50:disabled{opacity:0.5}</style></head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-indigo-800 mb-2">Eina de Visió per Computador</h1>
+            <p class="text-lg text-gray-600">Aplica tècniques de processament d'imatges pas a pas</p>
+        </header>
+
+        <div id="stepsContainer" class="space-y-6">
+            <!-- Initial upload step -->
+            <div class="step-container active bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Pas 1: Carrega la teva imatge</h2>
+                <div class="space-y-4">
+                    <input type="file" id="imageUpload" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <div id="imageContainer" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center min-h-[200px] flex items-center justify-center">
+                        <p class="text-gray-500">Selecciona una imatge per començar</p>
+                    </div>
+                </div>
+                <button id="addFirstStep" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+                    Afegir Pas de Processament
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stepCounter = 1;
+        let currentImage = null;
+        let processedImages = [];
+
+        const imageUpload = document.getElementById('imageUpload');
+        const imageContainer = document.getElementById('imageContainer');
+        const addFirstStep = document.getElementById('addFirstStep');
+        const stepsContainer = document.getElementById('stepsContainer');
+
+        // Handle image upload
+        imageUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImage = e.target.result;
+                    processedImages = [currentImage];
+                    displayImage(imageContainer, currentImage);
+                    addFirstStep.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function displayImage(container, imageSrc) {
+            container.innerHTML = `<img src="${imageSrc}" class="image-display mx-auto rounded-lg shadow-md" alt="Imatge processada">`;
+        }
+
+        // Add first processing step
+        addFirstStep.addEventListener('click', function() {
+            addProcessingStep();
+        });
+
+        function addProcessingStep() {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step-container bg-white rounded-lg p-6 shadow-lg';
+            stepDiv.innerHTML = `
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Pas X: Processament d'Imatge</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Selecciona la tècnica:</label>
+                    <select class="technique-select w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Selecciona una tècnica...</option>
+                        <option value="colorReplace">Canviar Color RGB</option>
+                        <option value="grayscale">Transformar a Escala de Grisos</option>
+                        <option value="threshold">Binarització per Llindar</option>
+                        <option value="niblack">Binarització de Niblack</option>
+                        <option value="dilate">Operació Morfològica: Dilatació</option>
+                        <option value="erode">Operació Morfològica: Erosió</option>
+                        <option value="opening">Operació Morfològica: Obertura</option>
+                        <option value="closing">Operació Morfològica: Tancament</option>
+                        <option value="morphGradient">Morphological Gradient</option>
+                        <option value="imageSum">Suma d'Imatges</option>
+                        <option value="imageDiff">Diferència d'Imatges</option>
+                        <option value="crop">Retallar Imatge</option>
+                        <option value="showValues">Mostrar Valors de Color</option>
+                        <option value="labeling">Etiquetatge de Regions</option>
+                    </select>
+                </div>
+
+                <div class="parameters-container mb-4"></div>
+
+                <button class="run-method bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4" disabled>
+                    Executar Mètode
+                </button>
+
+                <div class="result-container border-2 border-dashed border-gray-300 rounded-lg p-8 text-center min-h-[200px] flex items-center justify-center mb-4">
+                    <p class="text-gray-500">El resultat apareixerà aquí després d'executar el mètode</p>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button class="add-step bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors" style="display: none;">
+                        Afegir Pas
+                    </button>
+                    <button class="delete-step bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Eliminar Pas
+                    </button>
+                    <button class="move-up bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        ↑ Pujar
+                    </button>
+                    <button class="move-down bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        ↓ Baixar
+                    </button>
+                </div>
+            `;
+
+            stepsContainer.appendChild(stepDiv);
+
+            // Add event listeners for this step
+            setupStepEventListeners(stepDiv);
+            
+            // Renumber all steps
+            renumberSteps();
+        }
+
+        function renumberSteps() {
+            const steps = Array.from(stepsContainer.children);
+            steps.forEach((step, index) => {
+                if (index === 0) return; // Skip the original image step
+                
+                const header = step.querySelector('h2');
+                if (header) {
+                    header.textContent = `Pas ${index + 1}: Processament d'Imatge`;
+                }
+                
+                // Update button visibility
+                const moveUpButton = step.querySelector('.move-up');
+                const moveDownButton = step.querySelector('.move-down');
+                
+                if (moveUpButton) {
+                    moveUpButton.style.display = index === 1 ? 'none' : 'inline-block';
+                }
+                if (moveDownButton) {
+                    moveDownButton.style.display = index === steps.length - 1 ? 'none' : 'inline-block';
+                }
+            });
+        }
+
+        function setupStepEventListeners(stepDiv) {
+            const techniqueSelect = stepDiv.querySelector('.technique-select');
+            const parametersContainer = stepDiv.querySelector('.parameters-container');
+            const runButton = stepDiv.querySelector('.run-method');
+            const resultContainer = stepDiv.querySelector('.result-container');
+            const addStepButton = stepDiv.querySelector('.add-step');
+
+            techniqueSelect.addEventListener('change', function() {
+                const technique = this.value;
+                parametersContainer.innerHTML = '';
+                runButton.disabled = !technique;
+
+                if (technique) {
+                    generateParameterInputs(technique, parametersContainer);
+                }
+            });
+
+            runButton.addEventListener('click', function() {
+                const technique = techniqueSelect.value;
+                const parameters = getParameterValues(parametersContainer);
+                
+                // Get the correct input image for this step
+                const stepIndex = getStepIndex(stepDiv);
+                const inputImageIndex = stepIndex - 1; // Previous step's result
+                const inputImage = processedImages[inputImageIndex] || currentImage;
+                
+                // Check image size for showValues operation
+                if (technique === 'showValues') {
+                    checkImageSizeForShowValues(inputImage, function(isValid) {
+                        if (isValid) {
+                            simulateProcessing(technique, parameters, resultContainer, addStepButton, inputImage, stepIndex);
+                        } else {
+                            resultContainer.innerHTML = '<p class="text-red-600">La imatge és massa gran per mostrar valors (màxim 20x20 píxels)</p>';
+                        }
+                    });
+                } else {
+                    // Simulate processing (in a real app, this would call actual CV functions)
+                    simulateProcessing(technique, parameters, resultContainer, addStepButton, inputImage, stepIndex);
+                }
+            });
+
+            addStepButton.addEventListener('click', function() {
+                addProcessingStep();
+            });
+
+            // Delete step
+            const deleteButton = stepDiv.querySelector('.delete-step');
+            deleteButton.addEventListener('click', function() {
+                const stepIndex = getStepIndex(stepDiv);
+                stepDiv.remove();
+                renumberSteps();
+                reprocessFromStep(stepIndex);
+            });
+
+            // Move step up
+            const moveUpButton = stepDiv.querySelector('.move-up');
+            moveUpButton.addEventListener('click', function() {
+                const prevStep = stepDiv.previousElementSibling;
+                if (prevStep && !prevStep.querySelector('#imageUpload')) {
+                    const originalIndex = getStepIndex(stepDiv);
+                    stepDiv.parentNode.insertBefore(stepDiv, prevStep);
+                    renumberSteps();
+                    // Reprocess from the new position of the moved step
+                    reprocessFromStep(getStepIndex(stepDiv));
+                }
+            });
+
+            // Move step down
+            const moveDownButton = stepDiv.querySelector('.move-down');
+            moveDownButton.addEventListener('click', function() {
+                const nextStep = stepDiv.nextElementSibling;
+                if (nextStep) {
+                    const originalIndex = getStepIndex(stepDiv);
+                    stepDiv.parentNode.insertBefore(nextStep, stepDiv);
+                    renumberSteps();
+                    // Reprocess from the original position (now the previous step)
+                    reprocessFromStep(originalIndex);
+                }
+            });
+        }
+
+        function generateParameterInputs(technique, container) {
+            let html = '';
+            
+            switch(technique) {
+                case 'colorReplace':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Substitució de color RGB amb tolerància<br>
+                                <em>Si |R-Rorig| ≤ tol AND |G-Gorig| ≤ tol AND |B-Borig| ≤ tol → nou color</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <h4 class="font-medium text-gray-700">Color Original (RGB):</h4>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label class="block text-xs text-gray-600">R (0-255):</label>
+                                        <input type="number" name="origR" min="0" max="255" value="255" class="w-full p-2 border border-gray-300 rounded">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-600">G (0-255):</label>
+                                        <input type="number" name="origG" min="0" max="255" value="0" class="w-full p-2 border border-gray-300 rounded">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-600">B (0-255):</label>
+                                        <input type="number" name="origB" min="0" max="255" value="0" class="w-full p-2 border border-gray-300 rounded">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="font-medium text-gray-700">Nou Color (RGB):</h4>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label class="block text-xs text-gray-600">R (0-255):</label>
+                                        <input type="number" name="newR" min="0" max="255" value="0" class="w-full p-2 border border-gray-300 rounded">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-600">G (0-255):</label>
+                                        <input type="number" name="newG" min="0" max="255" value="255" class="w-full p-2 border border-gray-300 rounded">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-600">B (0-255):</label>
+                                        <input type="number" name="newB" min="0" max="255" value="0" class="w-full p-2 border border-gray-300 rounded">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tolerància (0-50):</label>
+                            <input type="number" name="tolerance" min="0" max="50" value="10" class="w-full p-2 border border-gray-300 rounded-lg">
+                        </div>
+                    `;
+                    break;
+                case 'grayscale':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Mitjana dels tres canals RGB<br>
+                                <em>Gris = (R + G + B) / 3</em>
+                            </p>
+                        </div>
+                    `;
+                    break;
+                case 'threshold':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Binarització per llindar global<br>
+                                <em>Binari: Si píxel ≥ llindar → 255 (blanc), sinó → 0 (negre)</em><br>
+                                <em>Binari Invers: Si píxel < llindar → 255 (blanc), sinó → 0 (negre)</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Valor del Llindar (0-255):</label>
+                                <input type="number" name="threshold" min="0" max="255" value="128" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipus:</label>
+                                <select name="type" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="binary">Binari</option>
+                                    <option value="binary_inv">Binari Invers</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'niblack':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Binarització adaptativa de Niblack<br>
+                                <em>Llindar local = mitjana + k × desviació estàndard</em><br>
+                                <em>Si píxel ≥ llindar local → 255 (blanc), sinó → 0 (negre)</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mida de la Finestra:</label>
+                                <input type="number" name="windowSize" min="3" max="51" step="2" value="15" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Factor K:</label>
+                                <input type="number" name="k" min="-1" max="1" step="0.1" value="-0.2" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'dilate':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Dilatació morfològica<br>
+                                <em>Expandeix les regions blanques (objectes) de la imatge binària</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Forma del Kernel:</label>
+                                <select name="kernelShape" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="rect">Rectangle</option>
+                                    <option value="ellipse">El·lipse</option>
+                                    <option value="cross">Creu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mida del Kernel:</label>
+                                <input type="number" name="kernelSize" min="3" max="15" step="2" value="5" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Iteracions:</label>
+                                <input type="number" name="iterations" min="1" max="10" value="1" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'erode':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Erosió morfològica<br>
+                                <em>Redueix les regions blanques (objectes) de la imatge binària</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Forma del Kernel:</label>
+                                <select name="kernelShape" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="rect">Rectangle</option>
+                                    <option value="ellipse">El·lipse</option>
+                                    <option value="cross">Creu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mida del Kernel:</label>
+                                <input type="number" name="kernelSize" min="3" max="15" step="2" value="5" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Iteracions:</label>
+                                <input type="number" name="iterations" min="1" max="10" value="1" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'opening':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Obertura morfològica<br>
+                                <em>Erosió seguida de dilatació. Elimina soroll i separa objectes</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Forma del Kernel:</label>
+                                <select name="kernelShape" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="rect">Rectangle</option>
+                                    <option value="ellipse">El·lipse</option>
+                                    <option value="cross">Creu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mida del Kernel:</label>
+                                <input type="number" name="kernelSize" min="3" max="15" step="2" value="5" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Iteracions:</label>
+                                <input type="number" name="iterations" min="1" max="10" value="1" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'closing':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Tancament morfològic<br>
+                                <em>Dilatació seguida d'erosió. Omple forats i connecta objectes</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Forma del Kernel:</label>
+                                <select name="kernelShape" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="rect">Rectangle</option>
+                                    <option value="ellipse">El·lipse</option>
+                                    <option value="cross">Creu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mida del Kernel:</label>
+                                <input type="number" name="kernelSize" min="3" max="15" step="2" value="5" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Iteracions:</label>
+                                <input type="number" name="iterations" min="1" max="10" value="1" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'morphGradient':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Gradient morfològic<br>
+                                <em>Diferència entre dilatació i erosió. Ressalta els contorns dels objectes</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Forma del Kernel:</label>
+                                <select name="kernelShape" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="rect">Rectangle</option>
+                                    <option value="ellipse">El·lipse</option>
+                                    <option value="cross">Creu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mida del Kernel:</label>
+                                <input type="number" name="kernelSize" min="3" max="15" step="2" value="5" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Iteracions:</label>
+                                <input type="number" name="iterations" min="1" max="10" value="1" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'imageSum':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Suma d'imatges<br>
+                                <em>Suma la imatge actual amb l'anterior. Resultat = Imatge1 + Imatge2</em>
+                            </p>
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-lg">
+                            <p class="text-sm text-yellow-800">
+                                <strong>Nota:</strong> Aquesta operació requereix dues imatges. S'utilitzarà la imatge anterior i l'actual.
+                            </p>
+                        </div>
+                    `;
+                    break;
+                case 'imageDiff':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Diferència d'imatges<br>
+                                <em>Resta la imatge anterior de l'actual. Resultat = |Imatge_actual - Imatge_anterior|</em>
+                            </p>
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-lg">
+                            <p class="text-sm text-yellow-800">
+                                <strong>Nota:</strong> Aquesta operació requereix dues imatges. S'utilitzarà la imatge anterior i l'actual.
+                            </p>
+                        </div>
+                    `;
+                    break;
+                case 'crop':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Retallar imatge<br>
+                                <em>Extreu una regió rectangular de la imatge especificant les coordenades</em>
+                            </p>
+                        </div>
+                        <div class="crop-controls space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">X Inicial:</label>
+                                    <input type="range" name="startX" min="0" max="100" value="0" class="w-full">
+                                    <span class="text-xs text-gray-500 startX-value">0</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">X Final:</label>
+                                    <input type="range" name="endX" min="0" max="100" value="100" class="w-full">
+                                    <span class="text-xs text-gray-500 endX-value">100</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Y Inicial:</label>
+                                    <input type="range" name="startY" min="0" max="100" value="0" class="w-full">
+                                    <span class="text-xs text-gray-500 startY-value">0</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Y Final:</label>
+                                    <input type="range" name="endY" min="0" max="100" value="100" class="w-full">
+                                    <span class="text-xs text-gray-500 endY-value">100</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'showValues':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Mostrar valors de color com a matriu<br>
+                                <em>Mostra cada píxel com el seu valor numèric: 0-255 (escala grisos), 0/1 (binària), o RGB (color)</em>
+                            </p>
+                        </div>
+                        <div class="bg-orange-50 p-3 rounded-lg">
+                            <p class="text-sm text-orange-800">
+                                <strong>Restricció:</strong> Només funciona amb imatges de màxim 20x20 píxels per raons de visualització.
+                            </p>
+                        </div>
+                    `;
+                    break;
+                case 'labeling':
+                    html = `
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-gray-700">
+                                <strong>Mètode:</strong> Etiquetatge de regions connectades<br>
+                                <em>Identifica i etiqueta cada objecte connectat amb un color diferent</em><br>
+                                <em>4-connectada: píxels adjacents horitzontalment i verticalment</em><br>
+                                <em>8-connectada: inclou també les diagonals</em>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Connectivitat:</label>
+                                <select name="connectivity" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="4">4-connectada</option>
+                                    <option value="8">8-connectada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mostrar Colors:</label>
+                                <select name="showColors" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="true">Sí</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            container.innerHTML = html;
+            
+            // Setup slider updates for crop operation
+            if (technique === 'crop') {
+                setupCropSliders(container);
+            }
+        }
+
+        function setupCropSliders(container) {
+            const sliders = container.querySelectorAll('input[type="range"]');
+            sliders.forEach(slider => {
+                const valueSpan = container.querySelector(`.${slider.name}-value`);
+                slider.addEventListener('input', function() {
+                    valueSpan.textContent = this.value;
+                });
+            });
+        }
+
+        function getParameterValues(container) {
+            const inputs = container.querySelectorAll('input, select');
+            const parameters = {};
+            
+            inputs.forEach(input => {
+                parameters[input.name] = input.value;
+            });
+            
+            return parameters;
+        }
+
+        function getStepIndex(stepDiv) {
+            const steps = Array.from(stepsContainer.children);
+            return steps.indexOf(stepDiv);
+        }
+
+        function reprocessFromStep(fromIndex) {
+            // Reset processed images array to only include images up to fromIndex
+            const steps = Array.from(stepsContainer.children);
+            processedImages = processedImages.slice(0, fromIndex);
+            
+            // If we only have the original image, make sure it's in the array
+            if (processedImages.length === 0) {
+                processedImages = [currentImage];
+            }
+            
+            // Clear results from affected steps
+            for (let i = fromIndex; i < steps.length; i++) {
+                const step = steps[i];
+                const resultContainer = step.querySelector('.result-container');
+                const addStepButton = step.querySelector('.add-step');
+                if (resultContainer) {
+                    resultContainer.innerHTML = '<p class="text-gray-500">El resultat apareixerà aquí després d\'executar el mètode</p>';
+                }
+                if (addStepButton) {
+                    addStepButton.style.display = 'none';
+                }
+            }
+            
+            // Reprocess all steps from the given index
+            for (let i = fromIndex; i < steps.length; i++) {
+                const step = steps[i];
+                const runButton = step.querySelector('.run-method');
+                if (runButton && !runButton.disabled) {
+                    // Simulate clicking the run button with delay
+                    setTimeout(() => runButton.click(), (i - fromIndex) * 200);
+                }
+            }
+        }
+
+        function checkImageSizeForShowValues(imageSrc, callback) {
+            const img = new Image();
+            img.onload = function() {
+                const isValid = img.width <= 20 && img.height <= 20;
+                callback(isValid);
+            };
+            img.src = imageSrc;
+        }
+
+        function isGrayscaleImage(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                
+                // Check if R, G, B values are the same (grayscale)
+                if (r !== g || g !== b) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function isBinaryImage(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                
+                // Check if pixel is not pure black (0,0,0) or pure white (255,255,255)
+                if (!((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function simulateProcessing(technique, parameters, resultContainer, addStepButton, inputImage, stepIndex) {
+            // Show loading state
+            resultContainer.innerHTML = `
+                <div class="flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                    <span class="ml-2 text-gray-600">Processant...</span>
+                </div>
+            `;
+
+            // Simulate processing delay
+            setTimeout(() => {
+                // Process all techniques with canvas for proper image processing
+                processImageWithCanvas(inputImage, technique, parameters, resultContainer, addStepButton, stepIndex);
+            }, 1500);
+        }
+
+        function processImageWithCanvas(imageSrc, technique, parameters, resultContainer, addStepButton, stepIndex) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                ctx.drawImage(img, 0, 0);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                let description = '';
+                let regionCount = 0;
+                
+                switch(technique) {
+                    case 'colorReplace':
+                        // Color replacement
+                        const origR = parseInt(parameters.origR);
+                        const origG = parseInt(parameters.origG);
+                        const origB = parseInt(parameters.origB);
+                        const newR = parseInt(parameters.newR);
+                        const newG = parseInt(parameters.newG);
+                        const newB = parseInt(parameters.newB);
+                        const tolerance = parseInt(parameters.tolerance);
+                        
+                        for (let i = 0; i < data.length; i += 4) {
+                            const r = data[i];
+                            const g = data[i + 1];
+                            const b = data[i + 2];
+                            
+                            if (Math.abs(r - origR) <= tolerance && 
+                                Math.abs(g - origG) <= tolerance && 
+                                Math.abs(b - origB) <= tolerance) {
+                                data[i] = newR;
+                                data[i + 1] = newG;
+                                data[i + 2] = newB;
+                            }
+                        }
+                        description = `Substitució de color RGB(${origR},${origG},${origB}) per RGB(${newR},${newG},${newB}) amb tolerància ${tolerance}`;
+                        break;
+                        
+                    case 'grayscale':
+                        // Convert to grayscale using average method
+                        for (let i = 0; i < data.length; i += 4) {
+                            const gray = Math.round((data[i] + data[i + 1] + data[i + 2]) / 3);
+                            data[i] = gray;     // Red
+                            data[i + 1] = gray; // Green
+                            data[i + 2] = gray; // Blue
+                        }
+                        description = 'Transformació a escala de grisos mitjançant la mitjana RGB';
+                        break;
+                        
+                    case 'threshold':
+                        // First convert to grayscale, then apply threshold
+                        const threshold = parseInt(parameters.threshold);
+                        const isInverse = parameters.type === 'binary_inv';
+                        
+                        for (let i = 0; i < data.length; i += 4) {
+                            const gray = Math.round((data[i] + data[i + 1] + data[i + 2]) / 3);
+                            let binaryValue;
+                            
+                            if (isInverse) {
+                                binaryValue = gray < threshold ? 255 : 0;
+                            } else {
+                                binaryValue = gray >= threshold ? 255 : 0;
+                            }
+                            
+                            data[i] = binaryValue;     // Red
+                            data[i + 1] = binaryValue; // Green
+                            data[i + 2] = binaryValue; // Blue
+                        }
+                        description = `Binarització ${isInverse ? 'inversa' : ''} amb llindar ${threshold}`;
+                        break;
+                        
+                    case 'niblack':
+                        // Simplified Niblack implementation
+                        const windowSize = parseInt(parameters.windowSize);
+                        const k = parseFloat(parameters.k);
+                        const halfWindow = Math.floor(windowSize / 2);
+                        
+                        // First convert to grayscale
+                        const grayData = new Uint8Array(canvas.width * canvas.height);
+                        for (let i = 0; i < data.length; i += 4) {
+                            grayData[i / 4] = Math.round((data[i] + data[i + 1] + data[i + 2]) / 3);
+                        }
+                        
+                        // Apply Niblack thresholding
+                        for (let y = 0; y < canvas.height; y++) {
+                            for (let x = 0; x < canvas.width; x++) {
+                                const idx = y * canvas.width + x;
+                                
+                                // Calculate local mean and standard deviation
+                                let sum = 0;
+                                let sumSq = 0;
+                                let count = 0;
+                                
+                                for (let dy = -halfWindow; dy <= halfWindow; dy++) {
+                                    for (let dx = -halfWindow; dx <= halfWindow; dx++) {
+                                        const ny = y + dy;
+                                        const nx = x + dx;
+                                        
+                                        if (ny >= 0 && ny < canvas.height && nx >= 0 && nx < canvas.width) {
+                                            const val = grayData[ny * canvas.width + nx];
+                                            sum += val;
+                                            sumSq += val * val;
+                                            count++;
+                                        }
+                                    }
+                                }
+                                
+                                const mean = sum / count;
+                                const variance = (sumSq / count) - (mean * mean);
+                                const stdDev = Math.sqrt(Math.max(0, variance));
+                                
+                                const localThreshold = mean + k * stdDev;
+                                const binaryValue = grayData[idx] >= localThreshold ? 255 : 0;
+                                
+                                const pixelIdx = idx * 4;
+                                data[pixelIdx] = binaryValue;     // Red
+                                data[pixelIdx + 1] = binaryValue; // Green
+                                data[pixelIdx + 2] = binaryValue; // Blue
+                            }
+                        }
+                        description = `Binarització de Niblack amb finestra ${windowSize} i k=${k}`;
+                        break;
+                        
+                    case 'dilate':
+                    case 'erode':
+                    case 'opening':
+                    case 'closing':
+                        // Check if image is binary for morphological operations
+                        if (!isBinaryImage(imageData)) {
+                            // Convert to binary first using Otsu-like threshold
+                            for (let i = 0; i < data.length; i += 4) {
+                                const gray = Math.round((data[i] + data[i + 1] + data[i + 2]) / 3);
+                                const binaryValue = gray >= 128 ? 255 : 0;
+                                data[i] = binaryValue;
+                                data[i + 1] = binaryValue;
+                                data[i + 2] = binaryValue;
+                            }
+                        }
+                        
+                        const kernelSize = parseInt(parameters.kernelSize);
+                        const iterations = parseInt(parameters.iterations);
+                        
+                        for (let iter = 0; iter < iterations; iter++) {
+                            const tempData = new Uint8ClampedArray(data);
+                            
+                            for (let y = 0; y < canvas.height; y++) {
+                                for (let x = 0; x < canvas.width; x++) {
+                                    const idx = (y * canvas.width + x) * 4;
+                                    
+                                    let result = false;
+                                    const halfKernel = Math.floor(kernelSize / 2);
+                                    
+                                    // Apply morphological operation
+                                    for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+                                        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+                                            const ny = y + ky;
+                                            const nx = x + kx;
+                                            
+                                            if (ny >= 0 && ny < canvas.height && nx >= 0 && nx < canvas.width) {
+                                                const nIdx = (ny * canvas.width + nx) * 4;
+                                                const isWhite = tempData[nIdx] === 255;
+                                                
+                                                if (technique === 'dilate' || technique === 'closing') {
+                                                    result = result || isWhite;
+                                                } else if (technique === 'erode' || technique === 'opening') {
+                                                    if (!result) result = true;
+                                                    result = result && isWhite;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    const value = result ? 255 : 0;
+                                    data[idx] = value;
+                                    data[idx + 1] = value;
+                                    data[idx + 2] = value;
+                                }
+                            }
+                        }
+                        
+                        // For opening and closing, apply the second operation
+                        if (technique === 'opening') {
+                            // Already did erosion, now dilate
+                            const tempData = new Uint8ClampedArray(data);
+                            for (let y = 0; y < canvas.height; y++) {
+                                for (let x = 0; x < canvas.width; x++) {
+                                    const idx = (y * canvas.width + x) * 4;
+                                    let result = false;
+                                    const halfKernel = Math.floor(kernelSize / 2);
+                                    
+                                    for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+                                        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+                                            const ny = y + ky;
+                                            const nx = x + kx;
+                                            
+                                            if (ny >= 0 && ny < canvas.height && nx >= 0 && nx < canvas.width) {
+                                                const nIdx = (ny * canvas.width + nx) * 4;
+                                                const isWhite = tempData[nIdx] === 255;
+                                                result = result || isWhite;
+                                            }
+                                        }
+                                    }
+                                    
+                                    const value = result ? 255 : 0;
+                                    data[idx] = value;
+                                    data[idx + 1] = value;
+                                    data[idx + 2] = value;
+                                }
+                            }
+                        } else if (technique === 'closing') {
+                            // Already did dilation, now erode
+                            const tempData = new Uint8ClampedArray(data);
+                            for (let y = 0; y < canvas.height; y++) {
+                                for (let x = 0; x < canvas.width; x++) {
+                                    const idx = (y * canvas.width + x) * 4;
+                                    let result = true;
+                                    const halfKernel = Math.floor(kernelSize / 2);
+                                    
+                                    for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+                                        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+                                            const ny = y + ky;
+                                            const nx = x + kx;
+                                            
+                                            if (ny >= 0 && ny < canvas.height && nx >= 0 && nx < canvas.width) {
+                                                const nIdx = (ny * canvas.width + nx) * 4;
+                                                const isWhite = tempData[nIdx] === 255;
+                                                result = result && isWhite;
+                                            }
+                                        }
+                                    }
+                                    
+                                    const value = result ? 255 : 0;
+                                    data[idx] = value;
+                                    data[idx + 1] = value;
+                                    data[idx + 2] = value;
+                                }
+                            }
+                        }
+                        
+                        description = `${technique === 'dilate' ? 'Dilatació' : technique === 'erode' ? 'Erosió' : technique === 'opening' ? 'Obertura' : 'Tancament'} amb kernel ${parameters.kernelShape} de mida ${kernelSize}`;
+                        break;
+                        
+                    case 'labeling':
+                        // Convert to binary first if not already
+                        if (!isBinaryImage(imageData)) {
+                            for (let i = 0; i < data.length; i += 4) {
+                                const gray = Math.round((data[i] + data[i + 1] + data[i + 2]) / 3);
+                                const binaryValue = gray >= 128 ? 255 : 0;
+                                data[i] = binaryValue;
+                                data[i + 1] = binaryValue;
+                                data[i + 2] = binaryValue;
+                            }
+                        }
+                        
+                        // Simple connected component labeling
+                        const connectivity = parseInt(parameters.connectivity);
+                        const showColors = parameters.showColors === 'true';
+                        const labels = new Array(canvas.width * canvas.height).fill(0);
+                        let currentLabel = 1;
+                        
+                        // Colors for different regions
+                        const colors = [
+                            [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 0],
+                            [255, 0, 255], [0, 255, 255], [128, 0, 128], [255, 128, 0],
+                            [128, 255, 0], [0, 128, 255], [255, 0, 128], [128, 128, 255]
+                        ];
+                        
+                        // Flood fill algorithm
+                        function floodFill(startX, startY, label) {
+                            const stack = [[startX, startY]];
+                            
+                            while (stack.length > 0) {
+                                const [x, y] = stack.pop();
+                                const idx = y * canvas.width + x;
+                                
+                                if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+                                if (labels[idx] !== 0) continue;
+                                
+                                const pixelIdx = idx * 4;
+                                if (data[pixelIdx] !== 255) continue; // Not a white pixel
+                                
+                                labels[idx] = label;
+                                
+                                // Add neighbors based on connectivity
+                                stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+                                if (connectivity === 8) {
+                                    stack.push([x + 1, y + 1], [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1]);
+                                }
+                            }
+                        }
+                        
+                        // Label all connected components
+                        for (let y = 0; y < canvas.height; y++) {
+                            for (let x = 0; x < canvas.width; x++) {
+                                const idx = y * canvas.width + x;
+                                const pixelIdx = idx * 4;
+                                
+                                if (data[pixelIdx] === 255 && labels[idx] === 0) {
+                                    floodFill(x, y, currentLabel);
+                                    currentLabel++;
+                                }
+                            }
+                        }
+                        
+                        regionCount = currentLabel - 1;
+                        
+                        // Apply colors if requested
+                        if (showColors) {
+                            for (let i = 0; i < labels.length; i++) {
+                                const label = labels[i];
+                                if (label > 0) {
+                                    const colorIdx = (label - 1) % colors.length;
+                                    const color = colors[colorIdx];
+                                    const pixelIdx = i * 4;
+                                    data[pixelIdx] = color[0];
+                                    data[pixelIdx + 1] = color[1];
+                                    data[pixelIdx + 2] = color[2];
+                                }
+                            }
+                        }
+                        
+                        description = `Etiquetatge de regions amb connectivitat ${connectivity}`;
+                        break;
+                        
+                    case 'morphGradient':
+                        // Check if image is binary for morphological operations
+                        if (!isBinaryImage(imageData)) {
+                            // Convert to binary first using Otsu-like threshold
+                            for (let i = 0; i < data.length; i += 4) {
+                                const gray = Math.round((data[i] + data[i + 1] + data[i + 2]) / 3);
+                                const binaryValue = gray >= 128 ? 255 : 0;
+                                data[i] = binaryValue;
+                                data[i + 1] = binaryValue;
+                                data[i + 2] = binaryValue;
+                            }
+                        }
+                        
+                        const morphKernelSize = parseInt(parameters.kernelSize);
+                        const morphIterations = parseInt(parameters.iterations);
+                        
+                        // Create dilated and eroded versions
+                        const dilatedData = new Uint8ClampedArray(data);
+                        const erodedData = new Uint8ClampedArray(data);
+                        
+                        // Apply dilation
+                        for (let iter = 0; iter < morphIterations; iter++) {
+                            const tempData = new Uint8ClampedArray(dilatedData);
+                            for (let y = 0; y < canvas.height; y++) {
+                                for (let x = 0; x < canvas.width; x++) {
+                                    const idx = (y * canvas.width + x) * 4;
+                                    let result = false;
+                                    const halfKernel = Math.floor(morphKernelSize / 2);
+                                    
+                                    for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+                                        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+                                            const ny = y + ky;
+                                            const nx = x + kx;
+                                            
+                                            if (ny >= 0 && ny < canvas.height && nx >= 0 && nx < canvas.width) {
+                                                const nIdx = (ny * canvas.width + nx) * 4;
+                                                const isWhite = tempData[nIdx] === 255;
+                                                result = result || isWhite;
+                                            }
+                                        }
+                                    }
+                                    
+                                    const value = result ? 255 : 0;
+                                    dilatedData[idx] = value;
+                                    dilatedData[idx + 1] = value;
+                                    dilatedData[idx + 2] = value;
+                                }
+                            }
+                        }
+                        
+                        // Apply erosion
+                        for (let iter = 0; iter < morphIterations; iter++) {
+                            const tempData = new Uint8ClampedArray(erodedData);
+                            for (let y = 0; y < canvas.height; y++) {
+                                for (let x = 0; x < canvas.width; x++) {
+                                    const idx = (y * canvas.width + x) * 4;
+                                    let result = true;
+                                    const halfKernel = Math.floor(morphKernelSize / 2);
+                                    
+                                    for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+                                        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+                                            const ny = y + ky;
+                                            const nx = x + kx;
+                                            
+                                            if (ny >= 0 && ny < canvas.height && nx >= 0 && nx < canvas.width) {
+                                                const nIdx = (ny * canvas.width + nx) * 4;
+                                                const isWhite = tempData[nIdx] === 255;
+                                                result = result && isWhite;
+                                            }
+                                        }
+                                    }
+                                    
+                                    const value = result ? 255 : 0;
+                                    erodedData[idx] = value;
+                                    erodedData[idx + 1] = value;
+                                    erodedData[idx + 2] = value;
+                                }
+                            }
+                        }
+                        
+                        // Calculate gradient (difference between dilation and erosion)
+                        for (let i = 0; i < data.length; i += 4) {
+                            const gradientValue = Math.abs(dilatedData[i] - erodedData[i]);
+                            data[i] = gradientValue;
+                            data[i + 1] = gradientValue;
+                            data[i + 2] = gradientValue;
+                        }
+                        
+                        description = `Gradient morfològic amb kernel ${parameters.kernelShape} de mida ${morphKernelSize}`;
+                        break;
+                        
+                    case 'imageSum':
+                        // Get previous image for sum operation
+                        if (stepIndex > 1) {
+                            const prevImageSrc = processedImages[stepIndex - 2];
+                            const prevImg = new Image();
+                            prevImg.onload = function() {
+                                const prevCanvas = document.createElement('canvas');
+                                const prevCtx = prevCanvas.getContext('2d');
+                                prevCanvas.width = prevImg.width;
+                                prevCanvas.height = prevImg.height;
+                                prevCtx.drawImage(prevImg, 0, 0);
+                                const prevImageData = prevCtx.getImageData(0, 0, prevCanvas.width, prevCanvas.height);
+                                const prevData = prevImageData.data;
+                                
+                                // Sum images
+                                for (let i = 0; i < data.length; i += 4) {
+                                    data[i] = Math.min(255, data[i] + (prevData[i] || 0));
+                                    data[i + 1] = Math.min(255, data[i + 1] + (prevData[i + 1] || 0));
+                                    data[i + 2] = Math.min(255, data[i + 2] + (prevData[i + 2] || 0));
+                                }
+                                
+                                ctx.putImageData(imageData, 0, 0);
+                                const processedImageSrc = canvas.toDataURL();
+                                
+                                resultContainer.innerHTML = `
+                                    <div>
+                                        <img src="${processedImageSrc}" class="image-display mx-auto rounded-lg shadow-md mb-2" alt="Resultat processat">
+                                        <p class="text-sm text-gray-600 italic">Suma de la imatge actual amb l'anterior</p>
+                                    </div>
+                                `;
+                                
+                                if (stepIndex < processedImages.length) {
+                                    processedImages[stepIndex] = processedImageSrc;
+                                } else {
+                                    processedImages.push(processedImageSrc);
+                                }
+                                addStepButton.style.display = 'inline-block';
+                            };
+                            prevImg.src = prevImageSrc;
+                            return; // Exit early as we handle the result in the callback
+                        }
+                        description = 'Suma d\'imatges (requereix imatge anterior)';
+                        break;
+                        
+                    case 'imageDiff':
+                        // Get previous image for difference operation
+                        if (stepIndex > 1) {
+                            const prevImageSrc = processedImages[stepIndex - 2];
+                            const prevImg = new Image();
+                            prevImg.onload = function() {
+                                const prevCanvas = document.createElement('canvas');
+                                const prevCtx = prevCanvas.getContext('2d');
+                                prevCanvas.width = prevImg.width;
+                                prevCanvas.height = prevImg.height;
+                                prevCtx.drawImage(prevImg, 0, 0);
+                                const prevImageData = prevCtx.getImageData(0, 0, prevCanvas.width, prevCanvas.height);
+                                const prevData = prevImageData.data;
+                                
+                                // Calculate absolute difference
+                                for (let i = 0; i < data.length; i += 4) {
+                                    data[i] = Math.abs(data[i] - (prevData[i] || 0));
+                                    data[i + 1] = Math.abs(data[i + 1] - (prevData[i + 1] || 0));
+                                    data[i + 2] = Math.abs(data[i + 2] - (prevData[i + 2] || 0));
+                                }
+                                
+                                ctx.putImageData(imageData, 0, 0);
+                                const processedImageSrc = canvas.toDataURL();
+                                
+                                resultContainer.innerHTML = `
+                                    <div>
+                                        <img src="${processedImageSrc}" class="image-display mx-auto rounded-lg shadow-md mb-2" alt="Resultat processat">
+                                        <p class="text-sm text-gray-600 italic">Diferència absoluta entre la imatge actual i l'anterior</p>
+                                    </div>
+                                `;
+                                
+                                if (stepIndex < processedImages.length) {
+                                    processedImages[stepIndex] = processedImageSrc;
+                                } else {
+                                    processedImages.push(processedImageSrc);
+                                }
+                                addStepButton.style.display = 'inline-block';
+                            };
+                            prevImg.src = prevImageSrc;
+                            return; // Exit early as we handle the result in the callback
+                        }
+                        description = 'Diferència d\'imatges (requereix imatge anterior)';
+                        break;
+                        
+                    case 'crop':
+                        const startX = Math.round((parseInt(parameters.startX) / 100) * canvas.width);
+                        const endX = Math.round((parseInt(parameters.endX) / 100) * canvas.width);
+                        const startY = Math.round((parseInt(parameters.startY) / 100) * canvas.height);
+                        const endY = Math.round((parseInt(parameters.endY) / 100) * canvas.height);
+                        
+                        const cropWidth = endX - startX;
+                        const cropHeight = endY - startY;
+                        
+                        if (cropWidth > 0 && cropHeight > 0) {
+                            const croppedImageData = ctx.getImageData(startX, startY, cropWidth, cropHeight);
+                            canvas.width = cropWidth;
+                            canvas.height = cropHeight;
+                            ctx.putImageData(croppedImageData, 0, 0);
+                        }
+                        
+                        description = `Retallat de (${startX},${startY}) a (${endX},${endY})`;
+                        break;
+                        
+                    case 'showValues':
+                        // Create matrix display
+                        let matrixHTML = '<div class="matrix-display text-xs font-mono bg-white p-4 rounded border overflow-auto max-h-96">';
+                        
+                        // Determine image type
+                        const isGrayscale = isGrayscaleImage(imageData);
+                        const isBinary = isBinaryImage(imageData);
+                        
+                        matrixHTML += '<div class="grid gap-1" style="grid-template-columns: repeat(' + canvas.width + ', minmax(0, 1fr));">';
+                        
+                        for (let y = 0; y < canvas.height; y++) {
+                            for (let x = 0; x < canvas.width; x++) {
+                                const idx = (y * canvas.width + x) * 4;
+                                const r = data[idx];
+                                const g = data[idx + 1];
+                                const b = data[idx + 2];
+                                
+                                let cellContent = '';
+                                let bgColor = '';
+                                let textColor = 'text-black';
+                                
+                                if (isBinary) {
+                                    cellContent = r === 255 ? '1' : '0';
+                                    bgColor = r === 255 ? 'bg-white' : 'bg-black';
+                                    textColor = r === 255 ? 'text-black' : 'text-white';
+                                } else if (isGrayscale) {
+                                    cellContent = r.toString();
+                                    const intensity = r / 255;
+                                    bgColor = `background-color: rgb(${r},${r},${r})`;
+                                    textColor = intensity > 0.5 ? 'text-black' : 'text-white';
+                                } else {
+                                    cellContent = `${r},${g},${b}`;
+                                    bgColor = `background-color: rgb(${r},${g},${b})`;
+                                    const intensity = (r + g + b) / (3 * 255);
+                                    textColor = intensity > 0.5 ? 'text-black' : 'text-white';
+                                }
+                                
+                                matrixHTML += `<div class="p-1 text-center border ${textColor}" style="${bgColor.startsWith('bg-') ? '' : bgColor}">${cellContent}</div>`;
+                            }
+                        }
+                        
+                        matrixHTML += '</div></div>';
+                        
+                        resultContainer.innerHTML = matrixHTML;
+                        
+                        // Don't process further for matrix display
+                        addStepButton.style.display = 'inline-block';
+                        return;
+                        
+                        description = `Matriu de valors ${canvas.width}x${canvas.height}`;
+                        break;
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                const processedImageSrc = canvas.toDataURL();
+                
+                let resultHTML = `
+                    <div>
+                        <img src="${processedImageSrc}" class="image-display mx-auto rounded-lg shadow-md mb-2" alt="Resultat processat">
+                        <p class="text-sm text-gray-600 italic">${description}</p>
+                `;
+                
+                if (technique === 'labeling') {
+                    resultHTML += `<p class="text-sm font-medium text-indigo-600 mt-2">Regions detectades: ${regionCount}</p>`;
+                }
+                
+                resultHTML += `</div>`;
+                
+                resultContainer.innerHTML = resultHTML;
+                
+                // Update the processed images array at the correct index
+                if (stepIndex < processedImages.length) {
+                    processedImages[stepIndex] = processedImageSrc;
+                } else {
+                    processedImages.push(processedImageSrc);
+                }
+                addStepButton.style.display = 'inline-block';
+            };
+            
+            img.src = imageSrc;
+        }
+    </script>
+</body></html>
