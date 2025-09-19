@@ -1,0 +1,3768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAD Studio - Online Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg-primary: #1f2937;
+            --bg-secondary: #374151;
+            --bg-tertiary: #4b5563;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #6b7280;
+            --accent-color: #3b82f6;
+            --hover-color: #4b5563;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #d1d5db;
+            --accent-color: #3b82f6;
+            --hover-color: #f3f4f6;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .toolbar-button {
+            transition: all 0.2s ease;
+            background-color: transparent;
+            color: var(--text-primary);
+        }
+        
+        .toolbar-button:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .toolbar-button.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .toolbar-button.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .toolbar-button.disabled:hover {
+            background-color: transparent;
+        }
+        
+        .canvas-container {
+            cursor: crosshair;
+        }
+        
+        .canvas-container.pan-mode {
+            cursor: grab;
+        }
+        
+        .canvas-container.pan-mode:active {
+            cursor: grabbing;
+        }
+        
+        .canvas-container.move-mode {
+            cursor: move;
+        }
+        
+        .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(128,128,128,0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(128,128,128,0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .property-panel {
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+        
+        .layer-item {
+            transition: background-color 0.2s ease;
+            color: var(--text-primary);
+        }
+        
+        .layer-item:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .layer-item.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        [data-theme="light"] .layer-item.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .bg-white {
+            background-color: var(--bg-secondary) !important;
+        }
+        
+        .border-gray-200 {
+            border-color: var(--border-color) !important;
+        }
+        
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        
+        .text-gray-600, .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+        
+        .border-gray-300 {
+            border-color: var(--border-color) !important;
+        }
+        
+        input, select, textarea {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        button {
+            color: var(--text-primary) !important;
+        }
+        
+        .hover\:bg-gray-100:hover {
+            background-color: var(--hover-color) !important;
+        }
+        
+        .hover\:bg-gray-200:hover {
+            background-color: var(--hover-color) !important;
+        }
+        
+        .hover\:bg-gray-50:hover {
+            background-color: var(--hover-color) !important;
+        }
+        
+        .category-divider {
+            border-top: 2px solid var(--border-color);
+            margin: 8px 0;
+            padding-top: 8px;
+        }
+        
+        .category-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #ef4444;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Custom scrollbar styles */
+        #leftToolbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #leftToolbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #leftToolbar::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 3px;
+            transition: background-color 0.2s ease;
+        }
+        
+        #leftToolbar::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-secondary);
+        }
+        
+        /* Firefox scrollbar */
+        #leftToolbar {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+    <!-- Top Menu Bar -->
+    <div class="border-b px-4 py-2 flex items-center justify-between" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.78 0-2.678-2.153-1.415-3.414l5-5A2 2 0 009 9.172V5L8 4z"></path>
+                    </svg>
+                </div>
+                <span class="font-semibold text-gray-900">CAD Studio</span>
+            </div>
+            
+            <!-- File Menu -->
+            <div class="flex items-center space-x-2">
+                <button class="px-3 py-1 text-sm hover:bg-gray-100 rounded" onclick="newFile()">New</button>
+                <button class="px-3 py-1 text-sm hover:bg-gray-100 rounded" onclick="openFile()">Open</button>
+                <button class="px-3 py-1 text-sm hover:bg-gray-100 rounded" onclick="saveFile()">Save</button>
+                <div class="border-l border-gray-300 h-6 mx-2"></div>
+                <button id="undoBtn" class="px-3 py-1 text-sm hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed" onclick="undo()" disabled title="Undo (Ctrl+Z)">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                    </svg>
+                    Undo
+                </button>
+                <button id="redoBtn" class="px-3 py-1 text-sm hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed" onclick="redo()" disabled title="Redo (Ctrl+Y)">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"></path>
+                    </svg>
+                    Redo
+                </button></div>
+                <div class="relative">
+                    <button class="px-3 py-1 text-sm hover:bg-gray-100 rounded flex items-center" onclick="toggleExportMenu()">
+                        Export
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="exportMenu" class="hidden absolute top-full left-0 bg-white border border-gray-200 rounded shadow-lg mt-1 z-50">
+                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" onclick="exportFile('dwg')">Export as .DWG</button>
+                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" onclick="exportFile('json')">Export as .JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- View Controls -->
+        <div class="flex items-center space-x-4" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+            <div class="flex items-center space-x-3 px-3 py-1 rounded" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                <button class="toolbar-button px-3 py-1 text-sm rounded" onclick="toggleTheme()" title="Toggle Theme">
+                    <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </button>
+                <button class="toolbar-button px-3 py-1 text-sm rounded" onclick="zoomFit()">Zoom Fit</button>
+                <button class="toolbar-button px-3 py-1 text-sm rounded" onclick="zoom(1.2)">Zoom In</button>
+                <button class="toolbar-button px-3 py-1 text-sm rounded" onclick="zoom(0.8)">Zoom Out</button>
+                <span class="text-sm" style="color: var(--text-secondary);">Zoom: <span id="zoomLevel">100%</span></span>
+                <button id="rightPanelToggle" class="toolbar-button px-3 py-1 text-sm rounded flex items-center" onclick="toggleRightPanel()" title="Toggle Properties Panel">
+                    <svg id="rightPanelIcon" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    Hide right panel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Left Toolbar -->
+        <div id="leftToolbar" class="border-r w-24 flex flex-col items-center py-4 space-y-2 transition-all duration-300 overflow-y-auto overflow-x-hidden" style="background-color: var(--bg-secondary); border-color: var(--border-color); scrollbar-width: thin; scrollbar-color: var(--border-color) transparent;">
+            <!-- Collapse/Expand Button -->
+            <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mb-2" onclick="toggleToolbarLabels()" title="Toggle Labels">
+                <svg id="toggleIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                </svg>
+            </button>
+            
+            <!-- Movement Category -->
+            <div class="w-full">
+                <div class="category-label">Movement</div>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('select')" title="Select">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.121 2.122"></path>
+                    </svg>
+                </button>
+                <button id="moveBtn" class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto disabled" onclick="handleTransformTool('move')" title="Move">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M10 4l2-2 2 2M10 20l2 2 2-2M2 12h20M20 10l2 2-2 2M4 10l-2 2 2 2"/>
+                    </svg>
+                </button>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('pan')" title="Pan">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Figures Category -->
+            <div class="w-full category-divider">
+                <div class="category-label">Figures</div>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('line')" title="Line">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20L20 4"></path>
+                    </svg>
+                </button>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('rectangle')" title="Rectangle">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"></path>
+                    </svg>
+                </button>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('circle')" title="Ellipse">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle>
+                    </svg>
+                </button>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('arc')" title="Arc">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12a10 10 0 0 0 20 0"></path>
+                    </svg>
+                </button>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('text')" title="Text">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Transforms Category -->
+            <div class="w-full category-divider">
+                <div class="category-label">Transforms</div>
+                <button id="duplicateBtn" class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto disabled" onclick="handleTransformTool('duplicate')" title="Duplicate">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                </button>
+                <button id="rotateBtn" class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto disabled" onclick="handleTransformTool('rotate')" title="Rotate">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                </button>
+                <button id="scaleBtn" class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto disabled" onclick="handleTransformTool('scale')" title="Scale">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                    </svg>
+                </button>
+
+            </div>
+            
+            <!-- Tools Category -->
+            <div class="w-full category-divider">
+                <div class="category-label">Tools</div>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('measure')" title="Measure">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6v12M21 6v12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6v3M9 6v2M12 6v3M15 6v2M18 6v3"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Canvas Area -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- Canvas -->
+            <div class="flex-1 relative overflow-hidden">
+                <canvas id="mainCanvas" class="canvas-container grid-pattern w-full h-full bg-white"></canvas>
+                
+                <!-- Coordinates Display -->
+                <div class="absolute bottom-4 left-4 px-3 py-1 rounded shadow text-sm" style="background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);">
+                    X: <span id="coordX">0</span>, Y: <span id="coordY">0</span>
+                </div>
+                
+                <!-- Tool Status -->
+                <div class="absolute top-4 left-4 px-3 py-1 rounded shadow text-sm" style="background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);">
+                    Tool: <span id="currentTool">Select</span>
+                </div>
+                
+                <!-- Measurement Display -->
+                <div id="measurementDisplay" class="hidden absolute top-4 right-4 px-3 py-2 rounded shadow text-sm" style="background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);">
+                    <div class="font-medium mb-1">Measurement</div>
+                    <div>Distance: <span id="measureDistance">0</span> <span id="measureUnit">mm</span></div>
+                    <div>Angle: <span id="measureAngle">0</span>°</div>
+                </div>
+            </div>
+            
+            <!-- Text Modal -->
+            <div id="textModal" class="hidden fixed inset-0 modal flex items-center justify-center z-50">
+                <div class="modal-content rounded-lg p-6 w-96">
+                    <h3 class="text-lg font-semibold mb-4">Add Text</h3>
+                    <textarea id="textInput" class="w-full h-24 p-3 border rounded resize-none" placeholder="Enter your text here..."></textarea>
+                    <div class="flex justify-end space-x-3 mt-4">
+                        <button class="px-4 py-2 border rounded hover:bg-gray-200 text-gray-900" onclick="closeTextModal()">Cancel</button>
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onclick="addTextFromModal()">Add Text</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Delete Layer Modal -->
+            <div id="deleteLayerModal" class="hidden fixed inset-0 modal flex items-center justify-center z-50">
+                <div class="modal-content rounded-lg p-6 w-96">
+                    <h3 class="text-lg font-semibold mb-4 text-red-600">Delete Layer</h3>
+                    <p class="mb-4">Are you sure you want to delete this layer? This action cannot be undone and will remove all objects on this layer.</p>
+                    <div class="flex justify-end space-x-3">
+                        <button class="px-4 py-2 border rounded hover:bg-gray-50" onclick="closeDeleteLayerModal()">Cancel</button>
+                        <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onclick="deleteLayer()">Delete Layer</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Clear Measurements Modal -->
+            <div id="clearMeasurementsModal" class="hidden fixed inset-0 modal flex items-center justify-center z-50">
+                <div class="modal-content rounded-lg p-6 w-96">
+                    <h3 class="text-lg font-semibold mb-4 text-red-600">Clear All Measurements</h3>
+                    <p class="mb-4">Are you sure you want to clear all measurements? This action cannot be undone and will remove all measurement data from the drawing.</p>
+                    <div class="flex justify-end space-x-3">
+                        <button class="px-4 py-2 border rounded hover:bg-gray-50" onclick="closeClearMeasurementsModal()">Cancel</button>
+                        <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onclick="confirmClearAllMeasurements()">Clear All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div id="rightPanel" class="property-panel border-l flex flex-col overflow-y-auto w-80 flex-shrink-0" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+            <!-- Measurements Panel -->
+            <div class="border-b p-4" style="border-color: var(--border-color);">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-gray-900">Measurements</h3>
+                    <button class="text-red-400 hover:text-red-600" onclick="clearAllMeasurements()" title="Clear All Measurements">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="measurementsList" class="space-y-1 max-h-32 overflow-y-auto">
+                    <!-- Measurements will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Layers Panel -->
+            <div class="border-b p-4" style="border-color: var(--border-color);">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-gray-900">Layers</h3>
+                    <button class="text-blue-600 hover:text-blue-700" onclick="addLayer()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="layersList" class="space-y-1">
+                    <div class="layer-item active flex items-center justify-between p-2 rounded cursor-pointer" data-layer="0" draggable="true">
+                        <div class="flex items-center space-x-2">
+                            <div class="drag-handle cursor-move text-gray-400 hover:text-gray-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                                </svg>
+                            </div>
+                            <div class="w-4 h-4 bg-black rounded"></div>
+                            <span class="text-sm">Layer 0</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button class="text-gray-400 hover:text-gray-600" onclick="toggleLayerVisibility(0)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Objects Panel -->
+            <div class="border-b p-4" style="border-color: var(--border-color);">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-gray-900">Objects in selected layer</h3>
+                    <button class="text-gray-400 hover:text-gray-600" onclick="toggleObjectsList()">
+                        <svg id="objectsToggleIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="objectsList" class="space-y-1 max-h-48 overflow-y-auto">
+                    <!-- Objects will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Properties Panel -->
+            <div id="propertiesPanel" class="p-4 flex-1 hidden">
+                <h3 class="font-semibold text-gray-900 mb-3">Properties</h3>
+                <div id="generalProperties" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Line Type</label>
+                        <select id="lineType" class="w-full border border-gray-300 rounded px-3 py-1 text-sm">
+                            <option value="solid">Solid</option>
+                            <option value="dashed">Dashed</option>
+                            <option value="dotted">Dotted</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Line Weight</label>
+                        <select id="lineWeight" class="w-full border border-gray-300 rounded px-3 py-1 text-sm">
+                            <option value="1">1px</option>
+                            <option value="2">2px</option>
+                            <option value="3">3px</option>
+                            <option value="4">4px</option>
+                            <option value="5">5px</option>
+                            <option value="6">6px</option>
+                            <option value="7">7px</option>
+                            <option value="8">8px</option>
+                            <option value="9">9px</option>
+                            <option value="10">10px</option>
+                            <option value="12">12px</option>
+                            <option value="14">14px</option>
+                            <option value="16">16px</option>
+                            <option value="18">18px</option>
+                            <option value="20">20px</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                        <input type="color" id="objectColor" value="#000000" class="w-full h-8 border border-gray-300 rounded" onchange="updateSelectedObjectColor()">
+                    </div>
+                </div>
+                
+                <!-- Selected Object Properties -->
+                <div id="selectedObjectProperties" class="hidden space-y-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-medium text-gray-900 text-sm">Selected Object Properties</h4>
+                        <button class="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700" onclick="deleteSelected()" title="Delete Selected">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Selected Object Style Properties -->
+                    <div id="selectedObjectStyle" class="space-y-3">
+                        <h5 class="font-medium text-gray-700 text-xs">Style</h5>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Line Type</label>
+                            <select id="selectedLineType" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="updateSelectedObjectStyle()">
+                                <option value="solid">Solid</option>
+                                <option value="dashed">Dashed</option>
+                                <option value="dotted">Dotted</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Line Weight</label>
+                            <select id="selectedLineWeight" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="updateSelectedObjectStyle()">
+                                <option value="1">1px</option>
+                                <option value="2">2px</option>
+                                <option value="3">3px</option>
+                                <option value="4">4px</option>
+                                <option value="5">5px</option>
+                                <option value="6">6px</option>
+                                <option value="7">7px</option>
+                                <option value="8">8px</option>
+                                <option value="9">9px</option>
+                                <option value="10">10px</option>
+                                <option value="12">12px</option>
+                                <option value="14">14px</option>
+                                <option value="16">16px</option>
+                                <option value="18">18px</option>
+                                <option value="20">20px</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Color</label>
+                            <input type="color" id="selectedObjectColor" class="w-full h-8 border border-gray-300 rounded" onchange="updateSelectedObjectStyle()">
+                        </div>
+                    </div>
+                    
+                    <!-- Position Controls -->
+                    <div id="positionControls" class="space-y-3">
+                        <h5 class="font-medium text-gray-700 text-xs">Position</h5>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">X (<span id="xUnit">mm</span>)</label>
+                                <input type="number" id="xInput" step="0.1" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="applyPositionChange()" oninput="applyPositionChange()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Y (<span id="yUnit">mm</span>)</label>
+                                <input type="number" id="yInput" step="0.1" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="applyPositionChange()" oninput="applyPositionChange()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Controls -->
+                    <div id="sizeControls" class="space-y-3">
+                        <h5 class="font-medium text-gray-700 text-xs">Size</h5>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Width (<span id="widthUnit">mm</span>)</label>
+                                <input type="number" id="widthInput" step="0.1" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="applySizeChange()" oninput="applySizeChange()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Height (<span id="heightUnit">mm</span>)</label>
+                                <input type="number" id="heightInput" step="0.1" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="applySizeChange()" oninput="applySizeChange()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Transform Controls -->
+                    <div id="transformControls" class="space-y-3">
+                        <h5 class="font-medium text-gray-700 text-xs">Transform</h5>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Scale (%)</label>
+                                <input type="number" id="scaleInput" value="100" step="10" min="10" max="1000" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="applyScale()">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Angle (°)</label>
+                                <input type="number" id="rotationInput" value="0" step="1" min="-360" max="360" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="applyRotation()" oninput="applyRotation()">
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Text Controls -->
+                    <div id="textControls" class="hidden space-y-3">
+                        <h5 class="font-medium text-gray-700 text-xs">Text Properties</h5>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Content</label>
+                            <textarea id="textContentInput" class="w-full border border-gray-300 rounded px-2 py-1 text-sm h-16 resize-none" onchange="updateTextContent()"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Font Size</label>
+                            <input type="number" id="fontSizeInput" value="16" min="8" max="72" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="updateTextContent()" oninput="updateTextContent()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Text Color</label>
+                            <input type="color" id="textColorInput" class="w-full h-8 border border-gray-300 rounded" onchange="updateTextContent()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Outline Weight</label>
+                            <select id="textLineWeight" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="updateTextContent()">
+                                <option value="0">None</option>
+                                <option value="1" selected>1px</option>
+                                <option value="2">2px</option>
+                                <option value="3">3px</option>
+                                <option value="4">4px</option>
+                                <option value="5">5px</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selected Measurement Properties Panel -->
+            <div id="selectedMeasurementPanel" class="p-4 flex-1 hidden">
+                <h3 class="font-semibold text-gray-900 mb-3">Measurement Properties</h3>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-medium text-gray-900 text-sm">Selected Measurement</h4>
+                    <button class="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700" onclick="deleteSelectedMeasurement()" title="Delete Selected Measurement">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Measurement Info -->
+                <div class="space-y-3 mb-4">
+                    <h5 class="font-medium text-gray-700 text-xs">Measurement Info</h5>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Distance</label>
+                            <input type="text" id="measurementDistance" readonly class="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-gray-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Angle</label>
+                            <input type="text" id="measurementAngle" readonly class="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Measurement Style -->
+                <div class="space-y-3 mb-4">
+                    <h5 class="font-medium text-gray-700 text-xs">Style</h5>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">Color</label>
+                        <input type="color" id="measurementColor" value="#ff6b6b" class="w-full h-8 border border-gray-300 rounded" onchange="updateMeasurementColor()">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">Line Weight</label>
+                        <select id="measurementLineWeight" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="updateMeasurementLineWeight()">
+                            <option value="1">1px</option>
+                            <option value="2" selected>2px</option>
+                            <option value="3">3px</option>
+                            <option value="4">4px</option>
+                            <option value="5">5px</option>
+                            <option value="6">6px</option>
+                            <option value="8">8px</option>
+                            <option value="10">10px</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">Font Size</label>
+                        <select id="measurementFontSize" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="updateMeasurementFontSize()">
+                            <option value="8">8px</option>
+                            <option value="9">9px</option>
+                            <option value="10" selected>10px</option>
+                            <option value="11">11px</option>
+                            <option value="12">12px</option>
+                            <option value="14">14px</option>
+                            <option value="16">16px</option>
+                            <option value="18">18px</option>
+                            <option value="20">20px</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Measurement Transform -->
+                <div class="space-y-3">
+                    <h5 class="font-medium text-gray-700 text-xs">Transform</h5>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">Rotation (°)</label>
+                        <input type="number" id="measurementRotation" value="0" step="1" min="-360" max="360" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="applyMeasurementRotation()" oninput="applyMeasurementRotation()">
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Units Configuration -->
+            <div class="border-t p-4" style="border-color: var(--border-color);">
+                <h3 class="font-semibold text-gray-900 mb-3">Units</h3>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                        <select id="unitSelect" class="w-full border border-gray-300 rounded px-3 py-1 text-sm" onchange="changeUnit()">
+                            <option value="nm">Nanometers (nm)</option>
+                            <option value="μm">Micrometers (μm)</option>
+                            <option value="mm" selected>Millimeters (mm)</option>
+                            <option value="cm">Centimeters (cm)</option>
+                            <option value="dm">Decimeters (dm)</option>
+                            <option value="m">Meters (m)</option>
+                            <option value="in">Inches (in)</option>
+                            <option value="ft">Feet (ft)</option>
+                            <option value="px">Pixels (px)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Constraints Panel - Hidden -->
+            <div class="border-t p-4 hidden" style="border-color: var(--border-color);">
+                <h3 class="font-semibold text-gray-900 mb-3">Constraints</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="px-3 py-2 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-900" onclick="addConstraint('parallel')">Parallel</button>
+                    <button class="px-3 py-2 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-900" onclick="addConstraint('perpendicular')">Perpendicular</button>
+                    <button class="px-3 py-2 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-900" onclick="addConstraint('equal')">Equal</button>
+                    <button class="px-3 py-2 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-900" onclick="addConstraint('fix')">Fix</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let canvas, ctx;
+        let currentTool = 'select';
+        let isDrawing = false;
+        let startX, startY;
+        let objects = [];
+        let selectedObjects = [];
+        let layers = [{id: 0, name: 'Layer 0', visible: true, color: '#000000'}];
+        let currentLayer = 0;
+        let zoomLevel = 1;
+        let panX = 0, panY = 0;
+        let isPanning = false;
+        let lastPanX, lastPanY;
+        let isMovingObject = false;
+        let moveStartX, moveStartY;
+        let draggedLayer = null;
+        let toolbarExpanded = false;
+        let measurementPoints = [];
+        let measurements = [];
+        let selectedMeasurement = null;
+        let currentUnit = 'mm';
+        let unitScale = 1; // pixels per unit
+        
+        // History for undo/redo
+        let history = [];
+        let historyIndex = -1;
+        let maxHistorySize = 50;
+        let layerToDelete = null;
+        
+        // History management
+        function saveState(action = 'action') {
+            const state = {
+                objects: JSON.parse(JSON.stringify(objects)),
+                layers: JSON.parse(JSON.stringify(layers)),
+                measurements: JSON.parse(JSON.stringify(measurements)),
+                currentLayer: currentLayer,
+                action: action
+            };
+            
+            // Remove any states after current index (when undoing then doing new action)
+            history = history.slice(0, historyIndex + 1);
+            
+            // Add new state
+            history.push(state);
+            
+            // Limit history size
+            if (history.length > maxHistorySize) {
+                history.shift();
+            } else {
+                historyIndex++;
+            }
+            
+            updateUndoRedoButtons();
+        }
+        
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                const state = history[historyIndex];
+                objects = JSON.parse(JSON.stringify(state.objects));
+                layers = JSON.parse(JSON.stringify(state.layers));
+                measurements = JSON.parse(JSON.stringify(state.measurements || []));
+                currentLayer = state.currentLayer;
+                selectedObjects = [];
+                selectedMeasurement = null;
+                updateLayersList();
+                updateMeasurementsList();
+                redrawCanvas();
+                updateUndoRedoButtons();
+                showNotification(`Undid: ${state.action}`);
+                hideSelectedObjectProperties();
+            }
+        }
+        
+        function redo() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                const state = history[historyIndex];
+                objects = JSON.parse(JSON.stringify(state.objects));
+                layers = JSON.parse(JSON.stringify(state.layers));
+                measurements = JSON.parse(JSON.stringify(state.measurements || []));
+                currentLayer = state.currentLayer;
+                selectedObjects = [];
+                selectedMeasurement = null;
+                updateLayersList();
+                updateMeasurementsList();
+                redrawCanvas();
+                updateUndoRedoButtons();
+                showNotification(`Redid: ${state.action}`);
+                hideSelectedObjectProperties();
+            }
+        }
+        
+        function updateUndoRedoButtons() {
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+            
+            undoBtn.disabled = historyIndex <= 0;
+            redoBtn.disabled = historyIndex >= history.length - 1;
+        }
+        
+        // Unit conversion factors (to pixels)
+        const unitConversions = {
+            'px': 1,
+            'nm': 0.000003779527559,
+            'μm': 0.003779527559,
+            'mm': 3.779527559,
+            'cm': 37.79527559,
+            'dm': 377.9527559,
+            'm': 3779.527559,
+            'in': 96,
+            'ft': 1152
+        };
+        let isRightMouseDown = false;
+        let pendingTextPosition = null;
+        let currentTheme = 'dark';
+        let objectsListCollapsed = false;
+        let rightPanelVisible = true;
+
+        // Initialize canvas
+        function initCanvas() {
+            canvas = document.getElementById('mainCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Mouse events
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('wheel', handleWheel);
+            canvas.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Update coordinates display
+            canvas.addEventListener('mousemove', updateCoordinates);
+            
+            redrawCanvas();
+        }
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            redrawCanvas();
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            const themeIcon = document.getElementById('themeIcon');
+            if (currentTheme === 'light') {
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+            } else {
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+            }
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            document.getElementById('currentTool').textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
+            
+            // Update toolbar button states
+            document.querySelectorAll('.toolbar-button').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.closest('.toolbar-button').classList.add('active');
+            }
+            
+            // Update cursor
+            if (tool === 'pan') {
+                canvas.classList.add('pan-mode');
+                canvas.classList.remove('move-mode');
+            } else if (tool === 'move') {
+                canvas.classList.add('move-mode');
+                canvas.classList.remove('pan-mode');
+            } else {
+                canvas.classList.remove('pan-mode', 'move-mode');
+            }
+            
+            const propertiesPanel = document.getElementById('propertiesPanel');
+            const figureTools = ['line', 'rectangle', 'circle', 'arc', 'text'];
+            
+            if (figureTools.includes(tool)) {
+                // When selecting a figure tool, deselect objects and show drawing properties
+                selectedObjects.forEach(obj => obj.selected = false);
+                selectedObjects = [];
+                hideSelectedObjectProperties();
+                updateTransformButtonStates();
+                redrawCanvas();
+                
+                // Show properties panel for drawing
+                propertiesPanel.classList.remove('hidden');
+                
+                if (tool === 'text') {
+                    // Don't open modal immediately, wait for canvas click
+                    showNotification('Text tool selected - click on canvas to add text');
+                } else {
+                    showNotification(`${tool.charAt(0).toUpperCase() + tool.slice(1)} tool selected - click and drag to draw`);
+                }
+            } else if (tool === 'select') {
+                // For select tool, only show properties panel if objects are selected
+                if (selectedObjects.length > 0) {
+                    propertiesPanel.classList.remove('hidden');
+                    showSelectedObjectProperties();
+                } else {
+                    propertiesPanel.classList.add('hidden');
+                }
+            } else {
+                // Other tools (pan, measure, etc.) - hide properties panel
+                propertiesPanel.classList.add('hidden');
+            }
+        }
+        
+        function handleTransformTool(action) {
+            if (action === 'move') {
+                if (currentTool === 'move') {
+                    // If move tool is already active, deactivate it
+                    setTool('select');
+                    showNotification('Move mode deactivated');
+                } else {
+                    // Activate move tool
+                    setTool('move');
+                    showNotification('Move mode activated - drag objects to move them');
+                }
+                return;
+            }
+            
+            // Check if we have any selection (objects or measurements)
+            const hasSelection = selectedObjects.length > 0 || selectedMeasurement !== null;
+            
+            if (!hasSelection) {
+                showAlert('Please select an object or measurement first');
+                return;
+            }
+            
+            switch (action) {
+                case 'duplicate':
+                    duplicateSelected();
+                    break;
+                case 'rotate':
+                    // Focus the appropriate rotation input field based on selection
+                    if (selectedMeasurement) {
+                        document.getElementById('measurementRotation').focus();
+                        document.getElementById('measurementRotation').select();
+                    } else if (selectedObjects.length > 0) {
+                        document.getElementById('rotationInput').focus();
+                        document.getElementById('rotationInput').select();
+                    }
+                    break;
+                case 'scale':
+                    showTransformPanel('scale');
+                    break;
+                case 'verticalMirror':
+                    mirrorSelectedVertical();
+                    break;
+                case 'horizontalMirror':
+                    mirrorSelectedHorizontal();
+                    break;
+            }
+        }
+        
+        function showTransformPanel(type) {
+            document.getElementById('transformControls').classList.remove('hidden');
+            if (type === 'rotate') {
+                document.getElementById('scaleInput').disabled = true;
+                document.getElementById('rotationInput').disabled = false;
+                document.getElementById('rotationInput').focus();
+            } else if (type === 'scale') {
+                document.getElementById('scaleInput').disabled = false;
+                document.getElementById('rotationInput').disabled = true;
+                document.getElementById('scaleInput').focus();
+            }
+        }
+        
+        function showAlert(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert';
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+        
+        function updateTransformButtonStates() {
+            const hasSelection = selectedObjects.length > 0;
+            const hasMeasurementSelection = selectedMeasurement !== null;
+            const hasTextSelection = selectedObjects.some(obj => obj.type === 'text');
+            const transformButtons = ['moveBtn', 'duplicateBtn', 'rotateBtn', 'scaleBtn'];
+            
+            transformButtons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                
+                if (btnId === 'rotateBtn') {
+                    // Enable rotate button for objects OR measurements
+                    if (hasSelection || hasMeasurementSelection) {
+                        btn.classList.remove('disabled');
+                        btn.style.pointerEvents = 'auto';
+                    } else {
+                        btn.classList.add('disabled');
+                        btn.style.pointerEvents = 'none';
+                    }
+                } else if (btnId === 'moveBtn') {
+                    // Enable move button for objects OR measurements
+                    if (hasSelection || hasMeasurementSelection) {
+                        btn.classList.remove('disabled');
+                        btn.style.pointerEvents = 'auto';
+                    } else {
+                        btn.classList.add('disabled');
+                        btn.style.pointerEvents = 'none';
+                    }
+                } else if (btnId === 'duplicateBtn') {
+                    // Enable duplicate button for objects OR measurements
+                    if (hasSelection || hasMeasurementSelection) {
+                        btn.classList.remove('disabled');
+                        btn.style.pointerEvents = 'auto';
+                    } else {
+                        btn.classList.add('disabled');
+                        btn.style.pointerEvents = 'none';
+                    }
+                } else {
+                    // Other buttons only work with objects, not measurements
+                    if ((btnId === 'verticalMirrorBtn' || btnId === 'horizontalMirrorBtn' || btnId === 'scaleBtn') && hasTextSelection) {
+                        btn.classList.add('disabled');
+                        btn.style.pointerEvents = 'none';
+                    } else if (hasSelection && !hasMeasurementSelection) {
+                        btn.classList.remove('disabled');
+                        btn.style.pointerEvents = 'auto';
+                    } else {
+                        btn.classList.add('disabled');
+                        btn.style.pointerEvents = 'none';
+                    }
+                }
+            });
+        }
+
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left - panX) / zoomLevel;
+            const y = (e.clientY - rect.top - panY) / zoomLevel;
+            
+            startX = x;
+            startY = y;
+            
+            // Right click always pans
+            if (e.button === 2) {
+                isRightMouseDown = true;
+                isPanning = true;
+                lastPanX = e.clientX;
+                lastPanY = e.clientY;
+                return;
+            }
+            
+            if (currentTool === 'pan') {
+                isPanning = true;
+                lastPanX = e.clientX;
+                lastPanY = e.clientY;
+                return;
+            }
+            
+            if (currentTool === 'select') {
+                // Check if clicking on a measurement first
+                const clickedMeasurement = getMeasurementAtPoint(x, y);
+                if (clickedMeasurement) {
+                    if (clickedMeasurement.selected) {
+                        // Start moving selected measurement
+                        isMovingObject = true;
+                        moveStartX = x;
+                        moveStartY = y;
+                    } else {
+                        selectMeasurement(clickedMeasurement.id);
+                        isMovingObject = true;
+                        moveStartX = x;
+                        moveStartY = y;
+                    }
+                    return;
+                }
+                
+                const clickedObject = getObjectAtPoint(x, y);
+                if (clickedObject && clickedObject.selected) {
+                    // Start moving selected objects
+                    isMovingObject = true;
+                    moveStartX = x;
+                    moveStartY = y;
+                } else {
+                    // Select new object
+                    selectObject(x, y);
+                    const newSelectedObject = getObjectAtPoint(x, y);
+                    if (newSelectedObject) {
+                        isMovingObject = true;
+                        moveStartX = x;
+                        moveStartY = y;
+                    }
+                }
+            } else if (currentTool === 'move') {
+                // In move mode, only allow moving objects, don't select new ones
+                const clickedMeasurement = getMeasurementAtPoint(x, y);
+                if (clickedMeasurement && clickedMeasurement.selected) {
+                    isMovingObject = true;
+                    moveStartX = x;
+                    moveStartY = y;
+                    return;
+                }
+                
+                const clickedObject = getObjectAtPoint(x, y);
+                if (clickedObject && clickedObject.selected) {
+                    // Start moving selected objects
+                    isMovingObject = true;
+                    moveStartX = x;
+                    moveStartY = y;
+                } else {
+                    // Don't select new objects in move mode, just show message
+                    showNotification('Select objects first, then use move tool');
+                }
+            } else if (currentTool === 'measure') {
+                measurementPoints.push({x: startX, y: startY});
+                if (measurementPoints.length === 2) {
+                    const pixelDistance = Math.sqrt(
+                        Math.pow(measurementPoints[1].x - measurementPoints[0].x, 2) +
+                        Math.pow(measurementPoints[1].y - measurementPoints[0].y, 2)
+                    );
+                    const distance = pixelDistance / unitConversions[currentUnit];
+                    const angle = Math.atan2(
+                        measurementPoints[1].y - measurementPoints[0].y,
+                        measurementPoints[1].x - measurementPoints[0].x
+                    ) * 180 / Math.PI;
+                    
+                    document.getElementById('measureDistance').textContent = distance.toFixed(2);
+                    document.getElementById('measureAngle').textContent = angle.toFixed(1);
+                    document.getElementById('measureUnit').textContent = currentUnit;
+                    document.getElementById('measurementDisplay').classList.remove('hidden');
+                    
+                    const measurement = {
+                        id: Date.now(),
+                        start: measurementPoints[0],
+                        end: measurementPoints[1],
+                        distance: distance,
+                        angle: angle,
+                        unit: currentUnit,
+                        selected: false,
+                        rotation: 0,
+                        lineWeight: 2,
+                        fontSize: 10,
+                        color: '#ff6b6b'
+                    };
+                    
+                    measurements.push(measurement);
+                    
+                    // Auto-select the newly created measurement
+                    measurements.forEach(m => m.selected = false);
+                    selectedObjects.forEach(obj => obj.selected = false);
+                    selectedObjects = [];
+                    measurement.selected = true;
+                    selectedMeasurement = measurement;
+                    
+                    // Show measurement properties panel
+                    showSelectedMeasurementPanel(measurement);
+                    updateTransformButtonStates();
+                    
+                    measurementPoints = [];
+                    saveState('Add measurement');
+                    redrawCanvas();
+                    updateMeasurementsList();
+                    updateObjectsList(); // Update objects list to remove highlighting
+                    showNotification(`Measured: ${distance.toFixed(2)} ${currentUnit} at ${angle.toFixed(1)}°`);
+                }
+            } else if (currentTool === 'text') {
+                // Open text modal and store position for later placement
+                pendingTextPosition = {x: x, y: y};
+                openTextModal();
+            } else if (['line', 'rectangle', 'circle', 'arc'].includes(currentTool)) {
+                isDrawing = true;
+            }
+        }
+
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left - panX) / zoomLevel;
+            const y = (e.clientY - rect.top - panY) / zoomLevel;
+            
+            if (isPanning && (currentTool === 'pan' || isRightMouseDown)) {
+                panX += e.clientX - lastPanX;
+                panY += e.clientY - lastPanY;
+                lastPanX = e.clientX;
+                lastPanY = e.clientY;
+                redrawCanvas();
+                return;
+            }
+            
+            if (isMovingObject && (currentTool === 'select' || currentTool === 'move')) {
+                const deltaX = x - moveStartX;
+                const deltaY = y - moveStartY;
+                
+                // Move selected measurement if one is selected
+                if (selectedMeasurement) {
+                    selectedMeasurement.start.x += deltaX;
+                    selectedMeasurement.start.y += deltaY;
+                    selectedMeasurement.end.x += deltaX;
+                    selectedMeasurement.end.y += deltaY;
+                } else {
+                    // Move selected objects
+                    selectedObjects.forEach(obj => {
+                        obj.x1 += deltaX;
+                        obj.y1 += deltaY;
+                        if (obj.x2 !== undefined) obj.x2 += deltaX;
+                        if (obj.y2 !== undefined) obj.y2 += deltaY;
+                    });
+                }
+                
+                moveStartX = x;
+                moveStartY = y;
+                redrawCanvas();
+                return;
+            }
+            
+            if (isDrawing && ['line', 'rectangle', 'circle', 'arc'].includes(currentTool)) {
+                redrawCanvas();
+                drawPreview(startX, startY, x, y);
+            }
+            
+            if (currentTool === 'measure' && measurementPoints.length === 1) {
+                redrawCanvas();
+                drawMeasurementPreview(measurementPoints[0].x, measurementPoints[0].y, x, y);
+            }
+        }
+
+        function handleMouseUp(e) {
+            if (isPanning) {
+                isPanning = false;
+                isRightMouseDown = false;
+                return;
+            }
+            
+            if (isMovingObject) {
+                isMovingObject = false;
+                // Only show move notification if object actually moved
+                const rect = canvas.getBoundingClientRect();
+                const currentX = (e.clientX - rect.left - panX) / zoomLevel;
+                const currentY = (e.clientY - rect.top - panY) / zoomLevel;
+                
+                const hasMoved = Math.abs(currentX - moveStartX) > 1 || Math.abs(currentY - moveStartY) > 1;
+                
+                if (hasMoved) {
+                    if (selectedMeasurement) {
+                        saveState('Move measurement');
+                        showNotification('Moved measurement');
+                    } else if (selectedObjects.length > 0) {
+                        saveState('Move objects');
+                        showNotification(`Moved ${selectedObjects.length} object(s)`);
+                    }
+                }
+                return;
+            }
+            
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left - panX) / zoomLevel;
+            const y = (e.clientY - rect.top - panY) / zoomLevel;
+            
+            if (isDrawing && ['line', 'rectangle', 'circle', 'arc'].includes(currentTool)) {
+                createObject(startX, startY, x, y);
+            }
+            
+            isDrawing = false;
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            const newZoom = Math.max(0.1, Math.min(5, zoomLevel * zoomFactor));
+            
+            // Zoom towards mouse position
+            panX = mouseX - (mouseX - panX) * (newZoom / zoomLevel);
+            panY = mouseY - (mouseY - panY) * (newZoom / zoomLevel);
+            
+            zoomLevel = newZoom;
+            document.getElementById('zoomLevel').textContent = Math.round(zoomLevel * 100) + '%';
+            
+            redrawCanvas();
+        }
+
+        function updateCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.round((e.clientX - rect.left - panX) / zoomLevel);
+            const y = Math.round((e.clientY - rect.top - panY) / zoomLevel);
+            
+            document.getElementById('coordX').textContent = x;
+            document.getElementById('coordY').textContent = y;
+        }
+
+        function createObject(x1, y1, x2, y2) {
+            // Deselect any selected measurements when creating new objects
+            measurements.forEach(m => m.selected = false);
+            selectedMeasurement = null;
+            document.getElementById('measurementDisplay').classList.add('hidden');
+            hideSelectedMeasurementPanel();
+            updateMeasurementsList(); // Update measurements list to remove highlighting
+            
+            const lineType = document.getElementById('lineType').value;
+            const lineWeight = parseInt(document.getElementById('lineWeight').value);
+            const color = document.getElementById('objectColor').value;
+            
+            const obj = {
+                id: Date.now(),
+                type: currentTool,
+                x1, y1, x2, y2,
+                layer: currentLayer,
+                lineType,
+                lineWeight,
+                color,
+                selected: false,
+                scale: 100
+            };
+            
+            // Special handling for different shapes
+            if (currentTool === 'circle') {
+                obj.radiusX = Math.abs(x2 - x1);
+                obj.radiusY = Math.abs(y2 - y1);
+                obj.radius = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); // Keep for backward compatibility
+            } else if (currentTool === 'arc') {
+                obj.radiusX = Math.abs(x2 - x1);
+                obj.radiusY = Math.abs(y2 - y1);
+                obj.radius = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); // Keep for backward compatibility
+                obj.startAngle = 0;
+                obj.endAngle = Math.PI;
+            } else if (currentTool === 'text') {
+                // Text creation is handled by modal, skip here
+                return;
+            } else if (currentTool === 'rectangle') {
+                obj.rotation = 0;
+            }
+            
+            objects.push(obj);
+            saveState(`Create ${currentTool}`);
+            redrawCanvas();
+            
+            // Update objects list immediately if it's visible
+            if (!objectsListCollapsed) {
+                updateObjectsList();
+            }
+            
+            // Show creation feedback
+            showNotification(`${currentTool.charAt(0).toUpperCase() + currentTool.slice(1)} created`);
+        }
+        
+        function deleteSelected() {
+            if (selectedObjects.length === 0) {
+                showAlert('No objects selected to delete');
+                return;
+            }
+            
+            const count = selectedObjects.length;
+            objects = objects.filter(obj => !selectedObjects.includes(obj));
+            selectedObjects = [];
+            
+            saveState(`Delete ${count} object(s)`);
+            redrawCanvas();
+            hideSelectedObjectProperties();
+            updateTransformButtonStates();
+            showNotification(`Deleted ${count} object(s)`);
+        }
+
+        function drawPreview(x1, y1, x2, y2) {
+            ctx.save();
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            
+            ctx.beginPath();
+            
+            switch (currentTool) {
+                case 'line':
+                    ctx.moveTo(x1 * zoomLevel + panX, y1 * zoomLevel + panY);
+                    ctx.lineTo(x2 * zoomLevel + panX, y2 * zoomLevel + panY);
+                    break;
+                case 'rectangle':
+                    ctx.rect(x1 * zoomLevel + panX, y1 * zoomLevel + panY, 
+                            (x2 - x1) * zoomLevel, (y2 - y1) * zoomLevel);
+                    break;
+                case 'circle':
+                    const radiusX = Math.abs(x2 - x1) * zoomLevel;
+                    const radiusY = Math.abs(y2 - y1) * zoomLevel;
+                    ctx.ellipse(x1 * zoomLevel + panX, y1 * zoomLevel + panY, radiusX, radiusY, 0, 0, 2 * Math.PI);
+                    break;
+                case 'arc':
+                    const arcRadiusX = Math.abs(x2 - x1) * zoomLevel;
+                    const arcRadiusY = Math.abs(y2 - y1) * zoomLevel;
+                    ctx.ellipse(x1 * zoomLevel + panX, y1 * zoomLevel + panY, arcRadiusX, arcRadiusY, 0, 0, Math.PI);
+                    break;
+                case 'text':
+                    ctx.rect(x1 * zoomLevel + panX - 2, y1 * zoomLevel + panY - 2, 4, 4);
+                    break;
+            }
+            
+            ctx.stroke();
+            ctx.restore();
+        }
+        
+        function drawMeasurementPreview(x1, y1, x2, y2) {
+            ctx.save();
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 3]);
+            
+            const startX = x1 * zoomLevel + panX;
+            const startY = y1 * zoomLevel + panY;
+            const endX = x2 * zoomLevel + panX;
+            const endY = y2 * zoomLevel + panY;
+            
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            
+            // Draw distance text with unit
+            const pixelDistance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const distance = pixelDistance / unitConversions[currentUnit];
+            const midX = (x1 + x2) / 2 * zoomLevel + panX;
+            const midY = (y1 + y2) / 2 * zoomLevel + panY;
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = '12px Inter';
+            
+            // Calculate text rotation based on line angle for better readability
+            const textAngle = Math.atan2(endY - startY, endX - startX);
+            let displayAngle = textAngle;
+            
+            // Keep text readable by flipping if upside down
+            if (Math.abs(textAngle) > Math.PI / 2) {
+                displayAngle = textAngle + Math.PI;
+            }
+            
+            // Save context and apply rotation
+            ctx.save();
+            ctx.translate(midX, midY);
+            ctx.rotate(displayAngle);
+            
+            // Measure text width for centering
+            const text = `${distance.toFixed(2)} ${currentUnit}`;
+            const textMetrics = ctx.measureText(text);
+            const textWidth = textMetrics.width;
+            
+            // Draw text centered with offset from line
+            const textOffset = 15;
+            ctx.fillText(text, -textWidth / 2, -textOffset);
+            
+            ctx.restore();
+            ctx.restore();
+        }
+
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw objects in layer order (higher layers on top)
+            const sortedObjects = [...objects].sort((a, b) => b.layer - a.layer);
+            sortedObjects.forEach(obj => {
+                if (!layers[obj.layer]?.visible) return;
+                
+                ctx.save();
+                ctx.strokeStyle = obj.selected ? '#3b82f6' : obj.color;
+                ctx.lineWidth = obj.lineWeight;
+                
+                // Set line dash pattern
+                switch (obj.lineType) {
+                    case 'dashed':
+                        ctx.setLineDash([10, 5]);
+                        break;
+                    case 'dotted':
+                        ctx.setLineDash([2, 3]);
+                        break;
+                    default:
+                        ctx.setLineDash([]);
+                }
+                
+                ctx.beginPath();
+                
+                switch (obj.type) {
+                    case 'line':
+                        ctx.moveTo(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY);
+                        ctx.lineTo(obj.x2 * zoomLevel + panX, obj.y2 * zoomLevel + panY);
+                        break;
+                    case 'rectangle':
+                        if (obj.rotation && obj.rotation !== 0) {
+                            // Calculate rectangle center and dimensions
+                            const centerX = (obj.x1 + obj.x2) / 2 * zoomLevel + panX;
+                            const centerY = (obj.y1 + obj.y2) / 2 * zoomLevel + panY;
+                            const width = (obj.x2 - obj.x1) * zoomLevel;
+                            const height = (obj.y2 - obj.y1) * zoomLevel;
+                            
+                            // Apply rotation transformation
+                            ctx.translate(centerX, centerY);
+                            ctx.rotate(obj.rotation * Math.PI / 180);
+                            ctx.rect(-width / 2, -height / 2, width, height);
+                        } else {
+                            ctx.rect(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY,
+                                    (obj.x2 - obj.x1) * zoomLevel, (obj.y2 - obj.y1) * zoomLevel);
+                        }
+                        break;
+                    case 'circle':
+                        if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                            const rotation = (obj.rotation || 0) * Math.PI / 180;
+                            ctx.ellipse(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY,
+                                       obj.radiusX * zoomLevel, obj.radiusY * zoomLevel, rotation, 0, 2 * Math.PI);
+                        } else {
+                            // Fallback for old circular objects
+                            ctx.arc(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY,
+                                   obj.radius * zoomLevel, 0, 2 * Math.PI);
+                        }
+                        break;
+                    case 'arc':
+                        if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                            const rotation = (obj.rotation || 0) * Math.PI / 180;
+                            ctx.ellipse(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY,
+                                       obj.radiusX * zoomLevel, obj.radiusY * zoomLevel, rotation, obj.startAngle || 0, obj.endAngle || Math.PI);
+                        } else {
+                            // Fallback for old arc objects
+                            ctx.arc(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY,
+                                   obj.radius * zoomLevel, obj.startAngle || 0, obj.endAngle || Math.PI);
+                        }
+                        break;
+                    case 'text':
+                        const fontSize = Math.max(8, (obj.fontSize || 16) * zoomLevel);
+                        const textLineWeight = obj.lineWeight || 1;
+                        ctx.font = `${fontSize}px Inter`;
+                        ctx.fillStyle = obj.selected ? '#3b82f6' : obj.color;
+                        
+                        // Apply rotation if specified
+                        if (obj.rotation && obj.rotation !== 0) {
+                            ctx.save();
+                            ctx.translate(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY);
+                            ctx.rotate(obj.rotation * Math.PI / 180);
+                            
+                            // Draw text outline if line weight > 0
+                            if (textLineWeight > 0) {
+                                ctx.strokeStyle = obj.selected ? '#3b82f6' : obj.color;
+                                ctx.lineWidth = textLineWeight;
+                                ctx.strokeText(obj.text, 0, 0);
+                            }
+                            ctx.fillText(obj.text, 0, 0);
+                            
+                            // Draw selection box for rotated text
+                            if (obj.selected) {
+                                const textMetrics = ctx.measureText(obj.text);
+                                const textWidth = textMetrics.width;
+                                const textHeight = fontSize;
+                                
+                                ctx.strokeStyle = '#3b82f6';
+                                ctx.lineWidth = 1;
+                                ctx.setLineDash([3, 3]);
+                                ctx.strokeRect(-2, -textHeight - 2, textWidth + 4, textHeight + 4);
+                            }
+                            ctx.restore();
+                        } else {
+                            // Draw text outline if line weight > 0
+                            if (textLineWeight > 0) {
+                                ctx.strokeStyle = obj.selected ? '#3b82f6' : obj.color;
+                                ctx.lineWidth = textLineWeight;
+                                ctx.strokeText(obj.text, obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY);
+                            }
+                            ctx.fillText(obj.text, obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY);
+                            
+                            // Draw selection box for text
+                            if (obj.selected) {
+                                const textMetrics = ctx.measureText(obj.text);
+                                const textWidth = textMetrics.width;
+                                const textHeight = fontSize;
+                                
+                                ctx.strokeStyle = '#3b82f6';
+                                ctx.lineWidth = 1;
+                                ctx.setLineDash([3, 3]);
+                                ctx.strokeRect(
+                                    obj.x1 * zoomLevel + panX - 2,
+                                    obj.y1 * zoomLevel + panY - textHeight - 2,
+                                    textWidth + 4,
+                                    textHeight + 4
+                                );
+                            }
+                        }
+                        break;
+                }
+                
+                ctx.stroke();
+                ctx.restore();
+            });
+            
+            // Draw measurements
+            measurements.forEach(measurement => {
+                ctx.save();
+                const measurementColor = measurement.color || '#ff6b6b';
+                const lineWeight = measurement.lineWeight || 2;
+                const fontSize = measurement.fontSize || 10;
+                ctx.strokeStyle = measurement.selected ? '#3b82f6' : measurementColor;
+                ctx.fillStyle = measurement.selected ? '#3b82f6' : measurementColor;
+                ctx.lineWidth = measurement.selected ? Math.max(lineWeight, 2) : lineWeight;
+                
+                const startX = measurement.start.x * zoomLevel + panX;
+                const startY = measurement.start.y * zoomLevel + panY;
+                const endX = measurement.end.x * zoomLevel + panX;
+                const endY = measurement.end.y * zoomLevel + panY;
+                
+                // Calculate angle and arrow size based on line weight
+                const angle = Math.atan2(endY - startY, endX - startX);
+                const baseArrowSize = Math.max(8, Math.min(15, 10 / zoomLevel));
+                const arrowSize = baseArrowSize + (lineWeight - 1) * 2;
+                
+                // Calculate arrow tip positions
+                const startArrowTipX = startX + arrowSize * Math.cos(angle);
+                const startArrowTipY = startY + arrowSize * Math.sin(angle);
+                const endArrowTipX = endX - arrowSize * Math.cos(angle);
+                const endArrowTipY = endY - arrowSize * Math.sin(angle);
+                
+                // Draw dotted line between arrow tips (not behind arrows)
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath();
+                ctx.moveTo(startArrowTipX, startArrowTipY);
+                ctx.lineTo(endArrowTipX, endArrowTipY);
+                ctx.stroke();
+                
+                // Draw start arrow (pointing outward from line)
+                ctx.setLineDash([]);
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(
+                    startX + arrowSize * Math.cos(angle + 0.3),
+                    startY + arrowSize * Math.sin(angle + 0.3)
+                );
+                ctx.lineTo(
+                    startX + arrowSize * Math.cos(angle - 0.3),
+                    startY + arrowSize * Math.sin(angle - 0.3)
+                );
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw end arrow (pointing outward from line)
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(
+                    endX + arrowSize * Math.cos(angle + Math.PI + 0.3),
+                    endY + arrowSize * Math.sin(angle + Math.PI + 0.3)
+                );
+                ctx.lineTo(
+                    endX + arrowSize * Math.cos(angle + Math.PI - 0.3),
+                    endY + arrowSize * Math.sin(angle + Math.PI - 0.3)
+                );
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw measurement text with unit
+                const midX = (measurement.start.x + measurement.end.x) / 2 * zoomLevel + panX;
+                const midY = (measurement.start.y + measurement.end.y) / 2 * zoomLevel + panY;
+                
+                ctx.fillStyle = measurement.selected ? '#3b82f6' : measurementColor;
+                const displayFontSize = Math.max(8, fontSize * zoomLevel);
+                ctx.font = measurement.selected ? `bold ${displayFontSize}px Inter` : `${displayFontSize}px Inter`;
+                
+                // Calculate text rotation based on line angle for better readability
+                const textAngle = Math.atan2(endY - startY, endX - startX);
+                let displayAngle = textAngle;
+                
+                // Keep text readable by flipping if upside down
+                if (Math.abs(textAngle) > Math.PI / 2) {
+                    displayAngle = textAngle + Math.PI;
+                }
+                
+                // Save context and apply rotation
+                ctx.save();
+                ctx.translate(midX, midY);
+                ctx.rotate(displayAngle);
+                
+                // Measure text width for centering
+                const text = `${measurement.distance.toFixed(2)} ${measurement.unit}`;
+                const textMetrics = ctx.measureText(text);
+                const textWidth = textMetrics.width;
+                
+                // Draw text centered with offset from line
+                const textOffset = 15;
+                ctx.fillText(text, -textWidth / 2, -textOffset);
+                
+                ctx.restore();
+                
+                // Draw selection indicators
+                if (measurement.selected) {
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.beginPath();
+                    ctx.arc(startX, startY, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(endX, endY, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        function getObjectAtPoint(x, y) {
+            // Check objects in reverse order (top to bottom)
+            for (let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                if (!layers[obj.layer]?.visible) continue;
+                
+                if (isPointInObject(x, y, obj)) {
+                    return obj;
+                }
+            }
+            return null;
+        }
+        
+        function isPointInObject(x, y, obj) {
+            let tolerance = Math.max(10, Math.min(30, 20 / zoomLevel)); // Better adaptive tolerance
+            
+            // Increase tolerance for lines to make them easier to select
+            if (obj.type === 'line') {
+                tolerance = Math.max(15, Math.min(40, 25 / zoomLevel));
+            }
+            
+            switch (obj.type) {
+                case 'line':
+                    return distanceToLine(x, y, obj.x1, obj.y1, obj.x2, obj.y2) < tolerance;
+                case 'rectangle':
+                    const minX = Math.min(obj.x1, obj.x2);
+                    const maxX = Math.max(obj.x1, obj.x2);
+                    const minY = Math.min(obj.y1, obj.y2);
+                    const maxY = Math.max(obj.y1, obj.y2);
+                    return x >= minX - tolerance && x <= maxX + tolerance && 
+                           y >= minY - tolerance && y <= maxY + tolerance;
+                case 'circle':
+                    if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                        // Ellipse collision detection
+                        const dx = x - obj.x1;
+                        const dy = y - obj.y1;
+                        const ellipseTest = (dx * dx) / (obj.radiusX * obj.radiusX) + (dy * dy) / (obj.radiusY * obj.radiusY);
+                        return Math.abs(ellipseTest - 1) < tolerance / Math.min(obj.radiusX, obj.radiusY);
+                    } else {
+                        // Fallback for old circular objects
+                        const distance = Math.sqrt((x - obj.x1) ** 2 + (y - obj.y1) ** 2);
+                        return Math.abs(distance - obj.radius) < tolerance;
+                    }
+                case 'text':
+                    // Better text bounding box calculation with rotation support
+                    ctx.font = `${Math.max(12, obj.fontSize * zoomLevel)}px Inter`;
+                    const textMetrics = ctx.measureText(obj.text);
+                    const textWidth = textMetrics.width / zoomLevel;
+                    const textHeight = Math.max(12, obj.fontSize * zoomLevel) / zoomLevel;
+                    
+                    if (obj.rotation && obj.rotation !== 0) {
+                        // For rotated text, use a circular approximation for easier selection
+                        const textRadius = Math.sqrt(textWidth * textWidth + textHeight * textHeight) / 2;
+                        const distance = Math.sqrt((x - obj.x1) ** 2 + (y - obj.y1) ** 2);
+                        return distance <= textRadius + tolerance;
+                    } else {
+                        return x >= obj.x1 - tolerance && x <= obj.x1 + textWidth + tolerance &&
+                               y >= obj.y1 - textHeight - tolerance && y <= obj.y1 + tolerance;
+                    }
+                case 'arc':
+                    if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                        // Elliptical arc collision detection
+                        const dx = x - obj.x1;
+                        const dy = y - obj.y1;
+                        const ellipseTest = (dx * dx) / (obj.radiusX * obj.radiusX) + (dy * dy) / (obj.radiusY * obj.radiusY);
+                        return Math.abs(ellipseTest - 1) < tolerance / Math.min(obj.radiusX, obj.radiusY);
+                    } else {
+                        // Fallback for old arc objects
+                        const arcDistance = Math.sqrt((x - obj.x1) ** 2 + (y - obj.y1) ** 2);
+                        return Math.abs(arcDistance - obj.radius) < tolerance;
+                    }
+                default:
+                    return Math.sqrt((x - obj.x1) ** 2 + (y - obj.y1) ** 2) < tolerance;
+            }
+        }
+        
+        function distanceToLine(px, py, x1, y1, x2, y2) {
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+            
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            
+            if (lenSq === 0) return Math.sqrt(A * A + B * B);
+            
+            let param = dot / lenSq;
+            param = Math.max(0, Math.min(1, param));
+            
+            const xx = x1 + param * C;
+            const yy = y1 + param * D;
+            
+            const dx = px - xx;
+            const dy = py - yy;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function selectObject(x, y) {
+            const clickedObject = getObjectAtPoint(x, y);
+            
+            if (!clickedObject) {
+                // Clear selection if clicking empty space
+                selectedObjects.forEach(obj => obj.selected = false);
+                selectedObjects = [];
+                
+                // Also deselect measurements
+                measurements.forEach(m => m.selected = false);
+                selectedMeasurement = null;
+                document.getElementById('measurementDisplay').classList.add('hidden');
+                hideSelectedMeasurementPanel();
+                
+                redrawCanvas();
+                hideSelectedObjectProperties();
+                updateTransformButtonStates();
+                updateObjectsList(); // Update list highlighting
+                updateMeasurementsList(); // Update measurements list highlighting
+                // Hide properties panel when no objects selected
+                document.getElementById('propertiesPanel').classList.add('hidden');
+                return;
+            }
+            
+            // Switch to the layer of the clicked object if it's different
+            if (clickedObject.layer !== currentLayer) {
+                currentLayer = clickedObject.layer;
+                updateLayersList(); // This will update the layer highlighting
+                showNotification(`Switched to Layer ${currentLayer}`);
+            }
+            
+            // Deselect any selected measurements when selecting objects
+            measurements.forEach(m => m.selected = false);
+            selectedMeasurement = null;
+            document.getElementById('measurementDisplay').classList.add('hidden');
+            hideSelectedMeasurementPanel();
+            updateMeasurementsList(); // Update measurements list to remove highlighting
+            
+            // Toggle selection if object is already selected
+            if (clickedObject.selected) {
+                clickedObject.selected = false;
+                selectedObjects = selectedObjects.filter(obj => obj !== clickedObject);
+            } else {
+                // Clear previous selection and select new object
+                selectedObjects.forEach(obj => obj.selected = false);
+                selectedObjects = [clickedObject];
+                clickedObject.selected = true;
+            }
+            
+            redrawCanvas();
+            updateObjectsList(); // Update list highlighting
+            updateMeasurementsList(); // Update measurements list highlighting
+            
+            if (selectedObjects.length > 0) {
+                showNotification(`Selected ${selectedObjects.length} object(s)`);
+                updateTransformControls();
+                updateTransformButtonStates();
+                showSelectedObjectProperties();
+                // Show properties panel when objects are selected
+                document.getElementById('propertiesPanel').classList.remove('hidden');
+            } else {
+                hideSelectedObjectProperties();
+                updateTransformButtonStates();
+                // Hide properties panel when no objects selected
+                document.getElementById('propertiesPanel').classList.add('hidden');
+            }
+        }
+        
+        function showSelectedObjectProperties() {
+            // Hide general properties when object is selected
+            document.getElementById('generalProperties').style.display = 'none';
+            
+            // Show selected object properties panel
+            document.getElementById('selectedObjectProperties').classList.remove('hidden');
+            
+            // Update selected object style controls with current values
+            if (selectedObjects.length > 0) {
+                const obj = selectedObjects[0]; // Use first selected object as reference
+                document.getElementById('selectedLineType').value = obj.lineType || 'solid';
+                document.getElementById('selectedLineWeight').value = obj.lineWeight || '1';
+                document.getElementById('selectedObjectColor').value = obj.color || '#000000';
+                
+                // Update transform controls with current object data
+                updateTransformControls();
+            }
+            
+            // Show text controls if text is selected
+            const textSelected = selectedObjects.some(obj => obj.type === 'text');
+            if (textSelected) {
+                document.getElementById('textControls').classList.remove('hidden');
+                document.getElementById('sizeControls').classList.add('hidden');
+                document.getElementById('transformControls').classList.remove('hidden');
+                
+                // Hide line type and line weight for text objects
+                document.getElementById('selectedObjectStyle').style.display = 'none';
+                
+                // Disable scale input for text objects but enable rotation
+                document.getElementById('scaleInput').disabled = true;
+                document.getElementById('scaleInput').style.opacity = '0.5';
+                document.getElementById('scaleInput').style.cursor = 'not-allowed';
+                document.getElementById('rotationInput').disabled = false;
+                document.getElementById('rotationInput').style.opacity = '1';
+                document.getElementById('rotationInput').style.cursor = 'auto';
+                
+                const textObj = selectedObjects.find(obj => obj.type === 'text');
+                document.getElementById('textContentInput').value = textObj.text || '';
+                document.getElementById('fontSizeInput').value = textObj.fontSize || 16;
+                document.getElementById('textColorInput').value = textObj.color || '#000000';
+                document.getElementById('textLineWeight').value = textObj.lineWeight || 1;
+            } else {
+                document.getElementById('textControls').classList.add('hidden');
+                document.getElementById('sizeControls').classList.remove('hidden');
+                document.getElementById('transformControls').classList.remove('hidden');
+                
+                // Show line type and line weight for non-text objects
+                document.getElementById('selectedObjectStyle').style.display = 'block';
+                
+                // Enable scale and rotation inputs for non-text objects
+                document.getElementById('scaleInput').disabled = false;
+                document.getElementById('scaleInput').style.opacity = '1';
+                document.getElementById('scaleInput').style.cursor = 'auto';
+                document.getElementById('rotationInput').disabled = false;
+                document.getElementById('rotationInput').style.opacity = '1';
+                document.getElementById('rotationInput').style.cursor = 'auto';
+            }
+        }
+        
+        function hideSelectedObjectProperties() {
+            // Show general properties when no object is selected
+            document.getElementById('generalProperties').style.display = 'block';
+            
+            document.getElementById('selectedObjectProperties').classList.add('hidden');
+            document.getElementById('textControls').classList.add('hidden');
+            
+            // Only hide measurement panel if no measurement is selected
+            if (!selectedMeasurement) {
+                hideSelectedMeasurementPanel();
+            }
+            
+            // Remove measurement color controls if they exist
+            const measurementColorControls = document.getElementById('measurementColorControls');
+            if (measurementColorControls) {
+                measurementColorControls.remove();
+            }
+            
+            // Disable rotation and scale inputs when nothing is selected
+            document.getElementById('rotationInput').disabled = true;
+            document.getElementById('rotationInput').style.opacity = '0.5';
+            document.getElementById('rotationInput').style.cursor = 'not-allowed';
+            document.getElementById('scaleInput').disabled = true;
+            document.getElementById('scaleInput').style.opacity = '0.5';
+            document.getElementById('scaleInput').style.cursor = 'not-allowed';
+            
+            // Hide properties panel if select tool is active and no objects selected and no measurement selected
+            if (currentTool === 'select' && !selectedMeasurement) {
+                document.getElementById('propertiesPanel').classList.add('hidden');
+            }
+        }
+        
+        function showSelectedMeasurementPanel(measurement) {
+            // Hide other panels
+            document.getElementById('propertiesPanel').classList.add('hidden');
+            
+            // Show measurement properties panel
+            document.getElementById('selectedMeasurementPanel').classList.remove('hidden');
+            
+            // Update measurement info
+            document.getElementById('measurementDistance').value = `${measurement.distance.toFixed(2)} ${measurement.unit}`;
+            document.getElementById('measurementAngle').value = `${measurement.angle.toFixed(1)}°`;
+            
+            // Update color input with measurement color
+            document.getElementById('measurementColor').value = measurement.color || '#ff6b6b';
+            
+            // Update line weight input with measurement line weight
+            document.getElementById('measurementLineWeight').value = measurement.lineWeight || 2;
+            
+            // Update font size input with measurement font size
+            document.getElementById('measurementFontSize').value = measurement.fontSize || 10;
+            
+            // Update rotation input with measurement angle - this should match the measurement info
+            document.getElementById('measurementRotation').value = measurement.angle.toFixed(1);
+        }
+        
+        function hideSelectedMeasurementPanel() {
+            document.getElementById('selectedMeasurementPanel').classList.add('hidden');
+        }
+        
+        function updateMeasurementColor() {
+            if (!selectedMeasurement) return;
+            
+            const newColor = document.getElementById('measurementColor').value;
+            selectedMeasurement.color = newColor;
+            
+            saveState('Update measurement color');
+            redrawCanvas();
+            showNotification('Measurement color updated');
+        }
+        
+        function updateMeasurementLineWeight() {
+            if (!selectedMeasurement) return;
+            
+            const newLineWeight = parseInt(document.getElementById('measurementLineWeight').value);
+            selectedMeasurement.lineWeight = newLineWeight;
+            
+            saveState('Update measurement line weight');
+            redrawCanvas();
+            showNotification('Measurement line weight updated');
+        }
+        
+        function updateMeasurementFontSize() {
+            if (!selectedMeasurement) return;
+            
+            const newFontSize = parseInt(document.getElementById('measurementFontSize').value);
+            selectedMeasurement.fontSize = newFontSize;
+            
+            saveState('Update measurement font size');
+            redrawCanvas();
+            showNotification('Measurement font size updated');
+        }
+        
+        function applyMeasurementRotation() {
+            if (!selectedMeasurement) return;
+            
+            let angle = parseFloat(document.getElementById('measurementRotation').value);
+            
+            // Handle empty input - restore to current angle
+            if (isNaN(angle)) {
+                angle = selectedMeasurement.angle;
+                document.getElementById('measurementRotation').value = angle.toFixed(1);
+                return;
+            }
+            
+            // Normalize angle to -360 to 360 range
+            while (angle > 360) angle -= 360;
+            while (angle < -360) angle += 360;
+            document.getElementById('measurementRotation').value = angle.toFixed(1);
+            
+            // Calculate the center point and current distance
+            const centerX = (selectedMeasurement.start.x + selectedMeasurement.end.x) / 2;
+            const centerY = (selectedMeasurement.start.y + selectedMeasurement.end.y) / 2;
+            const distance = selectedMeasurement.distance * unitConversions[selectedMeasurement.unit];
+            
+            // Set new positions based on the desired angle
+            const radians = angle * Math.PI / 180;
+            const halfDistance = distance / 2;
+            
+            selectedMeasurement.start.x = centerX - halfDistance * Math.cos(radians);
+            selectedMeasurement.start.y = centerY - halfDistance * Math.sin(radians);
+            selectedMeasurement.end.x = centerX + halfDistance * Math.cos(radians);
+            selectedMeasurement.end.y = centerY + halfDistance * Math.sin(radians);
+            
+            // Update the measurement angle to match exactly
+            selectedMeasurement.angle = angle;
+            
+            // Update both measurement displays to show the same angle
+            document.getElementById('measureDistance').textContent = selectedMeasurement.distance.toFixed(2);
+            document.getElementById('measureAngle').textContent = selectedMeasurement.angle.toFixed(1);
+            document.getElementById('measurementDistance').value = `${selectedMeasurement.distance.toFixed(2)} ${selectedMeasurement.unit}`;
+            document.getElementById('measurementAngle').value = `${selectedMeasurement.angle.toFixed(1)}°`;
+            
+            saveState('Rotate measurement');
+            redrawCanvas();
+        }
+        
+        function deleteSelectedMeasurement() {
+            if (!selectedMeasurement) return;
+            
+            const measurementIndex = measurements.findIndex(m => m.id === selectedMeasurement.id);
+            if (measurementIndex !== -1) {
+                measurements.splice(measurementIndex, 1);
+                selectedMeasurement = null;
+                document.getElementById('measurementDisplay').classList.add('hidden');
+                hideSelectedMeasurementPanel();
+                updateTransformButtonStates();
+                
+                saveState('Delete measurement');
+                redrawCanvas();
+                updateMeasurementsList();
+                showNotification('Measurement deleted');
+            }
+        }
+
+        // Layer management
+        function addLayer() {
+            const layerId = layers.length;
+            const layerName = `Layer ${layerId}`;
+            
+            layers.push({
+                id: layerId,
+                name: layerName,
+                visible: true,
+                color: '#000000'
+            });
+            
+            updateLayersList();
+            showNotification(`Layer "${layerName}" added`);
+        }
+
+        function updateLayersList() {
+            const layersList = document.getElementById('layersList');
+            layersList.innerHTML = '';
+            
+            layers.forEach((layer, index) => {
+                const layerDiv = document.createElement('div');
+                layerDiv.className = `layer-item flex items-center justify-between p-2 rounded cursor-pointer ${layer.id === currentLayer ? 'active' : ''}`;
+                layerDiv.dataset.layer = layer.id;
+                layerDiv.dataset.index = index;
+                layerDiv.draggable = true;
+                
+                layerDiv.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="drag-handle cursor-move text-gray-400 hover:text-gray-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                            </svg>
+                        </div>
+                        <div class="w-4 h-4 rounded" style="background-color: ${layer.color}"></div>
+                        <span class="text-sm">${layer.name}</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="text-gray-400 hover:text-gray-600" onclick="toggleLayerVisibility(${layer.id})">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                ${layer.visible ? 
+                                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>' :
+                                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>'
+                                }
+                            </svg>
+                        </button>
+                        <button class="text-red-400 hover:text-red-600 ml-1" onclick="confirmDeleteLayer(${layer.id})" title="Delete Layer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                // Add drag and drop event listeners
+                layerDiv.addEventListener('dragstart', handleLayerDragStart);
+                layerDiv.addEventListener('dragover', handleLayerDragOver);
+                layerDiv.addEventListener('drop', handleLayerDrop);
+                layerDiv.addEventListener('dragend', handleLayerDragEnd);
+                
+                layerDiv.addEventListener('click', (e) => {
+                    if (!e.target.closest('.drag-handle')) {
+                        setCurrentLayer(layer.id);
+                    }
+                });
+                
+                layersList.appendChild(layerDiv);
+            });
+            
+            updateObjectsList();
+        }
+        
+        function updateObjectsList() {
+            const objectsList = document.getElementById('objectsList');
+            if (objectsListCollapsed) {
+                objectsList.style.display = 'none';
+                return;
+            }
+            
+            objectsList.style.display = 'block';
+            objectsList.innerHTML = '';
+            
+            // Show only objects from the current selected layer
+            const currentLayerObjects = objects.filter(obj => obj.layer === currentLayer);
+            
+            if (currentLayerObjects.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'text-xs text-gray-500 text-center py-2';
+                emptyDiv.textContent = 'No objects in this layer';
+                objectsList.appendChild(emptyDiv);
+                return;
+            }
+            
+            currentLayerObjects.forEach(obj => {
+                const objectDiv = document.createElement('div');
+                objectDiv.className = `flex items-center justify-between p-1 rounded cursor-pointer group ${obj.selected ? 'bg-blue-100 border border-blue-300' : 'hover:bg-gray-100'}`;
+                objectDiv.dataset.objectId = obj.id; // Add data attribute for easier selection
+                
+                const icon = getObjectIcon(obj.type);
+                const name = getObjectName(obj);
+                
+                objectDiv.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 ${obj.selected ? 'text-blue-600' : 'text-gray-500'}">
+                            ${icon}
+                        </div>
+                        <span class="text-xs ${obj.selected ? 'text-blue-800 font-medium' : 'text-gray-700'}">${name}</span>
+                    </div>
+                    <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100" onclick="deleteObject('${obj.id}')" title="Delete Object">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" style="color: red;"></path>
+                        </svg>
+                    </button>
+                `;
+                
+                objectDiv.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        selectObjectById(obj.id);
+                    }
+                });
+                
+                objectsList.appendChild(objectDiv);
+            });
+        }
+        
+        function getObjectIcon(type) {
+            switch (type) {
+                case 'line':
+                    return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20L20 4"></path></svg>';
+                case 'rectangle':
+                    return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"></path></svg>';
+                case 'circle':
+                    return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle></svg>';
+                case 'arc':
+                    return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12a10 10 0 0 0 20 0"></path></svg>';
+                case 'text':
+                    return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>';
+                default:
+                    return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle></svg>';
+            }
+        }
+        
+        function getObjectName(obj) {
+            switch (obj.type) {
+                case 'line':
+                    const length = Math.sqrt(Math.pow(obj.x2 - obj.x1, 2) + Math.pow(obj.y2 - obj.y1, 2)) / unitConversions[currentUnit];
+                    return `Line (${length.toFixed(1)} ${currentUnit})`;
+                case 'rectangle':
+                    const width = Math.abs(obj.x2 - obj.x1) / unitConversions[currentUnit];
+                    const height = Math.abs(obj.y2 - obj.y1) / unitConversions[currentUnit];
+                    return `Rectangle (${width.toFixed(1)}×${height.toFixed(1)} ${currentUnit})`;
+                case 'circle':
+                    if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                        const width = (obj.radiusX * 2) / unitConversions[currentUnit];
+                        const height = (obj.radiusY * 2) / unitConversions[currentUnit];
+                        if (Math.abs(width - height) < 0.1) {
+                            return `Circle (⌀${width.toFixed(1)} ${currentUnit})`;
+                        } else {
+                            return `Ellipse (${width.toFixed(1)}×${height.toFixed(1)} ${currentUnit})`;
+                        }
+                    } else {
+                        // Fallback for old circular objects
+                        const diameter = (obj.radius * 2) / unitConversions[currentUnit];
+                        return `Circle (⌀${diameter.toFixed(1)} ${currentUnit})`;
+                    }
+                case 'arc':
+                    if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                        const width = (obj.radiusX * 2) / unitConversions[currentUnit];
+                        const height = (obj.radiusY * 2) / unitConversions[currentUnit];
+                        if (Math.abs(width - height) < 0.1) {
+                            return `Arc (⌀${width.toFixed(1)} ${currentUnit})`;
+                        } else {
+                            return `Arc (${width.toFixed(1)}×${height.toFixed(1)} ${currentUnit})`;
+                        }
+                    } else {
+                        // Fallback for old arc objects
+                        const arcDiameter = (obj.radius * 2) / unitConversions[currentUnit];
+                        return `Arc (⌀${arcDiameter.toFixed(1)} ${currentUnit})`;
+                    }
+                case 'text':
+                    const preview = obj.text.length > 15 ? obj.text.substring(0, 15) + '...' : obj.text;
+                    return `Text: "${preview}"`;
+                default:
+                    return `${obj.type.charAt(0).toUpperCase() + obj.type.slice(1)} #${obj.id}`;
+            }
+        }
+        
+        function toggleObjectsList() {
+            objectsListCollapsed = !objectsListCollapsed;
+            const icon = document.getElementById('objectsToggleIcon');
+            const objectsList = document.getElementById('objectsList');
+            
+            if (objectsListCollapsed) {
+                objectsList.style.display = 'none';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>';
+            } else {
+                objectsList.style.display = 'block';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+                updateObjectsList();
+            }
+        }
+        
+        function selectObjectById(objectId) {
+            const obj = objects.find(o => o.id == objectId);
+            if (obj) {
+                // Switch to the layer of the selected object if it's different
+                if (obj.layer !== currentLayer) {
+                    currentLayer = obj.layer;
+                    updateLayersList(); // This will update the layer highlighting
+                    showNotification(`Switched to Layer ${currentLayer}`);
+                }
+                
+                // Clear previous object selection
+                selectedObjects.forEach(o => o.selected = false);
+                selectedObjects = [obj];
+                obj.selected = true;
+                
+                // Deselect any selected measurements when selecting objects
+                measurements.forEach(m => m.selected = false);
+                selectedMeasurement = null;
+                document.getElementById('measurementDisplay').classList.add('hidden');
+                hideSelectedMeasurementPanel();
+                updateMeasurementsList(); // Update measurements list to remove highlighting
+                
+                // Switch to select tool
+                currentTool = 'select';
+                document.getElementById('currentTool').textContent = 'Select';
+                
+                // Update toolbar button states
+                document.querySelectorAll('.toolbar-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelector('.toolbar-button[onclick="setTool(\'select\')"]').classList.add('active');
+                
+                // Update canvas cursor
+                canvas.classList.remove('pan-mode');
+                
+                redrawCanvas();
+                showSelectedObjectProperties();
+                updateTransformButtonStates();
+                updateTransformControls();
+                document.getElementById('propertiesPanel').classList.remove('hidden');
+                
+                updateObjectsList(); // Refresh to show selection
+                showNotification(`Selected ${obj.type}`);
+            }
+        }
+        
+        function deleteObject(objectId) {
+            const objIndex = objects.findIndex(o => o.id == objectId);
+            if (objIndex !== -1) {
+                const obj = objects[objIndex];
+                objects.splice(objIndex, 1);
+                
+                // Remove from selection if selected
+                selectedObjects = selectedObjects.filter(o => o.id != objectId);
+                
+                saveState('Delete object');
+                redrawCanvas();
+                updateObjectsList();
+                
+                if (selectedObjects.length === 0) {
+                    hideSelectedObjectProperties();
+                    updateTransformButtonStates();
+                }
+                
+                showNotification('Object deleted');
+            }
+        }
+        
+        function handleLayerDragStart(e) {
+            draggedLayer = parseInt(e.target.dataset.index);
+            e.target.style.opacity = '0.5';
+        }
+        
+        function handleLayerDragOver(e) {
+            e.preventDefault();
+            e.target.closest('.layer-item').style.borderTop = '2px solid #3b82f6';
+        }
+        
+        function handleLayerDrop(e) {
+            e.preventDefault();
+            const targetIndex = parseInt(e.target.closest('.layer-item').dataset.index);
+            
+            if (draggedLayer !== null && draggedLayer !== targetIndex) {
+                // Reorder layers array
+                const draggedLayerObj = layers.splice(draggedLayer, 1)[0];
+                layers.splice(targetIndex, 0, draggedLayerObj);
+                
+                // Update layer IDs to match new order
+                layers.forEach((layer, index) => {
+                    layer.id = index;
+                });
+                
+                // Update objects to use new layer IDs
+                objects.forEach(obj => {
+                    if (obj.layer === draggedLayer) {
+                        obj.layer = targetIndex;
+                    } else if (draggedLayer < targetIndex && obj.layer > draggedLayer && obj.layer <= targetIndex) {
+                        obj.layer--;
+                    } else if (draggedLayer > targetIndex && obj.layer >= targetIndex && obj.layer < draggedLayer) {
+                        obj.layer++;
+                    }
+                });
+                
+                updateLayersList();
+                redrawCanvas();
+                showNotification('Layer reordered');
+            }
+            
+            e.target.closest('.layer-item').style.borderTop = '';
+        }
+        
+        function handleLayerDragEnd(e) {
+            e.target.style.opacity = '';
+            draggedLayer = null;
+            // Remove any remaining border styles
+            document.querySelectorAll('.layer-item').forEach(item => {
+                item.style.borderTop = '';
+            });
+        }
+
+        function setCurrentLayer(layerId) {
+            currentLayer = layerId;
+            updateLayersList();
+        }
+
+        function toggleLayerVisibility(layerId) {
+            layers[layerId].visible = !layers[layerId].visible;
+            redrawCanvas();
+        }
+
+        // File operations
+        function getMeasurementAtPoint(x, y) {
+            const tolerance = Math.max(10, Math.min(30, 20 / zoomLevel));
+            
+            for (let i = measurements.length - 1; i >= 0; i--) {
+                const measurement = measurements[i];
+                const distance = distanceToLine(x, y, measurement.start.x, measurement.start.y, measurement.end.x, measurement.end.y);
+                if (distance < tolerance) {
+                    return measurement;
+                }
+            }
+            return null;
+        }
+        
+        function selectMeasurement(measurementId) {
+            // Deselect all measurements
+            measurements.forEach(m => m.selected = false);
+            selectedMeasurement = null;
+            
+            // Deselect all objects and update their state
+            selectedObjects.forEach(obj => obj.selected = false);
+            selectedObjects = [];
+            
+            // Select the clicked measurement
+            const measurement = measurements.find(m => m.id === measurementId);
+            if (measurement) {
+                measurement.selected = true;
+                selectedMeasurement = measurement;
+                
+                // Update measurement display in top right
+                document.getElementById('measureDistance').textContent = measurement.distance.toFixed(2);
+                document.getElementById('measureAngle').textContent = measurement.angle.toFixed(1);
+                document.getElementById('measureUnit').textContent = measurement.unit;
+                document.getElementById('measurementDisplay').classList.remove('hidden');
+                
+                // Show measurement properties panel in right sidebar
+                showSelectedMeasurementPanel(measurement);
+                
+                showNotification(`Selected measurement: ${measurement.distance.toFixed(2)} ${measurement.unit}`);
+            }
+            
+            // Hide object properties panel and update UI state
+            hideSelectedObjectProperties();
+            updateTransformButtonStates();
+            
+            redrawCanvas();
+            updateMeasurementsList();
+            updateObjectsList(); // Update objects list to remove highlighting
+        }
+        
+        function updateMeasurementsList() {
+            const measurementsList = document.getElementById('measurementsList');
+            measurementsList.innerHTML = '';
+            
+            if (measurements.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'text-xs text-gray-500 text-center py-2';
+                emptyDiv.textContent = 'No measurements';
+                measurementsList.appendChild(emptyDiv);
+                return;
+            }
+            
+            measurements.forEach((measurement, index) => {
+                const measurementDiv = document.createElement('div');
+                measurementDiv.className = `flex items-center justify-between p-2 rounded cursor-pointer group ${measurement.selected ? 'bg-blue-100 border border-blue-300' : 'hover:bg-gray-100'}`;
+                measurementDiv.dataset.measurementId = measurement.id;
+                
+                measurementDiv.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 ${measurement.selected ? 'text-blue-600' : 'text-red-500'}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6v12M21 6v12"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6v3M9 6v2M12 6v3M15 6v2M18 6v3"></path>
+                            </svg>
+                        </div>
+                        <div class="text-xs ${measurement.selected ? 'text-blue-800 font-medium' : 'text-gray-700'}">
+                            <div>${measurement.distance.toFixed(2)} ${measurement.unit}</div>
+                            <div class="text-gray-500">${measurement.angle.toFixed(1)}°</div>
+                        </div>
+                    </div>
+                    <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100" onclick="deleteMeasurement('${measurement.id}')" title="Delete Measurement">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" style="color: red;"></path>
+                        </svg>
+                    </button>
+                `;
+                
+                measurementDiv.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        selectMeasurement(measurement.id);
+                    }
+                });
+                
+                measurementsList.appendChild(measurementDiv);
+            });
+        }
+        
+        function deleteMeasurement(measurementId) {
+            const measurementIndex = measurements.findIndex(m => m.id == measurementId);
+            if (measurementIndex !== -1) {
+                const measurement = measurements[measurementIndex];
+                measurements.splice(measurementIndex, 1);
+                
+                // Hide measurement display if this was the selected measurement
+                if (selectedMeasurement && selectedMeasurement.id == measurementId) {
+                    selectedMeasurement = null;
+                    document.getElementById('measurementDisplay').classList.add('hidden');
+                }
+                
+                saveState('Delete measurement');
+                redrawCanvas();
+                updateMeasurementsList();
+                showNotification('Measurement deleted');
+            }
+        }
+        
+        function clearAllMeasurements() {
+            if (measurements.length === 0) {
+                showNotification('No measurements to clear');
+                return;
+            }
+            
+            document.getElementById('clearMeasurementsModal').classList.remove('hidden');
+        }
+        
+        function closeClearMeasurementsModal() {
+            document.getElementById('clearMeasurementsModal').classList.add('hidden');
+        }
+        
+        function confirmClearAllMeasurements() {
+            measurements = [];
+            selectedMeasurement = null;
+            document.getElementById('measurementDisplay').classList.add('hidden');
+            hideSelectedMeasurementPanel();
+            updateTransformButtonStates();
+            saveState('Clear all measurements');
+            redrawCanvas();
+            updateMeasurementsList();
+            closeClearMeasurementsModal();
+            showNotification('All measurements cleared');
+        }
+
+        function newFile() {
+            objects = [];
+            selectedObjects = [];
+            measurements = [];
+            measurementPoints = [];
+            selectedMeasurement = null;
+            document.getElementById('measurementDisplay').classList.add('hidden');
+            updateTransformButtonStates();
+            updateMeasurementsList();
+            redrawCanvas();
+            showNotification('New file created');
+        }
+
+        function openFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,.dwg';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    
+                    if (fileExtension === 'json') {
+                        // Handle JSON files
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                const data = JSON.parse(e.target.result);
+                                objects = data.objects || [];
+                                layers = data.layers || layers;
+                                measurements = data.measurements || [];
+                                currentLayer = data.currentLayer || 0;
+                                currentUnit = data.currentUnit || 'mm';
+                                
+                                // Update UI
+                                document.getElementById('unitSelect').value = currentUnit;
+                                redrawCanvas();
+                                updateLayersList();
+                                updateMeasurementsList();
+                                showNotification(`JSON file "${file.name}" opened successfully`);
+                            } catch (error) {
+                                showNotification('Error opening JSON file: Invalid format', 'error');
+                            }
+                        };
+                        reader.readAsText(file);
+                    } else if (fileExtension === 'dwg') {
+                        // Handle DWG files
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                const dwgData = parseDWG(e.target.result);
+                                if (dwgData) {
+                                    objects = dwgData.objects || [];
+                                    layers = dwgData.layers || [{id: 0, name: 'Layer 0', visible: true, color: '#000000'}];
+                                    measurements = [];
+                                    currentLayer = 0;
+                                    
+                                    redrawCanvas();
+                                    updateLayersList();
+                                    updateMeasurementsList();
+                                    showNotification(`DWG file "${file.name}" opened successfully`);
+                                } else {
+                                    showNotification('Error: Could not parse DWG file', 'error');
+                                }
+                            } catch (error) {
+                                showNotification('Error opening DWG file: ' + error.message, 'error');
+                            }
+                        };
+                        reader.readAsArrayBuffer(file);
+                    }
+                }
+            };
+            input.click();
+        }
+
+        function saveFile() {
+            const data = {
+                objects: objects,
+                layers: layers,
+                measurements: measurements,
+                currentLayer: currentLayer,
+                currentUnit: currentUnit,
+                version: '1.0',
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'drawing.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('File saved as JSON');
+        }
+
+        function exportFile(format) {
+            let filename, content, mimeType;
+            
+            switch (format) {
+                case 'dwg':
+                    filename = 'drawing.dwg';
+                    content = generateDWG();
+                    mimeType = 'application/octet-stream';
+                    break;
+                case 'json':
+                    filename = 'drawing.json';
+                    const data = {
+                        objects: objects,
+                        layers: layers,
+                        measurements: measurements,
+                        currentLayer: currentLayer,
+                        currentUnit: currentUnit,
+                        version: '1.0',
+                        timestamp: new Date().toISOString(),
+                        exportedAs: 'CAD Studio Export'
+                    };
+                    content = JSON.stringify(data, null, 2);
+                    mimeType = 'application/json';
+                    break;
+            }
+            
+            const blob = new Blob([content], {type: mimeType});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification(`Exported as ${format.toUpperCase()}`);
+            toggleExportMenu();
+        }
+
+        function generateDWG() {
+            // Create a simplified DWG-like binary format
+            // This is a custom format that mimics DWG structure for compatibility
+            
+            const header = new ArrayBuffer(32);
+            const headerView = new DataView(header);
+            
+            // DWG signature and version
+            const signature = new TextEncoder().encode('AC1021'); // AutoCAD 2007 format identifier
+            const signatureArray = new Uint8Array(header, 0, 6);
+            signatureArray.set(signature);
+            
+            // File metadata
+            headerView.setUint32(8, objects.length, true); // Number of objects
+            headerView.setUint32(12, layers.length, true); // Number of layers
+            headerView.setFloat64(16, Date.now(), true); // Timestamp
+            headerView.setUint32(24, currentUnit === 'mm' ? 4 : currentUnit === 'in' ? 1 : 0, true); // Units
+            
+            // Serialize objects data
+            const objectsData = JSON.stringify({
+                objects: objects,
+                layers: layers,
+                measurements: measurements,
+                currentLayer: currentLayer,
+                currentUnit: currentUnit,
+                version: '1.0'
+            });
+            
+            const objectsBuffer = new TextEncoder().encode(objectsData);
+            
+            // Combine header and data
+            const totalSize = header.byteLength + objectsBuffer.byteLength;
+            const dwgBuffer = new ArrayBuffer(totalSize);
+            const dwgView = new Uint8Array(dwgBuffer);
+            
+            dwgView.set(new Uint8Array(header), 0);
+            dwgView.set(objectsBuffer, header.byteLength);
+            
+            return dwgBuffer;
+        }
+        
+        function parseDWG(arrayBuffer) {
+            try {
+                const headerView = new DataView(arrayBuffer, 0, 32);
+                
+                // Check signature
+                const signatureArray = new Uint8Array(arrayBuffer, 0, 6);
+                const signature = new TextDecoder().decode(signatureArray);
+                
+                if (!signature.startsWith('AC')) {
+                    throw new Error('Invalid DWG file format');
+                }
+                
+                // Read metadata
+                const objectCount = headerView.getUint32(8, true);
+                const layerCount = headerView.getUint32(12, true);
+                const timestamp = headerView.getFloat64(16, true);
+                const units = headerView.getUint32(24, true);
+                
+                // Read objects data
+                const objectsBuffer = arrayBuffer.slice(32);
+                const objectsData = new TextDecoder().decode(objectsBuffer);
+                const parsedData = JSON.parse(objectsData);
+                
+                // Validate and return data
+                if (parsedData.objects && Array.isArray(parsedData.objects)) {
+                    return {
+                        objects: parsedData.objects,
+                        layers: parsedData.layers || [{id: 0, name: 'Layer 0', visible: true, color: '#000000'}],
+                        measurements: parsedData.measurements || [],
+                        currentLayer: parsedData.currentLayer || 0,
+                        currentUnit: parsedData.currentUnit || 'mm'
+                    };
+                } else {
+                    throw new Error('Invalid DWG data structure');
+                }
+            } catch (error) {
+                console.error('DWG parsing error:', error);
+                return null;
+            }
+        }
+
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // View controls
+        function zoom(factor) {
+            zoomLevel = Math.max(0.1, Math.min(5, zoomLevel * factor));
+            document.getElementById('zoomLevel').textContent = Math.round(zoomLevel * 100) + '%';
+            redrawCanvas();
+        }
+
+        function zoomFit() {
+            if (objects.length === 0) return;
+            
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            
+            objects.forEach(obj => {
+                minX = Math.min(minX, obj.x1, obj.x2 || obj.x1);
+                minY = Math.min(minY, obj.y1, obj.y2 || obj.y1);
+                maxX = Math.max(maxX, obj.x1, obj.x2 || obj.x1);
+                maxY = Math.max(maxY, obj.y1, obj.y2 || obj.y1);
+            });
+            
+            const padding = 50;
+            const scaleX = (canvas.width - padding * 2) / (maxX - minX);
+            const scaleY = (canvas.height - padding * 2) / (maxY - minY);
+            
+            zoomLevel = Math.min(scaleX, scaleY);
+            panX = padding - minX * zoomLevel;
+            panY = padding - minY * zoomLevel;
+            
+            document.getElementById('zoomLevel').textContent = Math.round(zoomLevel * 100) + '%';
+            redrawCanvas();
+        }
+
+        // Unit management
+        function changeUnit() {
+            const newUnit = document.getElementById('unitSelect').value;
+            const oldScale = unitConversions[currentUnit];
+            const newScale = unitConversions[newUnit];
+            const conversionFactor = oldScale / newScale;
+            
+            // Convert all measurements
+            measurements.forEach(measurement => {
+                measurement.distance *= conversionFactor;
+            });
+            
+            // Update display
+            document.getElementById('measureUnit').textContent = newUnit;
+            if (measurements.length > 0) {
+                const lastMeasurement = measurements[measurements.length - 1];
+                document.getElementById('measureDistance').textContent = lastMeasurement.distance.toFixed(2);
+            }
+            
+            currentUnit = newUnit;
+            unitScale = newScale;
+            
+            // Update size controls if object is selected
+            if (selectedObjects.length > 0) {
+                updateTransformControls();
+            }
+            
+            redrawCanvas();
+            showNotification(`Units changed to ${newUnit}`);
+        }
+
+        // Constraints
+        function addConstraint(type) {
+            if (selectedObjects.length < 2 && type !== 'fix') {
+                showNotification('Select at least 2 objects for this constraint', 'error');
+                return;
+            }
+            
+            showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} constraint added`);
+        }
+
+        // Transform functions
+        function updateTransformControls() {
+            if (selectedObjects.length === 1) {
+                const obj = selectedObjects[0];
+                document.getElementById('scaleInput').value = obj.scale || 100;
+                
+                // Calculate current rotation angle
+                let currentRotation = 0;
+                if (obj.type === 'line') {
+                    currentRotation = Math.atan2(obj.y2 - obj.y1, obj.x2 - obj.x1) * 180 / Math.PI;
+                    if (currentRotation < 0) currentRotation += 360;
+                } else if (obj.type === 'text' && obj.rotation !== undefined) {
+                    currentRotation = obj.rotation;
+                } else if (obj.rotation !== undefined) {
+                    currentRotation = obj.rotation;
+                }
+                document.getElementById('rotationInput').value = Math.round(currentRotation);
+                
+                // Update unit labels
+                document.getElementById('widthUnit').textContent = currentUnit;
+                document.getElementById('heightUnit').textContent = currentUnit;
+                document.getElementById('xUnit').textContent = currentUnit;
+                document.getElementById('yUnit').textContent = currentUnit;
+                
+                // Update position controls
+                const posX = obj.x1 / unitConversions[currentUnit];
+                const posY = obj.y1 / unitConversions[currentUnit];
+                document.getElementById('xInput').value = posX.toFixed(2);
+                document.getElementById('yInput').value = posY.toFixed(2);
+                
+                // Update color picker
+                document.getElementById('objectColor').value = obj.color;
+                
+                // Update size controls
+                if (obj.type === 'circle') {
+                    if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                        const width = (obj.radiusX * 2) / unitConversions[currentUnit];
+                        const height = (obj.radiusY * 2) / unitConversions[currentUnit];
+                        document.getElementById('widthInput').value = width.toFixed(2);
+                        document.getElementById('heightInput').value = height.toFixed(2);
+                    } else {
+                        // Fallback for old circular objects
+                        const diameter = (obj.radius * 2) / unitConversions[currentUnit];
+                        document.getElementById('widthInput').value = diameter.toFixed(2);
+                        document.getElementById('heightInput').value = diameter.toFixed(2);
+                    }
+                } else if (obj.type === 'arc') {
+                    if (obj.radiusX !== undefined && obj.radiusY !== undefined) {
+                        const width = (obj.radiusX * 2) / unitConversions[currentUnit];
+                        const height = (obj.radiusY * 2) / unitConversions[currentUnit];
+                        document.getElementById('widthInput').value = width.toFixed(2);
+                        document.getElementById('heightInput').value = height.toFixed(2);
+                    } else {
+                        // Fallback for old arc objects
+                        const diameter = (obj.radius * 2) / unitConversions[currentUnit];
+                        document.getElementById('widthInput').value = diameter.toFixed(2);
+                        document.getElementById('heightInput').value = diameter.toFixed(2);
+                    }
+                } else if (obj.type === 'rectangle') {
+                    const width = Math.abs(obj.x2 - obj.x1) / unitConversions[currentUnit];
+                    const height = Math.abs(obj.y2 - obj.y1) / unitConversions[currentUnit];
+                    document.getElementById('widthInput').value = width.toFixed(2);
+                    document.getElementById('heightInput').value = height.toFixed(2);
+                } else if (obj.type === 'line') {
+                    const length = Math.sqrt(Math.pow(obj.x2 - obj.x1, 2) + Math.pow(obj.y2 - obj.y1, 2)) / unitConversions[currentUnit];
+                    const lineWeight = obj.lineWeight / unitConversions[currentUnit];
+                    document.getElementById('widthInput').value = length.toFixed(2);
+                    document.getElementById('heightInput').value = lineWeight.toFixed(3);
+                } else if (obj.type === 'text') {
+                    // For text, show approximate dimensions
+                    ctx.font = `${Math.max(12, obj.fontSize * zoomLevel)}px Inter`;
+                    const textMetrics = ctx.measureText(obj.text);
+                    const textWidth = textMetrics.width / zoomLevel / unitConversions[currentUnit];
+                    const textHeight = Math.max(12, obj.fontSize * zoomLevel) / zoomLevel / unitConversions[currentUnit];
+                    document.getElementById('widthInput').value = textWidth.toFixed(2);
+                    document.getElementById('heightInput').value = textHeight.toFixed(2);
+                }
+            }
+        }
+        
+        function applyPositionChange() {
+            if (selectedObjects.length === 0) return;
+            
+            const newX = parseFloat(document.getElementById('xInput').value);
+            const newY = parseFloat(document.getElementById('yInput').value);
+            
+            if (isNaN(newX) || isNaN(newY)) return;
+            
+            selectedObjects.forEach(obj => {
+                const pixelX = newX * unitConversions[currentUnit];
+                const pixelY = newY * unitConversions[currentUnit];
+                
+                const deltaX = pixelX - obj.x1;
+                const deltaY = pixelY - obj.y1;
+                
+                obj.x1 = pixelX;
+                obj.y1 = pixelY;
+                
+                if (obj.x2 !== undefined) {
+                    obj.x2 += deltaX;
+                    obj.y2 += deltaY;
+                }
+                
+                // Update original data if it exists to maintain transforms
+                if (obj.originalData) {
+                    obj.originalData.x1 += deltaX;
+                    obj.originalData.y1 += deltaY;
+                    if (obj.originalData.x2 !== undefined) {
+                        obj.originalData.x2 += deltaX;
+                        obj.originalData.y2 += deltaY;
+                    }
+                }
+            });
+            
+            saveState('Update position');
+            redrawCanvas();
+            showNotification('Position updated');
+        }
+        
+        function hideTransformControls() {
+            // Transform controls are now always visible when object is selected
+        }
+        
+        function confirmDeleteLayer(layerId) {
+            if (layers.length <= 1) {
+                showAlert('Cannot delete the last layer');
+                return;
+            }
+            layerToDelete = layerId;
+            document.getElementById('deleteLayerModal').classList.remove('hidden');
+        }
+        
+        function closeDeleteLayerModal() {
+            document.getElementById('deleteLayerModal').classList.add('hidden');
+            layerToDelete = null;
+        }
+        
+        function deleteLayer() {
+            if (layerToDelete === null) return;
+            
+            // Remove objects on this layer
+            objects = objects.filter(obj => obj.layer !== layerToDelete);
+            
+            // Remove the layer
+            layers.splice(layerToDelete, 1);
+            
+            // Update layer IDs
+            layers.forEach((layer, index) => {
+                layer.id = index;
+            });
+            
+            // Update object layer references
+            objects.forEach(obj => {
+                if (obj.layer > layerToDelete) {
+                    obj.layer--;
+                }
+            });
+            
+            // Update current layer if necessary
+            if (currentLayer === layerToDelete) {
+                currentLayer = 0;
+            } else if (currentLayer > layerToDelete) {
+                currentLayer--;
+            }
+            
+            updateLayersList();
+            redrawCanvas();
+            closeDeleteLayerModal();
+            showNotification('Layer deleted');
+        }
+        
+        function openTextModal() {
+            document.getElementById('textModal').classList.remove('hidden');
+            document.getElementById('textInput').focus();
+        }
+        
+        function closeTextModal() {
+            document.getElementById('textModal').classList.add('hidden');
+            document.getElementById('textInput').value = '';
+            pendingTextPosition = null;
+        }
+        
+        function addTextFromModal() {
+            const textContent = document.getElementById('textInput').value.trim();
+            if (!textContent) {
+                showAlert('Please enter some text');
+                return;
+            }
+            
+            if (pendingTextPosition && pendingTextPosition.x !== undefined) {
+                // Place text at stored position
+                createTextObject(pendingTextPosition.x, pendingTextPosition.y, textContent);
+                pendingTextPosition = null;
+                closeTextModal();
+                setTool('select');
+            } else {
+                // Fallback - store text for placement
+                pendingTextPosition = {text: textContent};
+                closeTextModal();
+                showNotification('Click on canvas to place text');
+            }
+        }
+        
+        function createTextObject(x, y, text) {
+            const lineWeight = parseInt(document.getElementById('lineWeight').value);
+            const color = document.getElementById('objectColor').value;
+            
+            const obj = {
+                id: Date.now(),
+                type: 'text',
+                x1: x, 
+                y1: y,
+                text: text,
+                fontSize: 16,
+                layer: currentLayer,
+                lineWeight: 1,
+                color,
+                selected: false,
+                scale: 100,
+                rotation: 0
+            };
+            
+            objects.push(obj);
+            saveState('Create text');
+            redrawCanvas();
+            
+            // Update objects list immediately
+            updateObjectsList();
+            
+            showNotification('Text added');
+        }
+        
+        function editSelectedText() {
+            const textObj = selectedObjects.find(obj => obj.type === 'text');
+            if (textObj) {
+                document.getElementById('textInput').value = textObj.text;
+                document.getElementById('textModal').classList.remove('hidden');
+                document.getElementById('textInput').focus();
+                
+                // Override the modal behavior for editing
+                const addButton = document.querySelector('#textModal button[onclick="addTextFromModal()"]');
+                addButton.onclick = function() {
+                    const newText = document.getElementById('textInput').value.trim();
+                    if (newText) {
+                        textObj.text = newText;
+                        document.getElementById('textContentInput').value = newText;
+                        redrawCanvas();
+                        updateObjectsList(); // Update the objects list to reflect text changes
+                        closeTextModal();
+                        showNotification('Text updated');
+                    }
+                    // Restore original function
+                    addButton.onclick = addTextFromModal;
+                };
+            }
+        }
+        
+        function updateTextContent() {
+            const textObj = selectedObjects.find(obj => obj.type === 'text');
+            if (textObj) {
+                const newText = document.getElementById('textContentInput').value;
+                const newFontSize = parseInt(document.getElementById('fontSizeInput').value);
+                const newColor = document.getElementById('textColorInput').value;
+                const newLineWeight = parseInt(document.getElementById('textLineWeight').value);
+                
+                // Validate font size
+                if (newFontSize && newFontSize > 0) {
+                    textObj.fontSize = newFontSize;
+                }
+                
+                textObj.text = newText;
+                textObj.color = newColor;
+                textObj.lineWeight = newLineWeight;
+                saveState('Update text');
+                redrawCanvas();
+                updateObjectsList(); // Update the objects list to reflect text changes
+            }
+        }
+        
+        function updateSelectedObjectColor() {
+            const newColor = document.getElementById('objectColor').value;
+            selectedObjects.forEach(obj => {
+                obj.color = newColor;
+            });
+            saveState('Update color');
+            redrawCanvas();
+            if (selectedObjects.length > 0) {
+                showNotification(`Color updated for ${selectedObjects.length} object(s)`);
+            }
+        }
+        
+        function updateSelectedObjectStyle() {
+            if (selectedObjects.length === 0) return;
+            
+            const newLineType = document.getElementById('selectedLineType').value;
+            const newLineWeight = parseInt(document.getElementById('selectedLineWeight').value);
+            const newColor = document.getElementById('selectedObjectColor').value;
+            
+            selectedObjects.forEach(obj => {
+                obj.lineType = newLineType;
+                obj.lineWeight = newLineWeight;
+                obj.color = newColor;
+            });
+            
+            // Update height input for lines to reflect new line weight
+            if (selectedObjects.length === 1 && selectedObjects[0].type === 'line') {
+                const lineWeightInUnits = newLineWeight / unitConversions[currentUnit];
+                document.getElementById('heightInput').value = lineWeightInUnits.toFixed(3);
+            }
+            
+            saveState('Update style');
+            redrawCanvas();
+            showNotification(`Style updated for ${selectedObjects.length} object(s)`);
+        }
+        
+        function updateSelectedMeasurementColor() {
+            if (!selectedMeasurement) return;
+            
+            const newColor = document.getElementById('selectedMeasurementColor').value;
+            selectedMeasurement.color = newColor;
+            
+            saveState('Update measurement color');
+            redrawCanvas();
+            showNotification('Measurement color updated');
+        }
+        
+        function applyScale() {
+            const scalePercent = parseFloat(document.getElementById('scaleInput').value);
+            const scale = scalePercent / 100;
+            
+            selectedObjects.forEach(obj => {
+                if (!obj.originalData) {
+                    obj.originalData = {
+                        x1: obj.x1,
+                        y1: obj.y1,
+                        x2: obj.x2,
+                        y2: obj.y2,
+                        radius: obj.radius,
+                        radiusX: obj.radiusX,
+                        radiusY: obj.radiusY,
+                        rotation: obj.rotation || 0
+                    };
+                }
+                
+                if (obj.type === 'circle' || obj.type === 'arc') {
+                    if (obj.originalData.radiusX !== undefined && obj.originalData.radiusY !== undefined) {
+                        obj.radiusX = obj.originalData.radiusX * Math.abs(scale);
+                        obj.radiusY = obj.originalData.radiusY * Math.abs(scale);
+                        obj.radius = Math.max(obj.radiusX, obj.radiusY); // Update for compatibility
+                    } else {
+                        obj.radius = obj.originalData.radius * Math.abs(scale);
+                        // Create radiusX and radiusY for old objects
+                        obj.radiusX = obj.radius;
+                        obj.radiusY = obj.radius;
+                    }
+                } else {
+                    const centerX = (obj.originalData.x1 + (obj.originalData.x2 || obj.originalData.x1)) / 2;
+                    const centerY = (obj.originalData.y1 + (obj.originalData.y2 || obj.originalData.y1)) / 2;
+                    
+                    obj.x1 = centerX + (obj.originalData.x1 - centerX) * scale;
+                    obj.y1 = centerY + (obj.originalData.y1 - centerY) * scale;
+                    if (obj.originalData.x2 !== undefined) {
+                        obj.x2 = centerX + (obj.originalData.x2 - centerX) * scale;
+                        obj.y2 = centerY + (obj.originalData.y2 - centerY) * scale;
+                    }
+                    
+                    // Preserve rotation for rectangles
+                    if (obj.type === 'rectangle' && obj.originalData.rotation !== undefined) {
+                        obj.rotation = obj.originalData.rotation;
+                    }
+                }
+                
+                obj.scale = scalePercent;
+            });
+            
+            // Update size controls to reflect new dimensions
+            updateTransformControls();
+            saveState('Scale objects');
+            redrawCanvas();
+        }
+        
+        function applyRotation() {
+            let angle = parseFloat(document.getElementById('rotationInput').value);
+            
+            // Handle empty input - restore to current angle
+            if (isNaN(angle)) {
+                if (selectedObjects.length > 0) {
+                    const obj = selectedObjects[0];
+                    if (obj.type === 'line') {
+                        // Calculate current line angle
+                        angle = Math.atan2(obj.y2 - obj.y1, obj.x2 - obj.x1) * 180 / Math.PI;
+                        if (angle < 0) angle += 360;
+                    } else {
+                        angle = obj.rotation || 0;
+                    }
+                } else {
+                    angle = 0;
+                }
+                document.getElementById('rotationInput').value = angle.toFixed(1);
+                return;
+            }
+            
+            // Normalize angle to -360 to 360 range
+            while (angle > 360) angle -= 360;
+            while (angle < -360) angle += 360;
+            document.getElementById('rotationInput').value = angle.toFixed(1);
+            
+            // Handle measurement rotation
+            if (selectedMeasurement) {
+                selectedMeasurement.rotation = angle;
+                saveState('Rotate measurement');
+                redrawCanvas();
+                return;
+            }
+            
+            selectedObjects.forEach(obj => {
+                if (obj.type === 'line') {
+                    // For lines, set the angle directly while maintaining length and start point
+                    const length = Math.sqrt(Math.pow(obj.x2 - obj.x1, 2) + Math.pow(obj.y2 - obj.y1, 2));
+                    const radians = angle * Math.PI / 180;
+                    obj.x2 = obj.x1 + length * Math.cos(radians);
+                    obj.y2 = obj.y1 + length * Math.sin(radians);
+                } else if (obj.type === 'circle' || obj.type === 'arc') {
+                    // For circles and arcs, store rotation angle for rendering
+                    obj.rotation = angle;
+                } else if (obj.type === 'rectangle') {
+                    // For rectangles, just store the rotation angle - don't change coordinates
+                    obj.rotation = angle;
+                } else if (obj.type === 'text') {
+                    // For text, store rotation angle for rendering
+                    obj.rotation = angle;
+                } else {
+                    // For other objects, store rotation angle
+                    obj.rotation = angle;
+                }
+            });
+            
+            // Update position controls to reflect current state
+            updateTransformControls();
+            saveState('Rotate objects');
+            redrawCanvas();
+        }
+        
+        function applyTransform() {
+            applyScale();
+            applyRotation();
+            showNotification('Transform applied');
+        }
+        
+        function resetTransform() {
+            selectedObjects.forEach(obj => {
+                if (obj.originalX1) {
+                    obj.x1 = obj.originalX1;
+                    obj.y1 = obj.originalY1;
+                    obj.x2 = obj.originalX2;
+                    obj.y2 = obj.originalY2;
+                    delete obj.originalX1;
+                    delete obj.originalY1;
+                    delete obj.originalX2;
+                    delete obj.originalY2;
+                }
+                if (obj.originalRadius) {
+                    obj.radius = obj.originalRadius;
+                    delete obj.originalRadius;
+                }
+                obj.scale = 1;
+                obj.rotation = 0;
+            });
+            document.getElementById('scaleInput').value = 1;
+            document.getElementById('rotationInput').value = 0;
+            redrawCanvas();
+            showNotification('Transform reset');
+        }
+        
+        function duplicateSelected() {
+            if (selectedObjects.length === 0 && !selectedMeasurement) {
+                showNotification('No objects or measurements selected to duplicate', 'error');
+                return;
+            }
+            
+            // Handle measurement duplication
+            if (selectedMeasurement) {
+                const duplicate = {...selectedMeasurement};
+                duplicate.id = Date.now() + Math.random();
+                duplicate.start = {
+                    x: duplicate.start.x + 20,
+                    y: duplicate.start.y + 20
+                };
+                duplicate.end = {
+                    x: duplicate.end.x + 20,
+                    y: duplicate.end.y + 20
+                };
+                duplicate.selected = false;
+                measurements.push(duplicate);
+                
+                // Select the duplicate measurement
+                selectedMeasurement.selected = false;
+                selectedMeasurement = duplicate;
+                duplicate.selected = true;
+                
+                saveState('Duplicate measurement');
+                redrawCanvas();
+                updateMeasurementsList();
+                showSelectedMeasurementPanel(duplicate);
+                showNotification('Duplicated measurement');
+                return;
+            }
+            
+            // Handle object duplication
+            const duplicates = [];
+            selectedObjects.forEach(obj => {
+                const duplicate = {...obj};
+                duplicate.id = Date.now() + Math.random();
+                duplicate.x1 += 20;
+                duplicate.y1 += 20;
+                if (duplicate.x2 !== undefined) duplicate.x2 += 20;
+                if (duplicate.y2 !== undefined) duplicate.y2 += 20;
+                duplicate.selected = false;
+                objects.push(duplicate);
+                duplicates.push(duplicate);
+            });
+            
+            // Select the duplicates
+            selectedObjects.forEach(obj => obj.selected = false);
+            selectedObjects = duplicates;
+            duplicates.forEach(obj => obj.selected = true);
+            
+            saveState('Duplicate objects');
+            redrawCanvas();
+            updateObjectsList(); // Update the objects list immediately
+            showNotification(`Duplicated ${duplicates.length} object(s)`);
+        }
+        
+        function mirrorSelectedVertical() {
+            if (selectedObjects.length === 0) {
+                showNotification('No objects selected to mirror', 'error');
+                return;
+            }
+            
+            // Don't mirror text objects
+            const textObjects = selectedObjects.filter(obj => obj.type === 'text');
+            if (textObjects.length > 0) {
+                showNotification('Cannot mirror text objects', 'error');
+                return;
+            }
+            
+            // Find the bounding box of all selected objects
+            let minX = Infinity, maxX = -Infinity;
+            selectedObjects.forEach(obj => {
+                if (obj.type === 'circle' || obj.type === 'arc') {
+                    // For circles and arcs, use center point
+                    minX = Math.min(minX, obj.x1);
+                    maxX = Math.max(maxX, obj.x1);
+                } else {
+                    minX = Math.min(minX, obj.x1, obj.x2 || obj.x1);
+                    maxX = Math.max(maxX, obj.x1, obj.x2 || obj.x1);
+                }
+            });
+            const centerX = (minX + maxX) / 2;
+            
+            selectedObjects.forEach(obj => {
+                if (obj.type === 'circle' || obj.type === 'arc') {
+                    // For circles and arcs, just mirror the center point
+                    obj.x1 = centerX + (centerX - obj.x1);
+                } else if (obj.type === 'rectangle') {
+                    // For rectangles, mirror both corner points
+                    const newX1 = centerX + (centerX - obj.x1);
+                    const newX2 = centerX + (centerX - obj.x2);
+                    obj.x1 = newX1;
+                    obj.x2 = newX2;
+                } else if (obj.type === 'line') {
+                    // For lines, mirror both endpoints
+                    const newX1 = centerX + (centerX - obj.x1);
+                    const newX2 = centerX + (centerX - obj.x2);
+                    obj.x1 = newX1;
+                    obj.x2 = newX2;
+                }
+                
+                // Reset original data for transforms
+                if (obj.originalData) {
+                    delete obj.originalData;
+                }
+            });
+            
+            saveState('Vertical mirror objects');
+            redrawCanvas();
+            showNotification(`Vertically mirrored ${selectedObjects.length} object(s)`);
+        }
+        
+        function mirrorSelectedHorizontal() {
+            if (selectedObjects.length === 0) {
+                showNotification('No objects selected to mirror', 'error');
+                return;
+            }
+            
+            // Don't mirror text objects
+            const textObjects = selectedObjects.filter(obj => obj.type === 'text');
+            if (textObjects.length > 0) {
+                showNotification('Cannot mirror text objects', 'error');
+                return;
+            }
+            
+            // Find the bounding box of all selected objects
+            let minY = Infinity, maxY = -Infinity;
+            selectedObjects.forEach(obj => {
+                if (obj.type === 'circle' || obj.type === 'arc') {
+                    // For circles and arcs, use center point
+                    minY = Math.min(minY, obj.y1);
+                    maxY = Math.max(maxY, obj.y1);
+                } else {
+                    minY = Math.min(minY, obj.y1, obj.y2 || obj.y1);
+                    maxY = Math.max(maxY, obj.y1, obj.y2 || obj.y1);
+                }
+            });
+            const centerY = (minY + maxY) / 2;
+            
+            selectedObjects.forEach(obj => {
+                if (obj.type === 'circle' || obj.type === 'arc') {
+                    // For circles and arcs, just mirror the center point
+                    obj.y1 = centerY + (centerY - obj.y1);
+                } else if (obj.type === 'rectangle') {
+                    // For rectangles, mirror both corner points
+                    const newY1 = centerY + (centerY - obj.y1);
+                    const newY2 = centerY + (centerY - obj.y2);
+                    obj.y1 = newY1;
+                    obj.y2 = newY2;
+                } else if (obj.type === 'line') {
+                    // For lines, mirror both endpoints
+                    const newY1 = centerY + (centerY - obj.y1);
+                    const newY2 = centerY + (centerY - obj.y2);
+                    obj.y1 = newY1;
+                    obj.y2 = newY2;
+                }
+                
+                // Reset original data for transforms
+                if (obj.originalData) {
+                    delete obj.originalData;
+                }
+            });
+            
+            saveState('Horizontal mirror objects');
+            redrawCanvas();
+            showNotification(`Horizontally mirrored ${selectedObjects.length} object(s)`);
+        }
+        
+        function applySizeChange() {
+            if (selectedObjects.length === 0) return;
+            
+            const newWidth = parseFloat(document.getElementById('widthInput').value);
+            const newHeight = parseFloat(document.getElementById('heightInput').value);
+            
+            if (isNaN(newWidth) || isNaN(newHeight)) return;
+            
+            selectedObjects.forEach(obj => {
+                if (obj.type === 'circle') {
+                    obj.radiusX = (newWidth * unitConversions[currentUnit]) / 2;
+                    obj.radiusY = (newHeight * unitConversions[currentUnit]) / 2;
+                    // Update old radius for backward compatibility
+                    obj.radius = Math.max(obj.radiusX, obj.radiusY);
+                } else if (obj.type === 'arc') {
+                    obj.radiusX = (newWidth * unitConversions[currentUnit]) / 2;
+                    obj.radiusY = (newHeight * unitConversions[currentUnit]) / 2;
+                    // Update old radius for backward compatibility
+                    obj.radius = Math.max(obj.radiusX, obj.radiusY);
+                } else if (obj.type === 'line') {
+                    // For lines, preserve the current angle and only change length
+                    const currentAngle = Math.atan2(obj.y2 - obj.y1, obj.x2 - obj.x1);
+                    const newLength = newWidth * unitConversions[currentUnit];
+                    
+                    obj.x2 = obj.x1 + newLength * Math.cos(currentAngle);
+                    obj.y2 = obj.y1 + newLength * Math.sin(currentAngle);
+                    
+                    // Update line weight from height input
+                    obj.lineWeight = newHeight * unitConversions[currentUnit];
+                } else if (obj.type === 'rectangle') {
+                    const centerX = (obj.x1 + obj.x2) / 2;
+                    const centerY = (obj.y1 + obj.y2) / 2;
+                    
+                    const pixelWidth = newWidth * unitConversions[currentUnit];
+                    const pixelHeight = newHeight * unitConversions[currentUnit];
+                    
+                    obj.x1 = centerX - pixelWidth / 2;
+                    obj.x2 = centerX + pixelWidth / 2;
+                    obj.y1 = centerY - pixelHeight / 2;
+                    obj.y2 = centerY + pixelHeight / 2;
+                }
+            });
+            
+            saveState('Update size');
+            redrawCanvas();
+            showNotification('Size updated');
+        }
+        
+        function toggleRightPanel() {
+            const rightPanel = document.getElementById('rightPanel');
+            const toggleButton = document.getElementById('rightPanelToggle');
+            const icon = document.getElementById('rightPanelIcon');
+            
+            rightPanelVisible = !rightPanelVisible;
+            
+            if (rightPanelVisible) {
+                rightPanel.style.display = 'flex';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>';
+                toggleButton.innerHTML = '<svg id="rightPanelIcon" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Hide right panel';
+            } else {
+                rightPanel.style.display = 'none';
+                toggleButton.innerHTML = '<svg id="rightPanelIcon" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>Show right panel';
+            }
+            
+            // Force canvas resize after panel toggle to fix proportions
+            setTimeout(() => {
+                resizeCanvas();
+            }, 100);
+        }
+        
+        function toggleToolbarLabels() {
+            const toolbar = document.getElementById('leftToolbar');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            toolbarExpanded = !toolbarExpanded;
+            
+            if (toolbarExpanded) {
+                toolbar.classList.remove('w-24');
+                toolbar.classList.add('w-48');
+                toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>';
+                
+                // Add labels to buttons
+                const buttons = toolbar.querySelectorAll('.toolbar-button');
+                buttons.forEach((button, index) => {
+                    if (button.title && !button.querySelector('.tool-label')) {
+                        const label = document.createElement('span');
+                        label.className = 'tool-label ml-2 text-sm';
+                        label.textContent = button.title;
+                        button.appendChild(label);
+                        button.classList.remove('w-20');
+                        button.classList.add('w-full', 'justify-start', 'px-3');
+                    }
+                });
+            } else {
+                toolbar.classList.remove('w-48');
+                toolbar.classList.add('w-24');
+                toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>';
+                
+                // Remove labels from buttons
+                const buttons = toolbar.querySelectorAll('.toolbar-button');
+                buttons.forEach(button => {
+                    const label = button.querySelector('.tool-label');
+                    if (label) {
+                        label.remove();
+                        button.classList.remove('w-full', 'justify-start', 'px-3');
+                        button.classList.add('w-20');
+                    }
+                });
+            }
+        }
+
+        // Utility functions
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-4 py-2 rounded shadow-lg text-white z-50 ${
+                type === 'error' ? 'bg-red-500' : 'bg-green-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initCanvas();
+            updateLayersList();
+            updateMeasurementsList();
+            
+            // Set default tool
+            setTool('select');
+            
+            // Save initial state for undo functionality
+            saveState('Initial state');
+            updateUndoRedoButtons();
+            
+            // Close export menu when clicking outside
+            document.addEventListener('click', function(e) {
+                const exportMenu = document.getElementById('exportMenu');
+                if (!e.target.closest('.relative') && !exportMenu.classList.contains('hidden')) {
+                    exportMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'n':
+                        e.preventDefault();
+                        newFile();
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        openFile();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        saveFile();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        // Undo functionality would go here
+                        break;
+                }
+            }
+            
+            // Tool shortcuts
+            switch (e.key) {
+                case 'Escape':
+                    setTool('select');
+                    break;
+                case 'l':
+                    setTool('line');
+                    break;
+                case 'r':
+                    setTool('rectangle');
+                    break;
+                case 'c':
+                    setTool('circle');
+                    break;
+                case 'p':
+                    setTool('pan');
+                    break;
+            }
+        });
+    </script>
+</html>
