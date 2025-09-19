@@ -260,6 +260,7 @@
                     <div id="exportMenu" class="hidden absolute top-full left-0 bg-white border border-gray-200 rounded shadow-lg mt-1 z-50">
                         <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" onclick="exportFile('dwg')">Export as .DWG</button>
                         <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" onclick="exportFile('json')">Export as .JSON</button>
+                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" onclick="exportFile('svg')">Export as .SVG</button>
                     </div>
                 </div>
             </div>
@@ -2756,6 +2757,11 @@
                     content = JSON.stringify(data, null, 2);
                     mimeType = 'application/json';
                     break;
+                case 'svg':
+                    filename = 'drawing.svg';
+                    content = generateSVG();
+                    mimeType = 'image/svg+xml';
+                    break;
             }
             
             const blob = new Blob([content], {type: mimeType});
@@ -2768,6 +2774,213 @@
             
             showNotification(`Exported as ${format.toUpperCase()}`);
             toggleExportMenu();
+        }
+
+        function generateSVG() {
+            // Calculate bounding box of all objects
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            
+            // Include objects in bounding box calculation
+            objects.forEach(obj => {
+                if (!layers[obj.layer]?.visible) return;
+                
+                if (obj.type === 'circle' || obj.type === 'arc') {
+                    const radiusX = obj.radiusX || obj.radius || 0;
+                    const radiusY = obj.radiusY || obj.radius || 0;
+                    minX = Math.min(minX, obj.x1 - radiusX);
+                    maxX = Math.max(maxX, obj.x1 + radiusX);
+                    minY = Math.min(minY, obj.y1 - radiusY);
+                    maxY = Math.max(maxY, obj.y1 + radiusY);
+                } else if (obj.type === 'text') {
+                    // Approximate text dimensions
+                    const textWidth = obj.text.length * (obj.fontSize || 16) * 0.6;
+                    const textHeight = obj.fontSize || 16;
+                    minX = Math.min(minX, obj.x1);
+                    maxX = Math.max(maxX, obj.x1 + textWidth);
+                    minY = Math.min(minY, obj.y1 - textHeight);
+                    maxY = Math.max(maxY, obj.y1);
+                } else {
+                    minX = Math.min(minX, obj.x1, obj.x2 || obj.x1);
+                    maxX = Math.max(maxX, obj.x1, obj.x2 || obj.x1);
+                    minY = Math.min(minY, obj.y1, obj.y2 || obj.y1);
+                    maxY = Math.max(maxY, obj.y1, obj.y2 || obj.y1);
+                }
+            });
+            
+            // Include measurements in bounding box
+            measurements.forEach(measurement => {
+                minX = Math.min(minX, measurement.start.x, measurement.end.x);
+                maxX = Math.max(maxX, measurement.start.x, measurement.end.x);
+                minY = Math.min(minY, measurement.start.y, measurement.end.y);
+                maxY = Math.max(maxY, measurement.start.y, measurement.end.y);
+            });
+            
+            // Add padding
+            const padding = 50;
+            minX -= padding;
+            minY -= padding;
+            maxX += padding;
+            maxY += padding;
+            
+            const width = maxX - minX;
+            const height = maxY - minY;
+            
+            let svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${width} ${height}">
+  <title>CAD Studio Export</title>
+  <desc>Exported from CAD Studio - Units: ${currentUnit}</desc>
+`;
+            
+            // Add layer groups and objects
+            const layerGroups = {};
+            
+            // Group objects by layer
+            objects.forEach(obj => {
+                if (!layers[obj.layer]?.visible) return;
+                
+                if (!layerGroups[obj.layer]) {
+                    layerGroups[obj.layer] = [];
+                }
+                layerGroups[obj.layer].push(obj);
+            });
+            
+            // Generate SVG for each layer
+            Object.keys(layerGroups).forEach(layerId => {
+                const layer = layers[layerId];
+                svg += `  <g id="layer-${layerId}" data-layer-name="${layer.name}">\n`;
+                
+                layerGroups[layerId].forEach(obj => {
+                    svg += generateSVGObject(obj);
+                });
+                
+                svg += `  </g>\n`;
+            });
+            
+            // Add measurements group
+            if (measurements.length > 0) {
+                svg += `  <g id="measurements" data-type="measurements">\n`;
+                measurements.forEach(measurement => {
+                    svg += generateSVGMeasurement(measurement);
+                });
+                svg += `  </g>\n`;
+            }
+            
+            svg += `</svg>`;
+            
+            return svg;
+        }
+        
+        function generateSVGObject(obj) {
+            const strokeDashArray = obj.lineType === 'dashed' ? '10,5' : obj.lineType === 'dotted' ? '2,3' : 'none';
+            const commonAttrs = `stroke="${obj.color}" stroke-width="${obj.lineWeight}" stroke-dasharray="${strokeDashArray}" fill="none"`;
+            
+            switch (obj.type) {
+                case 'line':
+                    return `    <line x1="${obj.x1}" y1="${obj.y1}" x2="${obj.x2}" y2="${obj.y2}" ${commonAttrs} />\n`;
+                
+                case 'rectangle':
+                    const rectX = Math.min(obj.x1, obj.x2);
+                    const rectY = Math.min(obj.y1, obj.y2);
+                    const rectWidth = Math.abs(obj.x2 - obj.x1);
+                    const rectHeight = Math.abs(obj.y2 - obj.y1);
+                    const rectTransform = obj.rotation ? ` transform="rotate(${obj.rotation} ${(obj.x1 + obj.x2) / 2} ${(obj.y1 + obj.y2) / 2})"` : '';
+                    return `    <rect x="${rectX}" y="${rectY}" width="${rectWidth}" height="${rectHeight}" ${commonAttrs}${rectTransform} />\n`;
+                
+                case 'circle':
+                    const radiusX = obj.radiusX || obj.radius || 0;
+                    const radiusY = obj.radiusY || obj.radius || 0;
+                    const circleTransform = obj.rotation ? ` transform="rotate(${obj.rotation} ${obj.x1} ${obj.y1})"` : '';
+                    if (Math.abs(radiusX - radiusY) < 0.1) {
+                        return `    <circle cx="${obj.x1}" cy="${obj.y1}" r="${radiusX}" ${commonAttrs}${circleTransform} />\n`;
+                    } else {
+                        return `    <ellipse cx="${obj.x1}" cy="${obj.y1}" rx="${radiusX}" ry="${radiusY}" ${commonAttrs}${circleTransform} />\n`;
+                    }
+                
+                case 'arc':
+                    const arcRadiusX = obj.radiusX || obj.radius || 0;
+                    const arcRadiusY = obj.radiusY || obj.radius || 0;
+                    const startAngle = obj.startAngle || 0;
+                    const endAngle = obj.endAngle || Math.PI;
+                    
+                    const startX = obj.x1 + arcRadiusX * Math.cos(startAngle);
+                    const startY = obj.y1 + arcRadiusY * Math.sin(startAngle);
+                    const endX = obj.x1 + arcRadiusX * Math.cos(endAngle);
+                    const endY = obj.y1 + arcRadiusY * Math.sin(endAngle);
+                    
+                    const largeArcFlag = Math.abs(endAngle - startAngle) > Math.PI ? 1 : 0;
+                    const sweepFlag = endAngle > startAngle ? 1 : 0;
+                    
+                    const arcTransform = obj.rotation ? ` transform="rotate(${obj.rotation} ${obj.x1} ${obj.y1})"` : '';
+                    return `    <path d="M ${startX} ${startY} A ${arcRadiusX} ${arcRadiusY} 0 ${largeArcFlag} ${sweepFlag} ${endX} ${endY}" ${commonAttrs}${arcTransform} />\n`;
+                
+                case 'text':
+                    const textTransform = obj.rotation ? ` transform="rotate(${obj.rotation} ${obj.x1} ${obj.y1})"` : '';
+                    const textStroke = obj.lineWeight > 0 ? ` stroke="${obj.color}" stroke-width="${obj.lineWeight}"` : '';
+                    return `    <text x="${obj.x1}" y="${obj.y1}" font-family="Inter, sans-serif" font-size="${obj.fontSize || 16}" fill="${obj.color}"${textStroke}${textTransform}>${escapeXML(obj.text)}</text>\n`;
+                
+                default:
+                    return '';
+            }
+        }
+        
+        function generateSVGMeasurement(measurement) {
+            const color = measurement.color || '#ff6b6b';
+            const lineWeight = measurement.lineWeight || 2;
+            const fontSize = measurement.fontSize || 10;
+            
+            const startX = measurement.start.x;
+            const startY = measurement.start.y;
+            const endX = measurement.end.x;
+            const endY = measurement.end.y;
+            
+            // Calculate angle and arrow positions
+            const angle = Math.atan2(endY - startY, endX - startX);
+            const arrowSize = 10;
+            
+            const startArrowTipX = startX + arrowSize * Math.cos(angle);
+            const startArrowTipY = startY + arrowSize * Math.sin(angle);
+            const endArrowTipX = endX - arrowSize * Math.cos(angle);
+            const endArrowTipY = endY - arrowSize * Math.sin(angle);
+            
+            let svg = `    <g class="measurement" data-distance="${measurement.distance}" data-unit="${measurement.unit}">\n`;
+            
+            // Dotted line
+            svg += `      <line x1="${startArrowTipX}" y1="${startArrowTipY}" x2="${endArrowTipX}" y2="${endArrowTipY}" stroke="${color}" stroke-width="${lineWeight}" stroke-dasharray="3,3" />\n`;
+            
+            // Start arrow
+            const startArrow1X = startX + arrowSize * Math.cos(angle + 0.3);
+            const startArrow1Y = startY + arrowSize * Math.sin(angle + 0.3);
+            const startArrow2X = startX + arrowSize * Math.cos(angle - 0.3);
+            const startArrow2Y = startY + arrowSize * Math.sin(angle - 0.3);
+            svg += `      <polygon points="${startX},${startY} ${startArrow1X},${startArrow1Y} ${startArrow2X},${startArrow2Y}" fill="${color}" />\n`;
+            
+            // End arrow
+            const endArrow1X = endX + arrowSize * Math.cos(angle + Math.PI + 0.3);
+            const endArrow1Y = endY + arrowSize * Math.sin(angle + Math.PI + 0.3);
+            const endArrow2X = endX + arrowSize * Math.cos(angle + Math.PI - 0.3);
+            const endArrow2Y = endY + arrowSize * Math.sin(angle + Math.PI - 0.3);
+            svg += `      <polygon points="${endX},${endY} ${endArrow1X},${endArrow1Y} ${endArrow2X},${endArrow2Y}" fill="${color}" />\n`;
+            
+            // Text
+            const midX = (startX + endX) / 2;
+            const midY = (startY + endY) / 2;
+            const textAngle = angle * 180 / Math.PI;
+            const displayAngle = Math.abs(textAngle) > 90 ? textAngle + 180 : textAngle;
+            const text = `${measurement.distance.toFixed(2)} ${measurement.unit}`;
+            
+            svg += `      <text x="${midX}" y="${midY - 15}" font-family="Inter, sans-serif" font-size="${fontSize}" fill="${color}" text-anchor="middle" transform="rotate(${displayAngle} ${midX} ${midY - 15})">${text}</text>\n`;
+            
+            svg += `    </g>\n`;
+            
+            return svg;
+        }
+        
+        function escapeXML(text) {
+            return text.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&apos;');
         }
 
         function generateDWG() {
