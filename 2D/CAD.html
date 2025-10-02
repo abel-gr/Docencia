@@ -808,13 +808,10 @@
         let currentUnit = 'mm';
         let unitScale = 1; // pixels per unit
         
-        // Secret tracking system for academic integrity
         let fileSecret = null;
         
-        // Generate a unique secret for this file
         function generateFileSecret() {
             if (!fileSecret) {
-                // Create a unique identifier using timestamp, random values, and browser fingerprint
                 const timestamp = Date.now().toString(36);
                 const random1 = Math.random().toString(36).substring(2, 15);
                 const random2 = Math.random().toString(36).substring(2, 15);
@@ -824,7 +821,6 @@
             return fileSecret;
         }
         
-        // Extract secret from imported data
         function extractSecret(data) {
             // Look for secret in various hidden locations
             if (data.internal_cad_id) return data.internal_cad_id;
@@ -834,36 +830,29 @@
             return null;
         }
         
-        // Embed secret in export data (hidden from user)
         function embedSecret(data, format) {
-            // Use existing fileSecret if available, otherwise generate new one
             const secret = fileSecret || generateFileSecret();
             
             switch (format) {
                 case 'json':
-                    // Hide secret in metadata object
                     data.metadata = data.metadata || {};
                     data.metadata._id = secret;
-                    // Also hide in version object as backup
                     if (typeof data.version === 'string') {
                         data.version = { number: data.version, _key: secret };
                     }
                     break;
                     
                 case 'dwg':
-                    // For DWG, embed as internal CAD identifier
                     data.internal_cad_id = secret;
                     break;
                     
                 case 'svg':
-                    // For SVG, embed as CAD metadata comment
                     return data.replace('</svg>', `<!-- CAD_METADATA: ${secret} --></svg>`);
             }
             
             return data;
         }
         
-        // Extract secret from SVG
         function extractSecretFromSVG(svgContent) {
             // Look for new CAD metadata format
             let match = svgContent.match(/<!-- CAD_METADATA: (CAD_[^>]+) -->/);
