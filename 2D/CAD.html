@@ -836,7 +836,8 @@
         
         // Embed secret in export data (hidden from user)
         function embedSecret(data, format) {
-            const secret = generateFileSecret();
+            // Use existing fileSecret if available, otherwise generate new one
+            const secret = fileSecret || generateFileSecret();
             
             switch (format) {
                 case 'json':
@@ -2801,10 +2802,11 @@
                             try {
                                 const data = JSON.parse(e.target.result);
                                 
-                                // Extract and preserve secret
+                                // Extract and preserve secret - this becomes the permanent ID for this file
                                 const importedSecret = extractSecret(data);
                                 if (importedSecret) {
                                     fileSecret = importedSecret;
+                                    console.log('Preserved secret from JSON:', fileSecret);
                                 }
                                 
                                 objects = data.objects || [];
@@ -2831,9 +2833,11 @@
                             try {
                                 const dwgData = parseDWG(e.target.result);
                                 if (dwgData) {
-                                    // Extract and preserve secret from DWG
-                                    if (dwgData._secret) {
-                                        fileSecret = dwgData._secret;
+                                    // Extract and preserve secret from DWG - this becomes the permanent ID
+                                    const importedSecret = dwgData.internal_cad_id || dwgData._secret;
+                                    if (importedSecret) {
+                                        fileSecret = importedSecret;
+                                        console.log('Preserved secret from DWG:', fileSecret);
                                     }
                                     
                                     objects = dwgData.objects || [];
@@ -2863,10 +2867,11 @@
                             try {
                                 const svgContent = e.target.result;
                                 
-                                // Extract secret from SVG
+                                // Extract secret from SVG - this becomes the permanent ID
                                 const importedSecret = extractSecretFromSVG(svgContent);
                                 if (importedSecret) {
                                     fileSecret = importedSecret;
+                                    console.log('Preserved secret from SVG:', fileSecret);
                                 }
                                 
                                 // Basic SVG import (limited functionality)
@@ -2901,7 +2906,6 @@
                 timestamp: new Date().toISOString()
             };
             
-            // Embed secret in the data
             data = embedSecret(data, 'json');
             
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
@@ -2936,7 +2940,6 @@
                         timestamp: new Date().toISOString(),
                         exportedAs: 'CAD Studio Export'
                     };
-                    // Embed secret in JSON export
                     data = embedSecret(data, 'json');
                     content = JSON.stringify(data, null, 2);
                     mimeType = 'application/json';
@@ -2944,7 +2947,6 @@
                 case 'svg':
                     filename = 'drawing.svg';
                     let svgContent = generateSVG();
-                    // Embed secret in SVG export
                     content = embedSecret(svgContent, 'svg');
                     mimeType = 'image/svg+xml';
                     break;
@@ -3203,7 +3205,6 @@
             headerView.setFloat64(16, Date.now(), true); // Timestamp
             headerView.setUint32(24, currentUnit === 'mm' ? 4 : currentUnit === 'in' ? 1 : 0, true); // Units
             
-            // Serialize objects data with embedded secret
             let objectsData = {
                 objects: objects,
                 layers: layers,
@@ -3213,7 +3214,6 @@
                 version: '1.0'
             };
             
-            // Embed secret in DWG data
             objectsData = embedSecret(objectsData, 'dwg');
             
             const objectsBuffer = new TextEncoder().encode(JSON.stringify(objectsData));
@@ -3260,7 +3260,7 @@
                         measurements: parsedData.measurements || [],
                         currentLayer: parsedData.currentLayer || 0,
                         currentUnit: parsedData.currentUnit || 'mm',
-                        internal_cad_id: parsedData.internal_cad_id || parsedData._secret // Support both formats
+                        internal_cad_id: parsedData.internal_cad_id || parsedData._secret
                     };
                 } else {
                     throw new Error('Invalid DWG data structure');
