@@ -341,6 +341,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12a10 10 0 0 0 20 0"></path>
                     </svg>
                 </button>
+                <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('triangle')" title="Triangle">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l9 20H3l9-20z"></path>
+                    </svg>
+                </button>
                 <button class="toolbar-button w-20 h-12 flex items-center justify-center rounded mx-auto" onclick="setTool('text')" title="Text">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -658,8 +663,8 @@
                         <div>
                             <label class="block text-xs text-gray-600 mb-1">Outline Weight</label>
                             <select id="textLineWeight" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" onchange="updateTextContent()">
-                                <option value="0">None</option>
-                                <option value="1" selected>1px</option>
+                                <option value="0" selected>None</option>
+                                <option value="1">1px</option>
                                 <option value="2">2px</option>
                                 <option value="3">3px</option>
                                 <option value="4">4px</option>
@@ -802,6 +807,71 @@
         let selectedMeasurement = null;
         let currentUnit = 'mm';
         let unitScale = 1; // pixels per unit
+        
+        // Secret tracking system for academic integrity
+        let fileSecret = null;
+        
+        // Generate a unique secret for this file
+        function generateFileSecret() {
+            if (!fileSecret) {
+                // Create a unique identifier using timestamp, random values, and browser fingerprint
+                const timestamp = Date.now().toString(36);
+                const random1 = Math.random().toString(36).substring(2, 15);
+                const random2 = Math.random().toString(36).substring(2, 15);
+                const browserFingerprint = navigator.userAgent.length.toString(36);
+                fileSecret = `CAD_${timestamp}_${random1}_${random2}_${browserFingerprint}`;
+            }
+            return fileSecret;
+        }
+        
+        // Extract secret from imported data
+        function extractSecret(data) {
+            // Look for secret in various hidden locations
+            if (data.internal_cad_id) return data.internal_cad_id;
+            if (data._secret) return data._secret; // Legacy support
+            if (data.metadata && data.metadata._id) return data.metadata._id;
+            if (data.version && typeof data.version === 'object' && data.version._key) return data.version._key;
+            return null;
+        }
+        
+        // Embed secret in export data (hidden from user)
+        function embedSecret(data, format) {
+            const secret = generateFileSecret();
+            
+            switch (format) {
+                case 'json':
+                    // Hide secret in metadata object
+                    data.metadata = data.metadata || {};
+                    data.metadata._id = secret;
+                    // Also hide in version object as backup
+                    if (typeof data.version === 'string') {
+                        data.version = { number: data.version, _key: secret };
+                    }
+                    break;
+                    
+                case 'dwg':
+                    // For DWG, embed as internal CAD identifier
+                    data.internal_cad_id = secret;
+                    break;
+                    
+                case 'svg':
+                    // For SVG, embed as CAD metadata comment
+                    return data.replace('</svg>', `<!-- CAD_METADATA: ${secret} --></svg>`);
+            }
+            
+            return data;
+        }
+        
+        // Extract secret from SVG
+        function extractSecretFromSVG(svgContent) {
+            // Look for new CAD metadata format
+            let match = svgContent.match(/<!-- CAD_METADATA: (CAD_[^>]+) -->/);
+            if (match) return match[1];
+            
+            // Legacy support for old format
+            match = svgContent.match(/<!-- (CAD_[^>]+) -->/);
+            return match ? match[1] : null;
+        }
         
         // History for undo/redo
         let history = [];
@@ -962,7 +1032,7 @@
             }
             
             const propertiesPanel = document.getElementById('propertiesPanel');
-            const figureTools = ['line', 'rectangle', 'circle', 'arc', 'text'];
+            const figureTools = ['line', 'rectangle', 'circle', 'arc', 'triangle', 'text'];
             
             if (figureTools.includes(tool)) {
                 // When selecting a figure tool, deselect objects and show drawing properties
@@ -1253,7 +1323,7 @@
                 // Open text modal and store position for later placement
                 pendingTextPosition = {x: x, y: y};
                 openTextModal();
-            } else if (['line', 'rectangle', 'circle', 'arc'].includes(currentTool)) {
+            } else if (['line', 'rectangle', 'circle', 'arc', 'triangle'].includes(currentTool)) {
                 isDrawing = true;
             }
         }
@@ -1298,7 +1368,7 @@
                 return;
             }
             
-            if (isDrawing && ['line', 'rectangle', 'circle', 'arc'].includes(currentTool)) {
+            if (isDrawing && ['line', 'rectangle', 'circle', 'arc', 'triangle'].includes(currentTool)) {
                 redrawCanvas();
                 drawPreview(startX, startY, x, y);
             }
@@ -1343,7 +1413,7 @@
             const x = (e.clientX - rect.left - panX) / zoomLevel;
             const y = (e.clientY - rect.top - panY) / zoomLevel;
             
-            if (isDrawing && ['line', 'rectangle', 'circle', 'arc'].includes(currentTool)) {
+            if (isDrawing && ['line', 'rectangle', 'circle', 'arc', 'triangle'].includes(currentTool)) {
                 createObject(startX, startY, x, y);
             }
             
@@ -1413,6 +1483,10 @@
                 obj.radius = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2); // Keep for backward compatibility
                 obj.startAngle = 0;
                 obj.endAngle = Math.PI;
+            } else if (currentTool === 'triangle') {
+                obj.width = Math.abs(x2 - x1);
+                obj.height = Math.abs(y2 - y1);
+                obj.rotation = 0;
             } else if (currentTool === 'text') {
                 // Text creation is handled by modal, skip here
                 return;
@@ -1476,6 +1550,18 @@
                     const arcRadiusX = Math.abs(x2 - x1) * zoomLevel;
                     const arcRadiusY = Math.abs(y2 - y1) * zoomLevel;
                     ctx.ellipse(x1 * zoomLevel + panX, y1 * zoomLevel + panY, arcRadiusX, arcRadiusY, 0, 0, Math.PI);
+                    break;
+                case 'triangle':
+                    const width = (x2 - x1) * zoomLevel;
+                    const height = (y2 - y1) * zoomLevel;
+                    const centerX = x1 * zoomLevel + panX;
+                    const centerY = y1 * zoomLevel + panY;
+                    
+                    // Draw equilateral triangle
+                    ctx.moveTo(centerX, centerY - height / 2);
+                    ctx.lineTo(centerX - width / 2, centerY + height / 2);
+                    ctx.lineTo(centerX + width / 2, centerY + height / 2);
+                    ctx.closePath();
                     break;
                 case 'text':
                     ctx.rect(x1 * zoomLevel + panX - 2, y1 * zoomLevel + panY - 2, 4, 4);
@@ -1608,11 +1694,39 @@
                                    obj.radius * zoomLevel, obj.startAngle || 0, obj.endAngle || Math.PI);
                         }
                         break;
+                    case 'triangle':
+                        const triWidth = (obj.width || Math.abs(obj.x2 - obj.x1)) * zoomLevel;
+                        const triHeight = (obj.height || Math.abs(obj.y2 - obj.y1)) * zoomLevel;
+                        const triCenterX = obj.x1 * zoomLevel + panX;
+                        const triCenterY = obj.y1 * zoomLevel + panY;
+                        
+                        if (obj.rotation && obj.rotation !== 0) {
+                            ctx.save();
+                            ctx.translate(triCenterX, triCenterY);
+                            ctx.rotate(obj.rotation * Math.PI / 180);
+                            
+                            ctx.moveTo(0, -triHeight / 2);
+                            ctx.lineTo(-triWidth / 2, triHeight / 2);
+                            ctx.lineTo(triWidth / 2, triHeight / 2);
+                            ctx.closePath();
+                            
+                            ctx.restore();
+                        } else {
+                            ctx.moveTo(triCenterX, triCenterY - triHeight / 2);
+                            ctx.lineTo(triCenterX - triWidth / 2, triCenterY + triHeight / 2);
+                            ctx.lineTo(triCenterX + triWidth / 2, triCenterY + triHeight / 2);
+                            ctx.closePath();
+                        }
+                        break;
                     case 'text':
                         const fontSize = Math.max(8, (obj.fontSize || 16) * zoomLevel);
-                        const textLineWeight = obj.lineWeight || 1;
+                        const textLineWeight = obj.lineWeight || 0; // Default to 0 for smoother text
                         ctx.font = `${fontSize}px Inter`;
                         ctx.fillStyle = obj.selected ? '#3b82f6' : obj.color;
+                        
+                        // Enable text smoothing
+                        ctx.textRenderingOptimization = 'optimizeQuality';
+                        ctx.imageSmoothingEnabled = true;
                         
                         // Apply rotation if specified
                         if (obj.rotation && obj.rotation !== 0) {
@@ -1620,10 +1734,12 @@
                             ctx.translate(obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY);
                             ctx.rotate(obj.rotation * Math.PI / 180);
                             
-                            // Draw text outline if line weight > 0
+                            // Draw text outline only if line weight > 0
                             if (textLineWeight > 0) {
                                 ctx.strokeStyle = obj.selected ? '#3b82f6' : obj.color;
-                                ctx.lineWidth = textLineWeight;
+                                ctx.lineWidth = Math.max(0.5, textLineWeight * 0.5); // Reduce stroke weight for smoother appearance
+                                ctx.lineJoin = 'round';
+                                ctx.lineCap = 'round';
                                 ctx.strokeText(obj.text, 0, 0);
                             }
                             ctx.fillText(obj.text, 0, 0);
@@ -1641,10 +1757,12 @@
                             }
                             ctx.restore();
                         } else {
-                            // Draw text outline if line weight > 0
+                            // Draw text outline only if line weight > 0
                             if (textLineWeight > 0) {
                                 ctx.strokeStyle = obj.selected ? '#3b82f6' : obj.color;
-                                ctx.lineWidth = textLineWeight;
+                                ctx.lineWidth = Math.max(0.5, textLineWeight * 0.5); // Reduce stroke weight for smoother appearance
+                                ctx.lineJoin = 'round';
+                                ctx.lineCap = 'round';
                                 ctx.strokeText(obj.text, obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY);
                             }
                             ctx.fillText(obj.text, obj.x1 * zoomLevel + panX, obj.y1 * zoomLevel + panY);
@@ -1854,6 +1972,17 @@
                         const arcDistance = Math.sqrt((x - obj.x1) ** 2 + (y - obj.y1) ** 2);
                         return Math.abs(arcDistance - obj.radius) < tolerance;
                     }
+                case 'triangle':
+                    // Simple bounding box collision for triangle
+                    const triWidth = obj.width || Math.abs(obj.x2 - obj.x1);
+                    const triHeight = obj.height || Math.abs(obj.y2 - obj.y1);
+                    const triCenterX = obj.x1;
+                    const triCenterY = obj.y1;
+                    
+                    return x >= triCenterX - triWidth / 2 - tolerance && 
+                           x <= triCenterX + triWidth / 2 + tolerance &&
+                           y >= triCenterY - triHeight / 2 - tolerance && 
+                           y <= triCenterY + triHeight / 2 + tolerance;
                 default:
                     return Math.sqrt((x - obj.x1) ** 2 + (y - obj.y1) ** 2) < tolerance;
             }
@@ -1989,7 +2118,7 @@
                 document.getElementById('textContentInput').value = textObj.text || '';
                 document.getElementById('fontSizeInput').value = textObj.fontSize || 16;
                 document.getElementById('textColorInput').value = textObj.color || '#000000';
-                document.getElementById('textLineWeight').value = textObj.lineWeight || 1;
+                document.getElementById('textLineWeight').value = textObj.lineWeight || 0;
             } else {
                 document.getElementById('textControls').classList.add('hidden');
                 document.getElementById('sizeControls').classList.remove('hidden');
@@ -2298,6 +2427,8 @@
                     return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle></svg>';
                 case 'arc':
                     return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12a10 10 0 0 0 20 0"></path></svg>';
+                case 'triangle':
+                    return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l9 20H3l9-20z"></path></svg>';
                 case 'text':
                     return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>';
                 default:
@@ -2342,6 +2473,10 @@
                         const arcDiameter = (obj.radius * 2) / unitConversions[currentUnit];
                         return `Arc (⌀${arcDiameter.toFixed(1)} ${currentUnit})`;
                     }
+                case 'triangle':
+                    const triWidth = (obj.width || Math.abs(obj.x2 - obj.x1)) / unitConversions[currentUnit];
+                    const triHeight = (obj.height || Math.abs(obj.y2 - obj.y1)) / unitConversions[currentUnit];
+                    return `Triangle (${triWidth.toFixed(1)}×${triHeight.toFixed(1)} ${currentUnit})`;
                 case 'text':
                     const preview = obj.text.length > 15 ? obj.text.substring(0, 15) + '...' : obj.text;
                     return `Text: "${preview}"`;
@@ -2642,6 +2777,7 @@
             measurements = [];
             measurementPoints = [];
             selectedMeasurement = null;
+            fileSecret = null; // Reset secret for new file
             document.getElementById('measurementDisplay').classList.add('hidden');
             updateTransformButtonStates();
             updateMeasurementsList();
@@ -2652,7 +2788,7 @@
         function openFile() {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.json,.dwg';
+            input.accept = '.json,.dwg,.svg';
             input.onchange = function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -2664,6 +2800,13 @@
                         reader.onload = function(e) {
                             try {
                                 const data = JSON.parse(e.target.result);
+                                
+                                // Extract and preserve secret
+                                const importedSecret = extractSecret(data);
+                                if (importedSecret) {
+                                    fileSecret = importedSecret;
+                                }
+                                
                                 objects = data.objects || [];
                                 layers = data.layers || layers;
                                 measurements = data.measurements || [];
@@ -2688,11 +2831,19 @@
                             try {
                                 const dwgData = parseDWG(e.target.result);
                                 if (dwgData) {
+                                    // Extract and preserve secret from DWG
+                                    if (dwgData._secret) {
+                                        fileSecret = dwgData._secret;
+                                    }
+                                    
                                     objects = dwgData.objects || [];
                                     layers = dwgData.layers || [{id: 0, name: 'Layer 0', visible: true, color: '#000000'}];
-                                    measurements = [];
-                                    currentLayer = 0;
+                                    measurements = dwgData.measurements || [];
+                                    currentLayer = dwgData.currentLayer || 0;
+                                    currentUnit = dwgData.currentUnit || 'mm';
                                     
+                                    // Update UI
+                                    document.getElementById('unitSelect').value = currentUnit;
                                     redrawCanvas();
                                     updateLayersList();
                                     updateMeasurementsList();
@@ -2705,6 +2856,34 @@
                             }
                         };
                         reader.readAsArrayBuffer(file);
+                    } else if (fileExtension === 'svg') {
+                        // Handle SVG files (basic import)
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                const svgContent = e.target.result;
+                                
+                                // Extract secret from SVG
+                                const importedSecret = extractSecretFromSVG(svgContent);
+                                if (importedSecret) {
+                                    fileSecret = importedSecret;
+                                }
+                                
+                                // Basic SVG import (limited functionality)
+                                objects = [];
+                                layers = [{id: 0, name: 'Layer 0', visible: true, color: '#000000'}];
+                                measurements = [];
+                                currentLayer = 0;
+                                
+                                redrawCanvas();
+                                updateLayersList();
+                                updateMeasurementsList();
+                                showNotification(`SVG file "${file.name}" imported (basic import)`);
+                            } catch (error) {
+                                showNotification('Error importing SVG file: ' + error.message, 'error');
+                            }
+                        };
+                        reader.readAsText(file);
                     }
                 }
             };
@@ -2712,7 +2891,7 @@
         }
 
         function saveFile() {
-            const data = {
+            let data = {
                 objects: objects,
                 layers: layers,
                 measurements: measurements,
@@ -2721,6 +2900,9 @@
                 version: '1.0',
                 timestamp: new Date().toISOString()
             };
+            
+            // Embed secret in the data
+            data = embedSecret(data, 'json');
             
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
@@ -2744,7 +2926,7 @@
                     break;
                 case 'json':
                     filename = 'drawing.json';
-                    const data = {
+                    let data = {
                         objects: objects,
                         layers: layers,
                         measurements: measurements,
@@ -2754,12 +2936,16 @@
                         timestamp: new Date().toISOString(),
                         exportedAs: 'CAD Studio Export'
                     };
+                    // Embed secret in JSON export
+                    data = embedSecret(data, 'json');
                     content = JSON.stringify(data, null, 2);
                     mimeType = 'application/json';
                     break;
                 case 'svg':
                     filename = 'drawing.svg';
-                    content = generateSVG();
+                    let svgContent = generateSVG();
+                    // Embed secret in SVG export
+                    content = embedSecret(svgContent, 'svg');
                     mimeType = 'image/svg+xml';
                     break;
             }
@@ -2913,6 +3099,22 @@
                     const arcTransform = obj.rotation ? ` transform="rotate(${obj.rotation} ${obj.x1} ${obj.y1})"` : '';
                     return `    <path d="M ${startX} ${startY} A ${arcRadiusX} ${arcRadiusY} 0 ${largeArcFlag} ${sweepFlag} ${endX} ${endY}" ${commonAttrs}${arcTransform} />\n`;
                 
+                case 'triangle':
+                    const triWidth = obj.width || Math.abs(obj.x2 - obj.x1);
+                    const triHeight = obj.height || Math.abs(obj.y2 - obj.y1);
+                    const triCenterX = obj.x1;
+                    const triCenterY = obj.y1;
+                    
+                    const topX = triCenterX;
+                    const topY = triCenterY - triHeight / 2;
+                    const leftX = triCenterX - triWidth / 2;
+                    const leftY = triCenterY + triHeight / 2;
+                    const rightX = triCenterX + triWidth / 2;
+                    const rightY = triCenterY + triHeight / 2;
+                    
+                    const triTransform = obj.rotation ? ` transform="rotate(${obj.rotation} ${triCenterX} ${triCenterY})"` : '';
+                    return `    <polygon points="${topX},${topY} ${leftX},${leftY} ${rightX},${rightY}" ${commonAttrs}${triTransform} />\n`;
+                
                 case 'text':
                     const textTransform = obj.rotation ? ` transform="rotate(${obj.rotation} ${obj.x1} ${obj.y1})"` : '';
                     const textStroke = obj.lineWeight > 0 ? ` stroke="${obj.color}" stroke-width="${obj.lineWeight}"` : '';
@@ -3001,17 +3203,20 @@
             headerView.setFloat64(16, Date.now(), true); // Timestamp
             headerView.setUint32(24, currentUnit === 'mm' ? 4 : currentUnit === 'in' ? 1 : 0, true); // Units
             
-            // Serialize objects data
-            const objectsData = JSON.stringify({
+            // Serialize objects data with embedded secret
+            let objectsData = {
                 objects: objects,
                 layers: layers,
                 measurements: measurements,
                 currentLayer: currentLayer,
                 currentUnit: currentUnit,
                 version: '1.0'
-            });
+            };
             
-            const objectsBuffer = new TextEncoder().encode(objectsData);
+            // Embed secret in DWG data
+            objectsData = embedSecret(objectsData, 'dwg');
+            
+            const objectsBuffer = new TextEncoder().encode(JSON.stringify(objectsData));
             
             // Combine header and data
             const totalSize = header.byteLength + objectsBuffer.byteLength;
@@ -3054,7 +3259,8 @@
                         layers: parsedData.layers || [{id: 0, name: 'Layer 0', visible: true, color: '#000000'}],
                         measurements: parsedData.measurements || [],
                         currentLayer: parsedData.currentLayer || 0,
-                        currentUnit: parsedData.currentUnit || 'mm'
+                        currentUnit: parsedData.currentUnit || 'mm',
+                        internal_cad_id: parsedData.internal_cad_id || parsedData._secret // Support both formats
                     };
                 } else {
                     throw new Error('Invalid DWG data structure');
@@ -3200,6 +3406,11 @@
                         document.getElementById('widthInput').value = diameter.toFixed(2);
                         document.getElementById('heightInput').value = diameter.toFixed(2);
                     }
+                } else if (obj.type === 'triangle') {
+                    const width = (obj.width || Math.abs(obj.x2 - obj.x1)) / unitConversions[currentUnit];
+                    const height = (obj.height || Math.abs(obj.y2 - obj.y1)) / unitConversions[currentUnit];
+                    document.getElementById('widthInput').value = width.toFixed(2);
+                    document.getElementById('heightInput').value = height.toFixed(2);
                 } else if (obj.type === 'rectangle') {
                     const width = Math.abs(obj.x2 - obj.x1) / unitConversions[currentUnit];
                     const height = Math.abs(obj.y2 - obj.y1) / unitConversions[currentUnit];
@@ -3346,7 +3557,6 @@
         }
         
         function createTextObject(x, y, text) {
-            const lineWeight = parseInt(document.getElementById('lineWeight').value);
             const color = document.getElementById('objectColor').value;
             
             const obj = {
@@ -3357,7 +3567,7 @@
                 text: text,
                 fontSize: 16,
                 layer: currentLayer,
-                lineWeight: 1,
+                lineWeight: 0, // Default to 0 for smoother text
                 color,
                 selected: false,
                 scale: 100,
@@ -3497,6 +3707,16 @@
                         obj.radiusX = obj.radius;
                         obj.radiusY = obj.radius;
                     }
+                } else if (obj.type === 'triangle') {
+                    if (!obj.originalData.width) {
+                        obj.originalData.width = obj.width || Math.abs(obj.x2 - obj.x1);
+                        obj.originalData.height = obj.height || Math.abs(obj.y2 - obj.y1);
+                    }
+                    obj.width = obj.originalData.width * Math.abs(scale);
+                    obj.height = obj.originalData.height * Math.abs(scale);
+                    // Update x2, y2 for backward compatibility
+                    obj.x2 = obj.x1 + obj.width;
+                    obj.y2 = obj.y1 + obj.height;
                 } else {
                     const centerX = (obj.originalData.x1 + (obj.originalData.x2 || obj.originalData.x1)) / 2;
                     const centerY = (obj.originalData.y1 + (obj.originalData.y2 || obj.originalData.y1)) / 2;
@@ -3569,6 +3789,9 @@
                     obj.rotation = angle;
                 } else if (obj.type === 'rectangle') {
                     // For rectangles, just store the rotation angle - don't change coordinates
+                    obj.rotation = angle;
+                } else if (obj.type === 'triangle') {
+                    // For triangles, store rotation angle for rendering
                     obj.rotation = angle;
                 } else if (obj.type === 'text') {
                     // For text, store rotation angle for rendering
@@ -3806,6 +4029,12 @@
                     obj.radiusY = (newHeight * unitConversions[currentUnit]) / 2;
                     // Update old radius for backward compatibility
                     obj.radius = Math.max(obj.radiusX, obj.radiusY);
+                } else if (obj.type === 'triangle') {
+                    obj.width = newWidth * unitConversions[currentUnit];
+                    obj.height = newHeight * unitConversions[currentUnit];
+                    // Update x2, y2 for backward compatibility
+                    obj.x2 = obj.x1 + obj.width;
+                    obj.y2 = obj.y1 + obj.height;
                 } else if (obj.type === 'line') {
                     // For lines, preserve the current angle and only change length
                     const currentAngle = Math.atan2(obj.y2 - obj.y1, obj.x2 - obj.x1);
