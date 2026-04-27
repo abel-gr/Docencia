@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joc d'Angles Espacials</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            touch-action: none;
+        }
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .spaceship {
+            position: absolute;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+        .spaceship-success {
+            transition: transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .drawing-area {
+            cursor: crosshair;
+        }
+        .angle-display {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .feedback {
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .btn {
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .drag-handle {
+            cursor: grab;
+            filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.7));
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-height: calc(100vh - 220px);
+            margin: 0 auto;
+        }
+        .trail {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(96, 165, 250, 0.6);
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Stars background -->
+    <div id="stars"></div>
+    
+    <!-- Game container -->
+    <div class="container mx-auto px-4 py-6 flex flex-col h-full">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-200 mb-2">Angles Espacials</h1>
+            <p class="text-xl md:text-2xl text-blue-100">Dibuixa la trajectòria correcta per la nau espacial</p>
+        </div>
+        
+        <!-- Game area -->
+        <div class="flex-grow relative bg-slate-900/50 rounded-xl border border-slate-700 overflow-hidden">
+            <!-- Angle display -->
+            <div class="angle-display absolute top-6 left-6 p-4 rounded-lg z-30">
+                <div class="text-xl md:text-2xl font-semibold">Angle objectiu: <span id="targetAngle" class="text-3xl md:text-4xl text-yellow-300">0°</span></div>
+                <div class="text-lg md:text-xl text-blue-200">Dibuixa una línia amb aquest angle</div>
+            </div>
+            
+            <!-- Score display -->
+            <div class="angle-display absolute bottom-6 left-6 p-4 rounded-lg z-30">
+                <div class="text-xl md:text-2xl font-semibold">Puntuació: <span id="score" class="text-3xl text-green-300">0</span></div>
+                <div class="text-xl md:text-2xl font-semibold">Nivell: <span id="level" class="text-3xl text-yellow-300">1</span></div>
+            </div>
+            
+            <!-- Drawing area -->
+            <div class="game-container">
+                <div id="drawingArea" class="drawing-area absolute inset-0">
+                    <!-- Trails container -->
+                    <div id="trailsContainer"></div>
+                    
+                    <!-- Spaceship -->
+                    <div id="spaceship" class="spaceship w-24 h-24" style="left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(90deg);">
+                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M32 8L40 40H24L32 8Z" fill="#60A5FA" stroke="#2563EB" stroke-width="2"/>
+                            <path d="M24 40H40L36 56H28L24 40Z" fill="#93C5FD" stroke="#2563EB" stroke-width="2"/>
+                            <circle cx="32" cy="32" r="4" fill="#FBBF24"/>
+                            <path d="M26 44L22 52M38 44L42 52" stroke="#2563EB" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Line drawing -->
+                    <svg id="lineCanvas" class="absolute inset-0 w-full h-full pointer-events-none">
+                        <line id="referenceLine" x1="50%" y1="50%" x2="90%" y2="50%" stroke="#475569" stroke-width="2" stroke-dasharray="5,5"/>
+                        <line id="angleLine" x1="50%" y1="50%" x2="50%" y2="10%" stroke="#FBBF24" stroke-width="4" stroke-dasharray="5,3"/>
+                        <circle id="dragHandle" cx="50%" cy="10%" r="12" fill="#FBBF24" class="drag-handle" style="pointer-events: auto;"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Feedback message -->
+            <div id="feedback" class="feedback absolute left-1/2 top-1/3 transform -translate-x-1/2 -translate-y-1/2 text-center p-5 rounded-xl text-3xl md:text-4xl font-bold z-40"></div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="mt-6 flex justify-center gap-6">
+            <button id="checkBtn" class="btn bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg text-xl md:text-2xl font-bold">Comprovar</button>
+            <button id="resetBtn" class="btn bg-slate-700 hover:bg-slate-600 text-white px-8 py-4 rounded-lg text-xl md:text-2xl font-bold">Reiniciar</button>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="mt-4 text-center text-lg md:text-xl text-blue-200">
+            <p>Arrossega el punt taronja per dibuixar la trajectòria amb l'angle correcte</p>
+        </div>
+    </div>
+
+    <script>
+        // Create stars background
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 4 + 1}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Game variables
+        let isDragging = false;
+        let currentAngle = 0;
+        let targetAngle = 0;
+        let score = 0;
+        let level = 1;
+        let tolerance = 10; // Degrees of tolerance for correct angle
+        let isAnimating = false;
+        
+        // DOM elements
+        const spaceship = document.getElementById('spaceship');
+        const angleLine = document.getElementById('angleLine');
+        const dragHandle = document.getElementById('dragHandle');
+        const drawingArea = document.getElementById('drawingArea');
+        const targetAngleDisplay = document.getElementById('targetAngle');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const checkBtn = document.getElementById('checkBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const feedback = document.getElementById('feedback');
+        const trailsContainer = document.getElementById('trailsContainer');
+        
+        // Initialize game
+        function initGame() {
+            createStars();
+            generateNewAngle();
+            
+            // Event listeners for drag handle
+            dragHandle.addEventListener('mousedown', startDragging);
+            dragHandle.addEventListener('touchstart', handleTouchStart);
+            
+            // Event listeners for document to handle dragging
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', handleTouchMove);
+            document.addEventListener('mouseup', stopDragging);
+            document.addEventListener('touchend', stopDragging);
+            
+            checkBtn.addEventListener('click', checkAngle);
+            resetBtn.addEventListener('click', resetLine);
+            
+            // Set initial angle to 0 degrees
+            setAngle(0);
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                setAngle(currentAngle);
+            });
+        }
+        
+        // Generate new target angle
+        function generateNewAngle() {
+            // Make angles more challenging as level increases
+            if (level <= 3) {
+                // Level 1-3: Multiples of 15 degrees
+                targetAngle = Math.floor(Math.random() * 24) * 15;
+            } else if (level <= 6) {
+                // Level 4-6: Multiples of 5 degrees
+                targetAngle = Math.floor(Math.random() * 72) * 5;
+            } else {
+                // Level 7+: Any integer angle
+                targetAngle = Math.floor(Math.random() * 360);
+            }
+            
+            // Adjust tolerance based on level
+            tolerance = Math.max(3, 12 - level);
+            
+            targetAngleDisplay.textContent = `${targetAngle}°`;
+            resetLine();
+        }
+        
+        // Start dragging
+        function startDragging(e) {
+            if (isAnimating) return;
+            isDragging = true;
+            drag(e);
+        }
+        
+        // Handle touch start
+        function handleTouchStart(e) {
+            if (isAnimating) return;
+            e.preventDefault();
+            isDragging = true;
+            handleTouchMove(e);
+        }
+        
+        // Drag handle
+        function drag(e) {
+            if (!isDragging || isAnimating) return;
+            
+            let mouseX, mouseY;
+            
+            if (e.type === 'mousemove') {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            } else {
+                return; // Not a mouse event
+            }
+            
+            const drawingRect = drawingArea.getBoundingClientRect();
+            const spaceshipX = drawingRect.width / 2;
+            const spaceshipY = drawingRect.height / 2; // Center position
+            
+            // Calculate angle
+            const dx = mouseX - (drawingRect.left + spaceshipX);
+            const dy = (drawingRect.top + spaceshipY) - mouseY;
+            currentAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+            
+            // Normalize angle to 0-360
+            if (currentAngle < 0) {
+                currentAngle += 360;
+            }
+            
+            setAngle(currentAngle);
+        }
+        
+        // Set angle of the line and rotate spaceship
+        function setAngle(angle) {
+            // Calculate end point for line
+            const drawingRect = drawingArea.getBoundingClientRect();
+            const spaceshipX = drawingRect.width / 2;
+            const spaceshipY = drawingRect.height / 2; // Center position
+            
+            // Calculate line length based on the drawing area size
+            // Use a shorter line to ensure it stays within bounds
+            const maxLineLength = Math.min(drawingRect.width, drawingRect.height) * 0.4;
+            
+            // Calculate end point
+            let endX = spaceshipX + maxLineLength * Math.cos(angle * Math.PI / 180);
+            let endY = spaceshipY - maxLineLength * Math.sin(angle * Math.PI / 180);
+            
+            // Ensure the end point stays within the drawing area with padding
+            const padding = 20; // Padding from the edge
+            endX = Math.max(padding, Math.min(drawingRect.width - padding, endX));
+            endY = Math.max(padding, Math.min(drawingRect.height - padding, endY));
+            
+            // Update line
+            angleLine.setAttribute('x2', endX);
+            angleLine.setAttribute('y2', endY);
+            
+            // Update drag handle position
+            dragHandle.setAttribute('cx', endX);
+            dragHandle.setAttribute('cy', endY);
+            
+            // Rotate spaceship to face the direction
+            spaceship.style.transform = `translate(-50%, -50%) rotate(${90-angle}deg)`;
+            
+            currentAngle = angle;
+        }
+        
+        // Handle touch move
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!isDragging || isAnimating) return;
+            
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            
+            drag(mouseEvent);
+        }
+        
+        // Stop dragging
+        function stopDragging() {
+            isDragging = false;
+        }
+        
+        // Check if angle is correct
+        function checkAngle() {
+            if (isAnimating) return;
+            
+            const angleDifference = Math.abs(currentAngle - targetAngle);
+            const normalizedDifference = Math.min(angleDifference, 360 - angleDifference);
+            
+            if (normalizedDifference <= tolerance) {
+                // Success
+                showFeedback('Correcte! 🚀', 'text-green-400');
+                moveSpaceship();
+                score += Math.max(10, 20 - Math.floor(normalizedDifference));
+                scoreDisplay.textContent = score;
+                
+                // Level up every 50 points
+                const newLevel = Math.floor(score / 50) + 1;
+                if (newLevel > level) {
+                    level = newLevel;
+                    levelDisplay.textContent = level;
+                    showFeedback(`Nivell ${level}! 🎉`, 'text-yellow-300');
+                }
+                
+                // Generate new angle after animation
+                setTimeout(generateNewAngle, 2000);
+            } else {
+                // Failure
+                showFeedback('Incorrecte! Torna a provar', 'text-red-400');
+                angleLine.setAttribute('stroke', '#EF4444');
+                setTimeout(() => {
+                    angleLine.setAttribute('stroke', '#FBBF24');
+                }, 1000);
+            }
+        }
+        
+        // Move spaceship along the drawn trajectory
+        function moveSpaceship() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            // Get current positions
+            const drawingRect = drawingArea.getBoundingClientRect();
+            const centerX = drawingRect.width / 2;
+            const centerY = drawingRect.height / 2;
+            
+            // Get target position (drag handle position)
+            const targetX = parseFloat(dragHandle.getAttribute('cx'));
+            const targetY = parseFloat(dragHandle.getAttribute('cy'));
+            
+            // Add trail effect
+            createTrailEffect(centerX, centerY, targetX, targetY);
+            
+            // Add success class for animation
+            spaceship.classList.add('spaceship-success');
+            
+            // Calculate the exact position to move to
+            // We need to account for the spaceship being positioned with transform: translate(-50%, -50%)
+            const moveToX = targetX - centerX;
+            const moveToY = targetY - centerY;
+            
+            // Set the new position
+            spaceship.style.transform = `translate(calc(${moveToX}px - 50%), calc(${moveToY}px - 50%)) rotate(${90-currentAngle}deg)`;
+            
+            // Reset after animation completes
+            setTimeout(() => {
+                spaceship.classList.remove('spaceship-success');
+                spaceship.style.transform = `translate(-50%, -50%) rotate(${90-currentAngle}deg)`;
+                
+                // Clear trails
+                trailsContainer.innerHTML = '';
+                
+                isAnimating = false;
+            }, 2000);
+        }
+        
+        // Create trail effect for spaceship movement
+        function createTrailEffect(startX, startY, endX, endY) {
+            // Clear previous trails
+            trailsContainer.innerHTML = '';
+            
+            const trailCount = 10;
+            const delay = 100; // ms between trail particles
+            
+            for (let i = 0; i < trailCount; i++) {
+                setTimeout(() => {
+                    if (!isAnimating) return;
+                    
+                    // Calculate position along the path
+                    const ratio = i / trailCount;
+                    const x = startX + (endX - startX) * ratio;
+                    const y = startY + (endY - startY) * ratio;
+                    
+                    // Create trail particle
+                    const trail = document.createElement('div');
+                    trail.className = 'trail';
+                    trail.style.left = `${x}px`;
+                    trail.style.top = `${y}px`;
+                    trail.style.opacity = `${1 - ratio}`;
+                    trail.style.transform = 'translate(-50%, -50%)';
+                    
+                    trailsContainer.appendChild(trail);
+                    
+                    // Remove trail after animation
+                    setTimeout(() => {
+                        if (trail.parentNode === trailsContainer) {
+                            trailsContainer.removeChild(trail);
+                        }
+                    }, 1000);
+                }, i * delay);
+            }
+        }
+        
+        // Reset line
+        function resetLine() {
+            if (isAnimating) return;
+            setAngle(0); // Reset to 0 degrees (pointing up)
+            angleLine.setAttribute('stroke', '#FBBF24');
+        }
+        
+        // Show feedback message
+        function showFeedback(message, colorClass) {
+            feedback.textContent = message;
+            feedback.className = 'feedback absolute left-1/2 top-1/3 transform -translate-x-1/2 -translate-y-1/2 text-center p-5 rounded-xl text-3xl md:text-4xl font-bold z-40';
+            feedback.classList.add(colorClass);
+            feedback.classList.add('show');
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Initialize game when page loads
+        window.onload = initGame;
+    </script>
+</html>
