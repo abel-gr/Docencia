@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Base de Datos SQL</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
+    }
+    .sql-editor {
+      font-family: 'Consolas', 'Courier New', monospace;
+      resize: none;
+      white-space: pre;
+      tab-size: 4;
+    }
+    .table-container {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .editable:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+    .editable:focus {
+      background-color: #e0e7ff;
+      outline: 2px solid #4f46e5;
+    }
+    .command-btn:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .result-message {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+    .result-success {
+      background-color: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #10b981;
+    }
+    .result-error {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border-left: 4px solid #ef4444;
+    }
+  </style>
+<script src="/_sdk/telemetry_sdk.js"></script></head>
+<body class="min-h-screen">
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold text-center text-indigo-700 mb-6">Gestor de Base de Datos SQL</h1>
+    
+    <div class="flex flex-col md:flex-row gap-4">
+      <!-- Panel izquierdo: Lista de tablas -->
+      <div class="w-full md:w-1/4 bg-white rounded-lg shadow-md p-4">
+        <h2 class="text-xl font-semibold mb-3 text-indigo-600">Tablas</h2>
+        <div id="tablesList" class="mb-4">
+          <p class="text-gray-500 italic">No hay tablas creadas</p>
+        </div>
+        <div class="flex justify-between">
+          <button id="createTableBtn" class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">
+            Nueva Tabla
+          </button>
+          <button id="importBtn" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+            <span class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Importar
+            </span>
+          </button>
+          <button id="exportBtn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+            <span class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Exportar
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel derecho: Contenido principal -->
+      <div class="w-full md:w-3/4 bg-white rounded-lg shadow-md p-4">
+        <!-- Intérprete SQL -->
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold mb-2 text-indigo-600">Intérprete SQL</h2>
+          <div class="flex mb-2">
+            <textarea id="sqlInput" class="sql-editor w-full p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="4" placeholder="Escribe tu consulta SQL aquí..."></textarea>
+            <button id="executeBtn" class="bg-indigo-600 text-white px-4 rounded-r-lg hover:bg-indigo-700">
+              Ejecutar
+            </button>
+          </div>
+          <div id="sqlResult" class="mb-4"></div>
+          <div class="text-sm text-gray-600 mb-2">
+            <span class="font-semibold">Comandos soportados:</span>
+            <div class="flex flex-wrap gap-2 mt-1">
+              <span class="command-btn bg-gray-100 px-2 py-1 rounded">CREATE TABLE</span>
+              <span class="command-btn bg-gray-100 px-2 py-1 rounded">INSERT INTO</span>
+              <span class="command-btn bg-gray-100 px-2 py-1 rounded">SELECT</span>
+              <span class="command-btn bg-gray-100 px-2 py-1 rounded">UPDATE</span>
+              <span class="command-btn bg-gray-100 px-2 py-1 rounded">DELETE FROM</span>
+              <span class="command-btn bg-gray-100 px-2 py-1 rounded">DROP TABLE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="mb-4">
+          <div class="flex mb-2">
+            <button id="tabEstructura" class="px-4 py-2 bg-gray-200 rounded-t-lg mr-1 focus:outline-none">Estructura</button>
+            <button id="tabDatos" class="px-4 py-2 bg-gray-100 rounded-t-lg focus:outline-none">Datos</button>
+          </div>
+          <div id="resultContainer" class="border border-gray-300 rounded-b-lg rounded-tr-lg p-4 min-h-[200px]">
+            <div id="estructuraTab">
+              <p class="text-gray-500 italic">Ejecuta una consulta para ver resultados</p>
+            </div>
+            <div id="datosTab" class="hidden">
+              <p class="text-gray-500 italic">Ejecuta una consulta para ver datos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para crear tabla -->
+  <div id="createTableModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+      <h2 class="text-2xl font-bold mb-4 text-indigo-700">Crear Nueva Tabla</h2>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Nombre de la tabla:</label>
+        <input id="tableNameInput" type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Nombre de la tabla">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Campos:</label>
+        <div id="fieldsContainer" class="space-y-2">
+          <div class="field-row flex items-center space-x-2">
+            <input type="text" class="field-name w-1/3 p-2 border border-gray-300 rounded" placeholder="Nombre del campo">
+            <select class="field-type w-1/3 p-2 border border-gray-300 rounded">
+              <option value="TEXT">TEXT</option>
+              <option value="INTEGER">INTEGER</option>
+              <option value="REAL">REAL</option>
+              <option value="BOOLEAN">BOOLEAN</option>
+              <option value="DATE">DATE</option>
+            </select>
+            <label class="flex items-center">
+              <input type="checkbox" class="field-primary mr-2 h-5 w-5">
+              <span>Clave primaria</span>
+            </label>
+            <button class="remove-field text-red-500 hover:text-red-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button id="addFieldBtn" class="mt-2 bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">
+          + Añadir Campo
+        </button>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button id="cancelCreateTable" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Cancelar
+        </button>
+        <button id="confirmCreateTable" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+          Crear Tabla
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para editar tabla -->
+  <div id="editTableModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+      <h2 class="text-2xl font-bold mb-4 text-indigo-700">Editar Tabla <span id="editTableName"></span></h2>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Nombre de la tabla:</label>
+        <input id="editTableNameInput" type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Nombre de la tabla">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">Campos:</label>
+        <div id="editFieldsContainer" class="space-y-2">
+          <!-- Los campos se añadirán dinámicamente -->
+        </div>
+        <button id="addEditFieldBtn" class="mt-2 bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">
+          + Añadir Campo
+        </button>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button id="cancelEditTable" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Cancelar
+        </button>
+        <button id="confirmEditTable" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para editar datos -->
+  <div id="editDataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+      <h2 class="text-2xl font-bold mb-4 text-indigo-700">Editar Registro</h2>
+      <div id="editDataFields" class="space-y-3">
+        <!-- Los campos se añadirán dinámicamente -->
+      </div>
+      <div class="flex justify-end space-x-2 mt-4">
+        <button id="cancelEditData" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+          Cancelar
+        </button>
+        <button id="confirmEditData" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Estado de la aplicación
+      const state = {
+        database: {},
+        currentTable: null,
+        currentView: 'estructura',
+        editingRow: null,
+        editingTable: null
+      };
+
+      // Referencias a elementos DOM
+      const elements = {
+        tablesList: document.getElementById('tablesList'),
+        sqlInput: document.getElementById('sqlInput'),
+        executeBtn: document.getElementById('executeBtn'),
+        sqlResult: document.getElementById('sqlResult'),
+        resultContainer: document.getElementById('resultContainer'),
+        estructuraTab: document.getElementById('estructuraTab'),
+        datosTab: document.getElementById('datosTab'),
+        tabEstructura: document.getElementById('tabEstructura'),
+        tabDatos: document.getElementById('tabDatos'),
+        createTableBtn: document.getElementById('createTableBtn'),
+        createTableModal: document.getElementById('createTableModal'),
+        tableNameInput: document.getElementById('tableNameInput'),
+        fieldsContainer: document.getElementById('fieldsContainer'),
+        addFieldBtn: document.getElementById('addFieldBtn'),
+        cancelCreateTable: document.getElementById('cancelCreateTable'),
+        confirmCreateTable: document.getElementById('confirmCreateTable'),
+        importBtn: document.getElementById('importBtn'),
+        exportBtn: document.getElementById('exportBtn'),
+        editTableModal: document.getElementById('editTableModal'),
+        editTableName: document.getElementById('editTableName'),
+        editTableNameInput: document.getElementById('editTableNameInput'),
+        editFieldsContainer: document.getElementById('editFieldsContainer'),
+        addEditFieldBtn: document.getElementById('addEditFieldBtn'),
+        cancelEditTable: document.getElementById('cancelEditTable'),
+        confirmEditTable: document.getElementById('confirmEditTable'),
+        editDataModal: document.getElementById('editDataModal'),
+        editDataFields: document.getElementById('editDataFields'),
+        cancelEditData: document.getElementById('cancelEditData'),
+        confirmEditData: document.getElementById('confirmEditData'),
+        commandBtns: document.querySelectorAll('.command-btn')
+      };
+
+      // Inicializar la aplicación
+      init();
+
+      function init() {
+        // Cargar datos guardados si existen
+        loadDatabase();
+        renderTablesList();
+        setupEventListeners();
+      }
+
+      function setupEventListeners() {
+        // Botones de pestañas
+        elements.tabEstructura.addEventListener('click', () => switchTab('estructura'));
+        elements.tabDatos.addEventListener('click', () => switchTab('datos'));
+        
+        // Botón ejecutar SQL
+        elements.executeBtn.addEventListener('click', executeSQL);
+        
+        // Botones de crear tabla
+        elements.createTableBtn.addEventListener('click', showCreateTableModal);
+        elements.cancelCreateTable.addEventListener('click', hideCreateTableModal);
+        elements.confirmCreateTable.addEventListener('click', createTableFromModal);
+        elements.addFieldBtn.addEventListener('click', addFieldRow);
+        
+        // Botones de importar/exportar
+        elements.importBtn.addEventListener('click', importDatabase);
+        elements.exportBtn.addEventListener('click', exportDatabase);
+        
+        // Botones de editar tabla
+        elements.cancelEditTable.addEventListener('click', hideEditTableModal);
+        elements.confirmEditTable.addEventListener('click', saveTableEdits);
+        elements.addEditFieldBtn.addEventListener('click', addEditFieldRow);
+        
+        // Botones de editar datos
+        elements.cancelEditData.addEventListener('click', hideEditDataModal);
+        elements.confirmEditData.addEventListener('click', saveDataEdits);
+
+        // Comandos SQL de ejemplo
+        elements.commandBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const command = btn.textContent.trim();
+            let template = '';
+            
+            switch(command) {
+              case 'CREATE TABLE':
+                template = 'CREATE TABLE nombre_tabla (campo1 TEXT, campo2 INTEGER PRIMARY KEY)';
+                break;
+              case 'INSERT INTO':
+                template = 'INSERT INTO nombre_tabla (campo1, campo2) VALUES ("valor1", 2)';
+                break;
+              case 'SELECT':
+                template = 'SELECT * FROM nombre_tabla WHERE campo1 = "valor"';
+                break;
+              case 'UPDATE':
+                template = 'UPDATE nombre_tabla SET campo1 = "nuevo_valor" WHERE campo2 = 2';
+                break;
+              case 'DELETE FROM':
+                template = 'DELETE FROM nombre_tabla WHERE campo1 = "valor"';
+                break;
+              case 'DROP TABLE':
+                template = 'DROP TABLE nombre_tabla';
+                break;
+            }
+            
+            elements.sqlInput.value = template;
+            elements.sqlInput.focus();
+          });
+        });
+
+        // Delegación de eventos para botones dinámicos
+        document.addEventListener('click', function(e) {
+          // Botones para eliminar campos
+          if (e.target.closest('.remove-field')) {
+            const row = e.target.closest('.field-row');
+            row.remove();
+          }
+          
+          // Botones para ver tabla
+          if (e.target.closest('.view-table-btn')) {
+            const tableName = e.target.closest('.view-table-btn').dataset.table;
+            viewTable(tableName);
+          }
+          
+          // Botones para editar tabla
+          if (e.target.closest('.edit-table-btn')) {
+            const tableName = e.target.closest('.edit-table-btn').dataset.table;
+            showEditTableModal(tableName);
+          }
+          
+          // Botones para eliminar tabla
+          if (e.target.closest('.delete-table-btn')) {
+            const tableName = e.target.closest('.delete-table-btn').dataset.table;
+            if (confirm(`¿Estás seguro de que deseas eliminar la tabla "${tableName}"?`)) {
+              deleteTable(tableName);
+            }
+          }
+          
+          // Celdas editables en la vista de datos
+          if (e.target.classList.contains('editable')) {
+            const row = parseInt(e.target.dataset.row);
+            const table = e.target.dataset.table;
+            showEditDataModal(table, row);
+          }
+        });
+      }
+
+      function switchTab(tab) {
+        state.currentView = tab;
+        
+        if (tab === 'estructura') {
+          elements.tabEstructura.classList.add('bg-gray-200');
+          elements.tabEstructura.classList.remove('bg-gray-100');
+          elements.tabDatos.classList.add('bg-gray-100');
+          elements.tabDatos.classList.remove('bg-gray-200');
+          
+          elements.estructuraTab.classList.remove('hidden');
+          elements.datosTab.classList.add('hidden');
+        } else {
+          elements.tabDatos.classList.add('bg-gray-200');
+          elements.tabDatos.classList.remove('bg-gray-100');
+          elements.tabEstructura.classList.add('bg-gray-100');
+          elements.tabEstructura.classList.remove('bg-gray-200');
+          
+          elements.datosTab.classList.remove('hidden');
+          elements.estructuraTab.classList.add('hidden');
+        }
+        
+        if (state.currentTable) {
+          viewTable(state.currentTable);
+        }
+      }
+
+      function executeSQL() {
+        const sql = elements.sqlInput.value.trim();
+        if (!sql) return;
+        
+        try {
+          // Analizar la consulta SQL
+          let result = '';
+          
+          if (sql.toUpperCase().startsWith('CREATE TABLE')) {
+            result = executeCreateTable(sql);
+          } else if (sql.toUpperCase().startsWith('INSERT INTO')) {
+            result = executeInsert(sql);
+          } else if (sql.toUpperCase().startsWith('SELECT')) {
+            result = executeSelect(sql);
+          } else if (sql.toUpperCase().startsWith('UPDATE')) {
+            result = executeUpdate(sql);
+          } else if (sql.toUpperCase().startsWith('DELETE FROM')) {
+            result = executeDelete(sql);
+          } else if (sql.toUpperCase().startsWith('DROP TABLE')) {
+            result = executeDropTable(sql);
+          } else {
+            throw new Error('Comando SQL no reconocido');
+          }
+          
+          // Guardar cambios en la base de datos
+          saveDatabase();
+          
+          // Actualizar la lista de tablas
+          renderTablesList();
+          
+          // Mostrar mensaje de éxito
+          showSqlResult(result, true);
+          
+        } catch (error) {
+          showSqlResult(error.message, false);
+        }
+      }
+
+      function executeCreateTable(sql) {
+        // Extraer el nombre de la tabla y los campos
+        const regex = /CREATE\s+TABLE\s+(\w+)\s*\(\s*(.*)\s*\)/i;
+        const match = sql.match(regex);
+        
+        if (!match) {
+          throw new Error('Sintaxis incorrecta para CREATE TABLE');
+        }
+        
+        const tableName = match[1];
+        const fieldsStr = match[2];
+        
+        // Verificar si la tabla ya existe
+        if (state.database[tableName]) {
+          throw new Error(`La tabla "${tableName}" ya existe`);
+        }
+        
+        // Analizar los campos
+        const fields = {};
+        const primaryKeys = [];
+        
+        fieldsStr.split(',').forEach(fieldStr => {
+          const fieldParts = fieldStr.trim().split(/\s+/);
+          const fieldName = fieldParts[0];
+          let fieldType = fieldParts[1] || 'TEXT';
+          
+          // Verificar si es clave primaria
+          const isPrimary = fieldStr.toUpperCase().includes('PRIMARY KEY');
+          if (isPrimary) {
+            primaryKeys.push(fieldName);
+            fieldType = fieldType.replace(/PRIMARY\s+KEY/i, '').trim();
+          }
+          
+          fields[fieldName] = { type: fieldType, primary: isPrimary };
+        });
+        
+        // Crear la tabla
+        state.database[tableName] = {
+          fields: fields,
+          data: [],
+          primaryKeys: primaryKeys
+        };
+        
+        // Mostrar la estructura de la tabla
+        state.currentTable = tableName;
+        switchTab('estructura');
+        showTableStructure(tableName);
+        
+        return `Tabla "${tableName}" creada correctamente con ${Object.keys(fields).length} campo(s)`;
+      }
+
+      function executeInsert(sql) {
+        // Extraer el nombre de la tabla, campos y valores
+        const regex = /INSERT\s+INTO\s+(\w+)\s*(?:\(\s*(.*?)\s*\))?\s*VALUES\s*\(\s*(.*?)\s*\)/i;
+        const match = sql.match(regex);
+        
+        if (!match) {
+          throw new Error('Sintaxis incorrecta para INSERT INTO');
+        }
+        
+        const tableName = match[1];
+        let fieldsStr = match[2];
+        const valuesStr = match[3];
+        
+        // Verificar si la tabla existe
+        if (!state.database[tableName]) {
+          throw new Error(`La tabla "${tableName}" no existe`);
+        }
+        
+        // Obtener los campos de la tabla
+        const tableFields = Object.keys(state.database[tableName].fields);
+        
+        // Si no se especificaron campos, usar todos los campos de la tabla
+        const fields = fieldsStr ? fieldsStr.split(',').map(f => f.trim()) : tableFields;
+        
+        // Analizar los valores
+        const valuesList = parseValues(valuesStr);
+        
+        if (fields.length !== valuesList.length) {
+          throw new Error('El número de campos no coincide con el número de valores');
+        }
+        
+        // Crear el nuevo registro
+        const newRecord = {};
+        tableFields.forEach(field => {
+          newRecord[field] = null; // Inicializar todos los campos con null
+        });
+        
+        fields.forEach((field, index) => {
+          newRecord[field] = valuesList[index];
+        });
+        
+        // Verificar claves primarias
+        const primaryKeys = state.database[tableName].primaryKeys || [];
+        for (const pk of primaryKeys) {
+          if (newRecord[pk] === null || newRecord[pk] === undefined) {
+            throw new Error(`La clave primaria "${pk}" no puede ser nula`);
+          }
+          
+          // Verificar si ya existe un registro con la misma clave primaria
+          const exists = state.database[tableName].data.some(record => 
+            record[pk] !== null && record[pk] !== undefined && record[pk] == newRecord[pk]
+          );
+          
+          if (exists) {
+            throw new Error(`Ya existe un registro con la clave primaria "${pk}" = "${newRecord[pk]}"`);
+          }
+        }
+        
+        // Añadir el registro a la tabla
+        state.database[tableName].data.push(newRecord);
+        
+        // Mostrar los datos de la tabla
+        state.currentTable = tableName;
+        switchTab('datos');
+        showTableData(tableName);
+        
+        return `Se insertó 1 registro en la tabla "${tableName}"`;
+      }
+
+      function executeSelect(sql) {
+        // Extraer el nombre de la tabla y la condición WHERE
+        const regex = /SELECT\s+(.*?)\s+FROM\s+(\w+)(?:\s+WHERE\s+(.*))?/i;
+        const match = sql.match(regex);
+        
+        if (!match) {
+          throw new Error('Sintaxis incorrecta para SELECT');
+        }
+        
+        const fieldsStr = match[1];
+        const tableName = match[2];
+        const whereStr = match[3];
+        
+        // Verificar si la tabla existe
+        if (!state.database[tableName]) {
+          throw new Error(`La tabla "${tableName}" no existe`);
+        }
+        
+        // Determinar qué campos seleccionar
+        let selectedFields = [];
+        if (fieldsStr.trim() === '*') {
+          selectedFields = Object.keys(state.database[tableName].fields);
+        } else {
+          selectedFields = fieldsStr.split(',').map(f => f.trim());
+          
+          // Verificar que todos los campos existan
+          for (const field of selectedFields) {
+            if (!state.database[tableName].fields[field]) {
+              throw new Error(`El campo "${field}" no existe en la tabla "${tableName}"`);
+            }
+          }
+        }
+        
+        // Filtrar los datos según la condición WHERE
+        let filteredData = [...state.database[tableName].data];
+        
+        if (whereStr) {
+          filteredData = filterDataByCondition(filteredData, whereStr);
+        }
+        
+        // Mostrar los resultados
+        state.currentTable = tableName;
+        switchTab('datos');
+        showQueryResults(selectedFields, filteredData, tableName);
+        
+        return `Se encontraron ${filteredData.length} registro(s) en la tabla "${tableName}"`;
+      }
+
+      function executeUpdate(sql) {
+        // Extraer el nombre de la tabla, los campos a actualizar y la condición WHERE
+        const regex = /UPDATE\s+(\w+)\s+SET\s+(.*?)(?:\s+WHERE\s+(.*))?/i;
+        const match = sql.match(regex);
+        
+        if (!match) {
+          throw new Error('Sintaxis incorrecta para UPDATE');
+        }
+        
+        const tableName = match[1];
+        const setStr = match[2];
+        const whereStr = match[3];
+        
+        // Verificar si la tabla existe
+        if (!state.database[tableName]) {
+          throw new Error(`La tabla "${tableName}" no existe`);
+        }
+        
+        // Analizar las asignaciones SET
+        const assignments = {};
+        setStr.split(',').forEach(assignment => {
+          const [field, valueStr] = assignment.split('=').map(s => s.trim());
+          
+          if (!state.database[tableName].fields[field]) {
+            throw new Error(`El campo "${field}" no existe en la tabla "${tableName}"`);
+          }
+          
+          assignments[field] = parseValue(valueStr);
+        });
+        
+        // Verificar claves primarias
+        const primaryKeys = state.database[tableName].primaryKeys || [];
+        const primaryKeyUpdates = primaryKeys.filter(pk => assignments[pk] !== undefined);
+        
+        if (primaryKeyUpdates.length > 0) {
+          // Obtener los registros que se actualizarán
+          let recordsToUpdate = [];
+          
+          if (whereStr) {
+            const filteredIndexes = getFilteredIndexes(state.database[tableName].data, whereStr);
+            recordsToUpdate = filteredIndexes.map(index => ({
+              index,
+              record: { ...state.database[tableName].data[index] }
+            }));
+          } else {
+            recordsToUpdate = state.database[tableName].data.map((record, index) => ({
+              index,
+              record: { ...record }
+            }));
+          }
+          
+          // Verificar si hay conflictos de claves primarias
+          for (const { record, index } of recordsToUpdate) {
+            // Aplicar las actualizaciones temporalmente
+            const updatedRecord = { ...record };
+            Object.keys(assignments).forEach(field => {
+              updatedRecord[field] = assignments[field];
+            });
+            
+            // Verificar cada clave primaria
+            for (const pk of primaryKeyUpdates) {
+              if (updatedRecord[pk] === null || updatedRecord[pk] === undefined) {
+                throw new Error(`La clave primaria "${pk}" no puede ser nula`);
+              }
+              
+              // Verificar si ya existe otro registro con la misma clave primaria
+              const conflictIndex = state.database[tableName].data.findIndex((r, i) => 
+                i !== index && 
+                r[pk] !== null && 
+                r[pk] !== undefined && 
+                r[pk] == updatedRecord[pk]
+              );
+              
+              if (conflictIndex !== -1) {
+                throw new Error(`Ya existe un registro con la clave primaria "${pk}" = "${updatedRecord[pk]}"`);
+              }
+            }
+          }
+        }
+        
+        // Actualizar los registros que cumplan la condición WHERE
+        let updatedCount = 0;
+        
+        if (whereStr) {
+          const filteredIndexes = getFilteredIndexes(state.database[tableName].data, whereStr);
+          
+          filteredIndexes.forEach(index => {
+            Object.keys(assignments).forEach(field => {
+              state.database[tableName].data[index][field] = assignments[field];
+            });
+            updatedCount++;
+          });
+        } else {
+          // Si no hay condición WHERE, actualizar todos los registros
+          state.database[tableName].data.forEach(record => {
+            Object.keys(assignments).forEach(field => {
+              record[field] = assignments[field];
+            });
+            updatedCount++;
+          });
+        }
+        
+        // Mostrar los datos actualizados
+        state.currentTable = tableName;
+        switchTab('datos');
+        showTableData(tableName);
+        
+        return `Se actualizaron ${updatedCount} registro(s) en la tabla "${tableName}"`;
+      }
+
+      function executeDelete(sql) {
+        // Extraer el nombre de la tabla y la condición WHERE
+        const regex = /DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(.*))?/i;
+        const match = sql.match(regex);
+        
+        if (!match) {
+          throw new Error('Sintaxis incorrecta para DELETE FROM');
+        }
+        
+        const tableName = match[1];
+        const whereStr = match[2];
+        
+        // Verificar si la tabla existe
+        if (!state.database[tableName]) {
+          throw new Error(`La tabla "${tableName}" no existe`);
+        }
+        
+        let deletedCount = 0;
+        
+        if (whereStr) {
+          // Eliminar los registros que cumplan la condición WHERE
+          const filteredIndexes = getFilteredIndexes(state.database[tableName].data, whereStr);
+          
+          // Eliminar los registros en orden inverso para no afectar los índices
+          for (let i = filteredIndexes.length - 1; i >= 0; i--) {
+            state.database[tableName].data.splice(filteredIndexes[i], 1);
+            deletedCount++;
+          }
+        } else {
+          // Si no hay condición WHERE, eliminar todos los registros
+          deletedCount = state.database[tableName].data.length;
+          state.database[tableName].data = [];
+        }
+        
+        // Mostrar los datos actualizados
+        state.currentTable = tableName;
+        switchTab('datos');
+        showTableData(tableName);
+        
+        return `Se eliminaron ${deletedCount} registro(s) de la tabla "${tableName}"`;
+      }
+
+      function executeDropTable(sql) {
+        // Extraer el nombre de la tabla
+        const regex = /DROP\s+TABLE\s+(\w+)/i;
+        const match = sql.match(regex);
+        
+        if (!match) {
+          throw new Error('Sintaxis incorrecta para DROP TABLE');
+        }
+        
+        const tableName = match[1];
+        
+        // Verificar si la tabla existe
+        if (!state.database[tableName]) {
+          throw new Error(`La tabla "${tableName}" no existe`);
+        }
+        
+        // Eliminar la tabla
+        delete state.database[tableName];
+        
+        // Limpiar la vista actual si era la tabla eliminada
+        if (state.currentTable === tableName) {
+          state.currentTable = null;
+          elements.estructuraTab.innerHTML = '<p class="text-gray-500 italic">Ejecuta una consulta para ver resultados</p>';
+          elements.datosTab.innerHTML = '<p class="text-gray-500 italic">Ejecuta una consulta para ver datos</p>';
+        }
+        
+        return `Se eliminó la tabla "${tableName}"`;
+      }
+
+      function parseValues(valuesStr) {
+        const values = [];
+        let currentValue = '';
+        let inString = false;
+        let escapeNext = false;
+        
+        for (let i = 0; i < valuesStr.length; i++) {
+          const char = valuesStr[i];
+          
+          if (escapeNext) {
+            currentValue += char;
+            escapeNext = false;
+            continue;
+          }
+          
+          if (char === '\\') {
+            escapeNext = true;
+            continue;
+          }
+          
+          if (char === '"' || char === "'") {
+            inString = !inString;
+            continue;
+          }
+          
+          if (char === ',' && !inString) {
+            values.push(parseValue(currentValue));
+            currentValue = '';
+            continue;
+          }
+          
+          currentValue += char;
+        }
+        
+        // Añadir el último valor
+        if (currentValue.trim()) {
+          values.push(parseValue(currentValue));
+        }
+        
+        return values;
+      }
+
+      function parseValue(valueStr) {
+        valueStr = valueStr.trim();
+        
+        // Si es una cadena entre comillas
+        if ((valueStr.startsWith('"') && valueStr.endsWith('"')) || 
+            (valueStr.startsWith("'") && valueStr.endsWith("'"))) {
+          return valueStr.substring(1, valueStr.length - 1);
+        }
+        
+        // Si es un número
+        if (!isNaN(valueStr)) {
+          return Number(valueStr);
+        }
+        
+        // Si es un booleano
+        if (valueStr.toLowerCase() === 'true') return true;
+        if (valueStr.toLowerCase() === 'false') return false;
+        
+        // Si es null
+        if (valueStr.toLowerCase() === 'null') return null;
+        
+        // Por defecto, devolver como cadena
+        return valueStr;
+      }
+
+      function filterDataByCondition(data, whereStr) {
+        // Implementación simple de parser para condiciones WHERE
+        // Soporta operadores =, !=, >, <, >=, <=
+        // y operadores lógicos AND, OR
+        // No usa eval() para evitar problemas de seguridad
+        
+        // Dividir en condiciones separadas por AND u OR
+        const conditions = [];
+        let currentCondition = '';
+        let inString = false;
+        let operator = 'AND'; // Por defecto
+        
+        for (let i = 0; i < whereStr.length; i++) {
+          const char = whereStr[i];
+          
+          if (char === '"' || char === "'") {
+            inString = !inString;
+            currentCondition += char;
+            continue;
+          }
+          
+          // Detectar operadores lógicos
+          if (!inString && i + 2 < whereStr.length) {
+            const nextChars = whereStr.substring(i, i + 3).toUpperCase();
+            if (nextChars === 'AND') {
+              conditions.push({ condition: currentCondition.trim(), operator });
+              currentCondition = '';
+              operator = 'AND';
+              i += 2; // Saltar 'AND'
+              continue;
+            }
+          }
+          
+          if (!inString && i + 1 < whereStr.length) {
+            const nextChars = whereStr.substring(i, i + 2).toUpperCase();
+            if (nextChars === 'OR') {
+              conditions.push({ condition: currentCondition.trim(), operator });
+              currentCondition = '';
+              operator = 'OR';
+              i += 1; // Saltar 'OR'
+              continue;
+            }
+          }
+          
+          currentCondition += char;
+        }
+        
+        // Añadir la última condición
+        if (currentCondition.trim()) {
+          conditions.push({ condition: currentCondition.trim(), operator });
+        }
+        
+        // Filtrar los datos según las condiciones
+        return data.filter(record => {
+          let result = true; // Para AND inicial
+          
+          conditions.forEach(({ condition, operator }, index) => {
+            // Para la primera condición, ignorar el operador
+            if (index === 0) {
+              result = evaluateCondition(record, condition);
+              return;
+            }
+            
+            // Para las siguientes condiciones, aplicar el operador lógico
+            if (operator === 'AND') {
+              result = result && evaluateCondition(record, condition);
+            } else if (operator === 'OR') {
+              result = result || evaluateCondition(record, condition);
+            }
+          });
+          
+          return result;
+        });
+      }
+
+      function getFilteredIndexes(data, whereStr) {
+        // Similar a filterDataByCondition, pero devuelve los índices en lugar de los registros
+        const filteredIndexes = [];
+        
+        data.forEach((record, index) => {
+          if (evaluateCondition(record, whereStr)) {
+            filteredIndexes.push(index);
+          }
+        });
+        
+        return filteredIndexes;
+      }
+
+      function evaluateCondition(record, condition) {
+        // Detectar el operador de comparación
+        let operator = '=';
+        let parts = [];
+        
+        if (condition.includes('!=')) {
+          operator = '!=';
+          parts = condition.split('!=');
+        } else if (condition.includes('>=')) {
+          operator = '>=';
+          parts = condition.split('>=');
+        } else if (condition.includes('<=')) {
+          operator = '<=';
+          parts = condition.split('<=');
+        } else if (condition.includes('>')) {
+          operator = '>';
+          parts = condition.split('>');
+        } else if (condition.includes('<')) {
+          operator = '<';
+          parts = condition.split('<');
+        } else if (condition.includes('=')) {
+          operator = '=';
+          parts = condition.split('=');
+        } else {
+          throw new Error(`Operador no reconocido en la condición: ${condition}`);
+        }
+        
+        if (parts.length !== 2) {
+          throw new Error(`Condición mal formada: ${condition}`);
+        }
+        
+        const fieldName = parts[0].trim();
+        const valueStr = parts[1].trim();
+        const value = parseValue(valueStr);
+        
+        // Comparar según el operador
+        switch (operator) {
+          case '=':
+            return record[fieldName] == value;
+          case '!=':
+            return record[fieldName] != value;
+          case '>':
+            return record[fieldName] > value;
+          case '<':
+            return record[fieldName] < value;
+          case '>=':
+            return record[fieldName] >= value;
+          case '<=':
+            return record[fieldName] <= value;
+          default:
+            throw new Error(`Operador no soportado: ${operator}`);
+        }
+      }
+
+      function showTableStructure(tableName) {
+        if (!state.database[tableName]) {
+          showError(`La tabla "${tableName}" no existe`);
+          return;
+        }
+        
+        const fields = state.database[tableName].fields;
+        const primaryKeys = state.database[tableName].primaryKeys || [];
+        
+        let html = `
+          <h3 class="text-lg font-semibold mb-2">Estructura de la tabla "${tableName}"</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-300">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="py-2 px-4 border-b text-left">Campo</th>
+                  <th class="py-2 px-4 border-b text-left">Tipo</th>
+                  <th class="py-2 px-4 border-b text-left">Clave Primaria</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        
+        Object.keys(fields).forEach(fieldName => {
+          const field = fields[fieldName];
+          const isPrimary = primaryKeys.includes(fieldName) || field.primary;
+          
+          html += `
+            <tr>
+              <td class="py-2 px-4 border-b">${fieldName}</td>
+              <td class="py-2 px-4 border-b">${field.type}</td>
+              <td class="py-2 px-4 border-b">${isPrimary ? '✓' : ''}</td>
+            </tr>
+          `;
+        });
+        
+        html += `
+              </tbody>
+            </table>
+          </div>
+        `;
+        
+        elements.estructuraTab.innerHTML = html;
+      }
+
+      function showTableData(tableName) {
+        if (!state.database[tableName]) {
+          showError(`La tabla "${tableName}" no existe`);
+          return;
+        }
+        
+        const fields = Object.keys(state.database[tableName].fields);
+        const data = state.database[tableName].data;
+        
+        showQueryResults(fields, data, tableName);
+      }
+
+      function showQueryResults(fields, data, tableName) {
+        let html = `
+          <h3 class="text-lg font-semibold mb-2">Datos de la tabla "${tableName}"</h3>
+          <div class="overflow-x-auto table-container">
+            <table class="min-w-full bg-white border border-gray-300">
+              <thead>
+                <tr class="bg-gray-100">
+        `;
+        
+        // Encabezados de la tabla con tipos de datos
+        fields.forEach(field => {
+          const fieldType = state.database[tableName].fields[field]?.type || '';
+          html += `<th class="py-2 px-4 border-b text-left">${field} (${fieldType})</th>`;
+        });
+        
+        html += `
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        
+        // Datos de la tabla
+        if (data.length === 0) {
+          html += `
+            <tr>
+              <td colspan="${fields.length}" class="py-4 px-4 text-center text-gray-500">No hay datos</td>
+            </tr>
+          `;
+        } else {
+          data.forEach((record, rowIndex) => {
+            html += '<tr>';
+            
+            fields.forEach(field => {
+              const value = record[field] !== null && record[field] !== undefined ? record[field] : '';
+              html += `<td class="py-2 px-4 border-b editable" data-table="${tableName}" data-row="${rowIndex}" data-field="${field}">${value}</td>`;
+            });
+            
+            html += '</tr>';
+          });
+        }
+        
+        html += `
+              </tbody>
+            </table>
+          </div>
+        `;
+        
+        elements.datosTab.innerHTML = html;
+      }
+
+      function renderTablesList() {
+        const tables = Object.keys(state.database);
+        
+        if (tables.length === 0) {
+          elements.tablesList.innerHTML = '<p class="text-gray-500 italic">No hay tablas creadas</p>';
+          return;
+        }
+        
+        let html = '<ul class="space-y-2">';
+        
+        tables.forEach(tableName => {
+          html += `
+            <li class="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
+              <span class="font-medium">${tableName}</span>
+              <div class="flex space-x-1">
+                <button class="view-table-btn text-blue-600 hover:text-blue-800" data-table="${tableName}" title="Ver tabla">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+                <button class="edit-table-btn text-yellow-600 hover:text-yellow-800" data-table="${tableName}" title="Editar estructura">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </button>
+                <button class="delete-table-btn text-red-600 hover:text-red-800" data-table="${tableName}" title="Eliminar tabla">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </li>
+          `;
+        });
+        
+        html += '</ul>';
+        elements.tablesList.innerHTML = html;
+      }
+
+      function viewTable(tableName) {
+        state.currentTable = tableName;
+        
+        if (state.currentView === 'estructura') {
+          showTableStructure(tableName);
+        } else {
+          showTableData(tableName);
+        }
+      }
+
+      function showCreateTableModal() {
+        // Limpiar el formulario
+        elements.tableNameInput.value = '';
+        elements.fieldsContainer.innerHTML = '';
+        addFieldRow(); // Añadir una fila de campo por defecto
+        
+        // Mostrar el modal
+        elements.createTableModal.classList.remove('hidden');
+      }
+
+      function hideCreateTableModal() {
+        elements.createTableModal.classList.add('hidden');
+      }
+
+      function addFieldRow() {
+        const fieldRow = document.createElement('div');
+        fieldRow.className = 'field-row flex items-center space-x-2';
+        
+        fieldRow.innerHTML = `
+          <input type="text" class="field-name w-1/3 p-2 border border-gray-300 rounded" placeholder="Nombre del campo">
+          <select class="field-type w-1/3 p-2 border border-gray-300 rounded">
+            <option value="TEXT">TEXT</option>
+            <option value="INTEGER">INTEGER</option>
+            <option value="REAL">REAL</option>
+            <option value="BOOLEAN">BOOLEAN</option>
+            <option value="DATE">DATE</option>
+          </select>
+          <label class="flex items-center">
+            <input type="checkbox" class="field-primary mr-2 h-5 w-5">
+            <span>Clave primaria</span>
+          </label>
+          <button class="remove-field text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        `;
+        
+        elements.fieldsContainer.appendChild(fieldRow);
+      }
+
+      function createTableFromModal() {
+        const tableName = elements.tableNameInput.value.trim();
+        
+        if (!tableName) {
+          showError('Debes especificar un nombre para la tabla');
+          return;
+        }
+        
+        if (state.database[tableName]) {
+          showError(`La tabla "${tableName}" ya existe`);
+          return;
+        }
+        
+        const fieldRows = elements.fieldsContainer.querySelectorAll('.field-row');
+        const fields = {};
+        const primaryKeys = [];
+        
+        for (const row of fieldRows) {
+          const fieldName = row.querySelector('.field-name').value.trim();
+          const fieldType = row.querySelector('.field-type').value;
+          const isPrimary = row.querySelector('.field-primary').checked;
+          
+          if (!fieldName) {
+            showError('Todos los campos deben tener un nombre');
+            return;
+          }
+          
+          fields[fieldName] = { type: fieldType, primary: isPrimary };
+          
+          if (isPrimary) {
+            primaryKeys.push(fieldName);
+          }
+        }
+        
+        if (Object.keys(fields).length === 0) {
+          showError('Debes añadir al menos un campo');
+          return;
+        }
+        
+        // Crear la tabla
+        state.database[tableName] = {
+          fields: fields,
+          data: [],
+          primaryKeys: primaryKeys
+        };
+        
+        // Guardar la base de datos
+        saveDatabase();
+        
+        // Actualizar la lista de tablas
+        renderTablesList();
+        
+        // Mostrar la estructura de la tabla
+        state.currentTable = tableName;
+        switchTab('estructura');
+        showTableStructure(tableName);
+        
+        // Ocultar el modal
+        hideCreateTableModal();
+        
+        showSuccess(`Tabla "${tableName}" creada correctamente`);
+      }
+
+      function showEditTableModal(tableName) {
+        if (!state.database[tableName]) {
+          showError(`La tabla "${tableName}" no existe`);
+          return;
+        }
+        
+        state.editingTable = tableName;
+        
+        // Llenar el formulario con los datos de la tabla
+        elements.editTableName.textContent = tableName;
+        elements.editTableNameInput.value = tableName;
+        elements.editFieldsContainer.innerHTML = '';
+        
+        const fields = state.database[tableName].fields;
+        const primaryKeys = state.database[tableName].primaryKeys || [];
+        
+        Object.keys(fields).forEach(fieldName => {
+          const field = fields[fieldName];
+          const isPrimary = primaryKeys.includes(fieldName) || field.primary;
+          
+          addEditFieldRow(fieldName, field.type, isPrimary);
+        });
+        
+        // Mostrar el modal
+        elements.editTableModal.classList.remove('hidden');
+      }
+
+      function hideEditTableModal() {
+        elements.editTableModal.classList.add('hidden');
+        state.editingTable = null;
+      }
+
+      function addEditFieldRow(fieldName = '', fieldType = 'TEXT', isPrimary = false) {
+        const fieldRow = document.createElement('div');
+        fieldRow.className = 'field-row flex items-center space-x-2';
+        
+        fieldRow.innerHTML = `
+          <input type="text" class="field-name w-1/3 p-2 border border-gray-300 rounded" placeholder="Nombre del campo" value="${fieldName}">
+          <select class="field-type w-1/3 p-2 border border-gray-300 rounded">
+            <option value="TEXT" ${fieldType === 'TEXT' ? 'selected' : ''}>TEXT</option>
+            <option value="INTEGER" ${fieldType === 'INTEGER' ? 'selected' : ''}>INTEGER</option>
+            <option value="REAL" ${fieldType === 'REAL' ? 'selected' : ''}>REAL</option>
+            <option value="BOOLEAN" ${fieldType === 'BOOLEAN' ? 'selected' : ''}>BOOLEAN</option>
+            <option value="DATE" ${fieldType === 'DATE' ? 'selected' : ''}>DATE</option>
+          </select>
+          <label class="flex items-center">
+            <input type="checkbox" class="field-primary mr-2 h-5 w-5" ${isPrimary ? 'checked' : ''}>
+            <span>Clave primaria</span>
+          </label>
+          <button class="remove-field text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        `;
+        
+        elements.editFieldsContainer.appendChild(fieldRow);
+      }
+
+      function saveTableEdits() {
+        if (!state.editingTable) return;
+        
+        const oldTableName = state.editingTable;
+        const newTableName = elements.editTableNameInput.value.trim();
+        
+        if (!newTableName) {
+          showError('Debes especificar un nombre para la tabla');
+          return;
+        }
+        
+        if (newTableName !== oldTableName && state.database[newTableName]) {
+          showError(`La tabla "${newTableName}" ya existe`);
+          return;
+        }
+        
+        const fieldRows = elements.editFieldsContainer.querySelectorAll('.field-row');
+        const fields = {};
+        const primaryKeys = [];
+        
+        for (const row of fieldRows) {
+          const fieldName = row.querySelector('.field-name').value.trim();
+          const fieldType = row.querySelector('.field-type').value;
+          const isPrimary = row.querySelector('.field-primary').checked;
+          
+          if (!fieldName) {
+            showError('Todos los campos deben tener un nombre');
+            return;
+          }
+          
+          fields[fieldName] = { type: fieldType, primary: isPrimary };
+          
+          if (isPrimary) {
+            primaryKeys.push(fieldName);
+          }
+        }
+        
+        if (Object.keys(fields).length === 0) {
+          showError('Debes añadir al menos un campo');
+          return;
+        }
+        
+        // Crear la nueva estructura de la tabla
+        const tableData = state.database[oldTableName].data;
+        
+        // Si el nombre de la tabla ha cambiado, crear una nueva y eliminar la antigua
+        if (newTableName !== oldTableName) {
+          state.database[newTableName] = {
+            fields: fields,
+            data: tableData,
+            primaryKeys: primaryKeys
+          };
+          
+          delete state.database[oldTableName];
+          
+          if (state.currentTable === oldTableName) {
+            state.currentTable = newTableName;
+          }
+        } else {
+          // Actualizar la estructura de la tabla existente
+          state.database[oldTableName].fields = fields;
+          state.database[oldTableName].primaryKeys = primaryKeys;
+        }
+        
+        // Guardar la base de datos
+        saveDatabase();
+        
+        // Actualizar la lista de tablas
+        renderTablesList();
+        
+        // Mostrar la estructura de la tabla
+        viewTable(newTableName);
+        
+        // Ocultar el modal
+        hideEditTableModal();
+        
+        showSuccess(`Tabla "${newTableName}" actualizada correctamente`);
+      }
+
+      function showEditDataModal(tableName, rowIndex) {
+        if (!state.database[tableName] || !state.database[tableName].data[rowIndex]) {
+          showError('No se puede editar este registro');
+          return;
+        }
+        
+        state.editingRow = { table: tableName, index: rowIndex };
+        
+        const record = state.database[tableName].data[rowIndex];
+        const fields = state.database[tableName].fields;
+        
+        elements.editDataFields.innerHTML = '';
+        
+        Object.keys(fields).forEach(fieldName => {
+          const fieldType = fields[fieldName].type;
+          const value = record[fieldName] !== null && record[fieldName] !== undefined ? record[fieldName] : '';
+          
+          const fieldDiv = document.createElement('div');
+          fieldDiv.className = 'mb-3';
+          
+          let inputHtml = '';
+          
+          switch (fieldType) {
+            case 'BOOLEAN':
+              inputHtml = `
+                <label class="flex items-center">
+                  <input type="checkbox" class="edit-field-value mr-2 h-5 w-5" data-field="${fieldName}" ${value ? 'checked' : ''}>
+                  <span>${fieldName}</span>
+                </label>
+              `;
+              break;
+            case 'DATE':
+              inputHtml = `
+                <label class="block text-gray-700 mb-1">${fieldName} (${fieldType})</label>
+                <input type="date" class="edit-field-value w-full p-2 border border-gray-300 rounded" data-field="${fieldName}" value="${value}">
+              `;
+              break;
+            default:
+              inputHtml = `
+                <label class="block text-gray-700 mb-1">${fieldName} (${fieldType})</label>
+                <input type="${fieldType === 'INTEGER' || fieldType === 'REAL' ? 'number' : 'text'}" class="edit-field-value w-full p-2 border border-gray-300 rounded" data-field="${fieldName}" value="${value}">
+              `;
+          }
+          
+          fieldDiv.innerHTML = inputHtml;
+          elements.editDataFields.appendChild(fieldDiv);
+        });
+        
+        // Mostrar el modal
+        elements.editDataModal.classList.remove('hidden');
+      }
+
+      function hideEditDataModal() {
+        elements.editDataModal.classList.add('hidden');
+        state.editingRow = null;
+      }
+
+      function saveDataEdits() {
+        if (!state.editingRow) return;
+        
+        const { table, index } = state.editingRow;
+        const record = state.database[table].data[index];
+        const fields = state.database[table].fields;
+        const primaryKeys = state.database[table].primaryKeys || [];
+        
+        const editFields = elements.editDataFields.querySelectorAll('.edit-field-value');
+        const updatedValues = {};
+        
+        editFields.forEach(field => {
+          const fieldName = field.dataset.field;
+          let value;
+          
+          if (field.type === 'checkbox') {
+            value = field.checked;
+          } else if (fields[fieldName].type === 'INTEGER') {
+            value = parseInt(field.value) || 0;
+          } else if (fields[fieldName].type === 'REAL') {
+            value = parseFloat(field.value) || 0;
+          } else {
+            value = field.value;
+          }
+          
+          updatedValues[fieldName] = value;
+        });
+        
+        // Verificar claves primarias
+        for (const pk of primaryKeys) {
+          if (updatedValues[pk] === null || updatedValues[pk] === undefined || updatedValues[pk] === '') {
+            showError(`La clave primaria "${pk}" no puede estar vacía`);
+            return;
+          }
+          
+          // Verificar si ya existe otro registro con la misma clave primaria
+          const exists = state.database[table].data.some((r, i) => 
+            i !== index && 
+            r[pk] !== null && 
+            r[pk] !== undefined && 
+            r[pk] == updatedValues[pk]
+          );
+          
+          if (exists) {
+            showError(`Ya existe un registro con la clave primaria "${pk}" = "${updatedValues[pk]}"`);
+            return;
+          }
+        }
+        
+        // Actualizar el registro
+        Object.keys(updatedValues).forEach(fieldName => {
+          record[fieldName] = updatedValues[fieldName];
+        });
+        
+        // Guardar la base de datos
+        saveDatabase();
+        
+        // Actualizar la vista de datos
+        showTableData(table);
+        
+        // Ocultar el modal
+        hideEditDataModal();
+        
+        showSuccess('Registro actualizado correctamente');
+      }
+
+      function deleteTable(tableName) {
+        if (!state.database[tableName]) {
+          showError(`La tabla "${tableName}" no existe`);
+          return;
+        }
+        
+        // Eliminar la tabla
+        delete state.database[tableName];
+        
+        // Guardar la base de datos
+        saveDatabase();
+        
+        // Actualizar la lista de tablas
+        renderTablesList();
+        
+        // Limpiar la vista actual si era la tabla eliminada
+        if (state.currentTable === tableName) {
+          state.currentTable = null;
+          elements.estructuraTab.innerHTML = '<p class="text-gray-500 italic">Ejecuta una consulta para ver resultados</p>';
+          elements.datosTab.innerHTML = '<p class="text-gray-500 italic">Ejecuta una consulta para ver datos</p>';
+        }
+        
+        showSuccess(`Tabla "${tableName}" eliminada correctamente`);
+      }
+
+      function importDatabase() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,.sql';
+        
+        input.onchange = function(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const content = e.target.result;
+              
+              // Intentar importar como JSON
+              if (file.name.endsWith('.json')) {
+                const data = JSON.parse(content);
+                state.database = data;
+                saveDatabase();
+                renderTablesList();
+                showSuccess('Base de datos importada correctamente desde JSON');
+              } 
+              // Intentar importar como SQL
+              else if (file.name.endsWith('.sql')) {
+                importSqlDump(content);
+                showSuccess('Base de datos importada correctamente desde SQL');
+              }
+              else {
+                throw new Error('Formato de archivo no soportado');
+              }
+            } catch (error) {
+              showError('Error al importar la base de datos: ' + error.message);
+            }
+          };
+          reader.readAsText(file);
+        };
+        
+        input.click();
+      }
+
+      function importSqlDump(sqlContent) {
+        // Implementación básica para importar un dump SQL
+        // Solo soporta CREATE TABLE e INSERT INTO
+        
+        // Limpiar la base de datos actual
+        state.database = {};
+        
+        // Dividir el contenido en líneas
+        const lines = sqlContent.split(/\r?\n/);
+        let currentStatement = '';
+        
+        // Procesar cada línea
+        for (let line of lines) {
+          line = line.trim();
+          
+          // Ignorar comentarios y líneas vacías
+          if (line.startsWith('--') || line.startsWith('#') || line === '') {
+            continue;
+          }
+          
+          // Añadir la línea al statement actual
+          currentStatement += ' ' + line;
+          
+          // Si la línea termina con punto y coma, ejecutar el statement
+          if (line.endsWith(';')) {
+            currentStatement = currentStatement.trim();
+            currentStatement = currentStatement.substring(0, currentStatement.length - 1); // Quitar el punto y coma
+            
+            try {
+              if (currentStatement.toUpperCase().startsWith('CREATE TABLE')) {
+                executeCreateTable(currentStatement);
+              } else if (currentStatement.toUpperCase().startsWith('INSERT INTO')) {
+                executeInsert(currentStatement);
+              }
+            } catch (error) {
+              console.error('Error al importar statement:', error);
+            }
+            
+            currentStatement = '';
+          }
+        }
+        
+        // Guardar la base de datos
+        saveDatabase();
+        
+        // Actualizar la lista de tablas
+        renderTablesList();
+      }
+
+      function exportDatabase() {
+        // Preguntar al usuario qué formato desea
+        const format = confirm('¿Deseas exportar en formato SQL? (Cancelar para exportar en JSON)') ? 'sql' : 'json';
+        
+        if (format === 'json') {
+          // Exportar como JSON
+          const data = JSON.stringify(state.database, null, 2);
+          const blob = new Blob([data], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'database.json';
+          a.click();
+          
+          URL.revokeObjectURL(url);
+        } else {
+          // Exportar como SQL
+          let sqlDump = '';
+          
+          // Añadir comentario de cabecera
+          sqlDump += '-- SQL Dump generado por Gestor de Base de Datos SQL\n';
+          sqlDump += `-- Fecha: ${new Date().toISOString()}\n\n`;
+          
+          // Generar sentencias CREATE TABLE
+          Object.keys(state.database).forEach(tableName => {
+            const table = state.database[tableName];
+            
+            // Generar DROP TABLE si existe
+            sqlDump += `DROP TABLE IF EXISTS \`${tableName}\`;\n`;
+            
+            // Generar CREATE TABLE
+            sqlDump += `CREATE TABLE \`${tableName}\` (\n`;
+            
+            const fields = [];
+            Object.keys(table.fields).forEach(fieldName => {
+              const field = table.fields[fieldName];
+              let fieldDef = `  \`${fieldName}\` ${field.type}`;
+              
+              if (field.primary || (table.primaryKeys && table.primaryKeys.includes(fieldName))) {
+                fieldDef += ' PRIMARY KEY';
+              }
+              
+              fields.push(fieldDef);
+            });
+            
+            sqlDump += fields.join(',\n');
+            sqlDump += '\n);\n\n';
+            
+            // Generar INSERT INTO para los datos
+            if (table.data && table.data.length > 0) {
+              const fieldNames = Object.keys(table.fields);
+              
+              table.data.forEach(record => {
+                sqlDump += `INSERT INTO \`${tableName}\` (`;
+                sqlDump += fieldNames.map(f => `\`${f}\``).join(', ');
+                sqlDump += ') VALUES (';
+                
+                const values = fieldNames.map(fieldName => {
+                  const value = record[fieldName];
+                  
+                  if (value === null || value === undefined) {
+                    return 'NULL';
+                  } else if (typeof value === 'string') {
+                    return `"${value.replace(/"/g, '\\"')}"`;
+                  } else if (typeof value === 'boolean') {
+                    return value ? '1' : '0';
+                  } else {
+                    return value;
+                  }
+                });
+                
+                sqlDump += values.join(', ');
+                sqlDump += ');\n';
+              });
+              
+              sqlDump += '\n';
+            }
+          });
+          
+          // Descargar el archivo SQL
+          const blob = new Blob([sqlDump], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'database.sql';
+          a.click();
+          
+          URL.revokeObjectURL(url);
+        }
+        
+        showSuccess(`Base de datos exportada correctamente en formato ${format.toUpperCase()}`);
+      }
+
+      function loadDatabase() {
+        const data = localStorage.getItem('sqlDatabase');
+        if (data) {
+          try {
+            state.database = JSON.parse(data);
+          } catch (error) {
+            console.error('Error al cargar la base de datos:', error);
+            state.database = {};
+          }
+        } else {
+          state.database = {};
+        }
+      }
+
+      function saveDatabase() {
+        localStorage.setItem('sqlDatabase', JSON.stringify(state.database));
+      }
+
+      function showSqlResult(message, isSuccess) {
+        const resultDiv = document.createElement('div');
+        resultDiv.className = `result-message ${isSuccess ? 'result-success' : 'result-error'}`;
+        resultDiv.textContent = message;
+        
+        // Limpiar resultados anteriores
+        elements.sqlResult.innerHTML = '';
+        elements.sqlResult.appendChild(resultDiv);
+      }
+
+      function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50';
+        errorDiv.textContent = message;
+        
+        document.body.appendChild(errorDiv);
+        
+        setTimeout(() => {
+          errorDiv.remove();
+        }, 3000);
+      }
+
+      function showSuccess(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+        successDiv.textContent = message;
+        
+        document.body.appendChild(successDiv);
+        
+        setTimeout(() => {
+          successDiv.remove();
+        }, 3000);
+      }
+    });
+  </script>
+</html>
