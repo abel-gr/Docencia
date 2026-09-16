@@ -14,21 +14,24 @@
       --line: #dce4e6;
       --cream: #fff8df;
       --warm: #fce7c3;
+      --white: #ffffff;
     }
 
     * { box-sizing: border-box; }
 
+    html, body { margin: 0; min-width: 0; }
+
     body {
       width: 100%;
       min-height: 100%;
-      margin: 0;
       color: var(--ink);
       background: var(--paper);
-      font-family: "DM Sans", "Trebuchet MS", sans-serif;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
     }
 
     button, input { font: inherit; }
     button { cursor: pointer; }
+
     button:focus-visible,
     input:focus-visible {
       outline: 4px solid rgba(19, 122, 120, .28);
@@ -45,32 +48,32 @@
       background-size: 28px 28px, 34px 34px;
     }
 
-    .page-padding { width: 100%; padding-left: 28px; padding-right: 28px; }
-    .content-width { width: 100%; max-width: 1280px; margin: 0 auto; }
-    .title-font { font-family: Georgia, "Times New Roman", serif; }
-    .hidden { display: none !important; }
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
+    .page-padding {
+      width: 100%;
+      padding-right: 28px;
+      padding-left: 28px;
     }
 
+    .content-width {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .title-font { font-family: Georgia, "Times New Roman", serif; }
+    .hidden { display: none !important; }
+
     .header-wrap { padding-top: 32px; }
+
     .header-banner {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 20px;
       padding: 24px 30px;
-      border: 1px solid rgba(255,255,255,.72);
+      border: 1px solid rgba(255, 255, 255, .72);
       border-radius: 28px;
-      box-shadow: 0 4px 16px rgba(23,32,51,.06);
+      box-shadow: 0 4px 16px rgba(23, 32, 51, .06);
     }
 
     .header-kicker {
@@ -82,8 +85,8 @@
 
     .page-title {
       margin: 0;
-      line-height: 1.1;
       font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
     }
 
     .header-badge {
@@ -105,10 +108,14 @@
 
     .panel, .card {
       border: 1px solid var(--line);
-      box-shadow: 0 4px 16px rgba(23,32,51,.05);
+      box-shadow: 0 4px 16px rgba(23, 32, 51, .05);
     }
 
-    .panel { border-radius: 28px; padding: 18px; }
+    .panel {
+      padding: 18px;
+      border-radius: 28px;
+    }
+
     .card { border-radius: 30px; }
 
     .panel-heading {
@@ -117,28 +124,37 @@
       font-size: 1.1rem;
     }
 
-    .level-list { display: grid; gap: 8px; }
+    .level-list {
+      display: grid;
+      gap: 8px;
+    }
 
     .level-button {
       width: 100%;
       padding: 12px 15px;
+      color: #145c5b;
+      text-align: left;
       border: 1px solid transparent;
       border-radius: 16px;
-      text-align: left;
+      background: #e7f4f2;
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
 
     .level-button:hover,
     .level-button:focus-visible {
-      transform: translateX(3px);
       border-color: rgba(19, 122, 120, .45);
-      box-shadow: 0 6px 16px rgba(20,47,60,.1);
+      box-shadow: 0 6px 16px rgba(20, 47, 60, .1);
+      transform: translateX(3px);
     }
 
     .level-button.is-active {
       border-color: var(--teal);
-      box-shadow: 0 7px 0 rgba(19,122,120,.16);
+      box-shadow: 0 7px 0 rgba(19, 122, 120, .16);
     }
+
+    .level-button.resta { color: #9f3d2d; background: #fff1ec; }
+    .level-button.repte { color: #fff; background: var(--ink); }
+    .level-button.repte-final { color: #fff; background: var(--coral); }
 
     .stat-grid {
       display: grid;
@@ -148,32 +164,45 @@
     }
 
     .stat-card { padding: 16px 20px; }
+    .score-card { background: #e7f4f2; }
+    .streak-card { background: #fff1ec; }
+
     .stat-label {
       margin: 0;
       font-size: .75rem;
       letter-spacing: .14em;
       text-transform: uppercase;
     }
-    .stat-value { margin: 5px 0 0; font-size: 2rem; line-height: 1; }
+
+    .stat-value {
+      margin: 5px 0 0;
+      font-size: 2rem;
+      line-height: 1;
+    }
 
     .operation-card {
       position: relative;
-      overflow: hidden;
       padding: 34px;
+      overflow: hidden;
+      background: var(--white);
     }
 
     .operation-card::after {
-      content: "±";
       position: absolute;
       right: -18px;
       bottom: -52px;
       z-index: 0;
-      color: rgba(19,122,120,.08);
+      color: rgba(19, 122, 120, .08);
       font: 700 180px/1 Georgia, serif;
+      content: "±";
       pointer-events: none;
     }
 
-    .operation-content { position: relative; z-index: 1; }
+    .operation-content {
+      position: relative;
+      z-index: 1;
+    }
+
     .current-label {
       margin: 0;
       font-size: .75rem;
@@ -196,16 +225,24 @@
     .simplify-button {
       min-width: 230px;
       padding: 13px 18px;
+      color: var(--teal);
       border: 2px solid var(--teal);
       border-radius: 16px;
-      box-shadow: 0 5px 0 rgba(19,122,120,.16);
+      background: var(--white);
+      box-shadow: 0 5px 0 rgba(19, 122, 120, .16);
       font-size: .95rem;
+      font-weight: 700;
     }
 
     .simplify-button:hover,
     .simplify-button:focus-visible {
+      box-shadow: 0 7px 0 rgba(19, 122, 120, .2);
       transform: translateY(-2px);
-      box-shadow: 0 7px 0 rgba(19,122,120,.2);
+    }
+
+    .simplify-button.is-active {
+      color: #fff !important;
+      background: var(--teal) !important;
     }
 
     .equation-box {
@@ -218,15 +255,15 @@
       padding: 16px;
       border: 1px dashed #b8c5cf;
       border-radius: 24px;
-      background: rgba(255,255,255,.55);
+      background: rgba(255, 255, 255, .55);
     }
 
     .operation-display {
       margin: 0;
       font-size: clamp(2.35rem, 6vw, 4rem);
       line-height: 1;
-      text-align: center;
       letter-spacing: -.04em;
+      text-align: center;
     }
 
     .simplified-operation {
@@ -243,48 +280,59 @@
       line-height: 1;
     }
 
-    .simplified-display {
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
+    .simplified-display { font-size: clamp(1.8rem, 4vw, 2.8rem); }
+
+    .answer-label {
+      display: block;
+      margin-bottom: 8px;
     }
 
-    .answer-label { display: block; margin-bottom: 8px; }
-    .answer-row { display: flex; gap: 12px; }
+    .answer-row {
+      display: flex;
+      gap: 12px;
+    }
 
     .answer-input {
       width: 100%;
       min-width: 0;
       padding: 15px 18px;
-      color: #172033;
-      border: 2px solid #dce4e6;
+      color: var(--ink);
+      border: 2px solid var(--line);
       border-radius: 16px;
       background: #fff;
       font-size: 1.25rem;
       font-weight: 700;
       appearance: textfield;
-      transition: border-color .2s ease, box-shadow .2s ease;
     }
 
     .answer-input:focus {
       border-color: var(--teal);
-      box-shadow: 0 0 0 4px rgba(19,122,120,.13);
+      box-shadow: 0 0 0 4px rgba(19, 122, 120, .13);
       outline: none;
     }
 
     .answer-input::-webkit-outer-spin-button,
-    .answer-input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+    .answer-input::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
 
-    .button-main, .button-secondary, .aid-choice {
+    .button-main, .button-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       border: 1px solid transparent;
       font-weight: 700;
       transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
     }
 
-    .button-main:hover, .button-secondary:hover { transform: translateY(-2px); filter: brightness(.97); }
+    .button-main:hover, .button-secondary:hover {
+      filter: brightness(.97);
+      transform: translateY(-2px);
+    }
+
     .button-main {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       flex-shrink: 0;
       padding: 15px 22px;
       border-radius: 16px;
@@ -299,32 +347,22 @@
       margin-top: 20px;
     }
 
-    .feedback { min-height: 1.4em; margin: 0; font-weight: 700; }
+    .feedback {
+      min-height: 1.4em;
+      margin: 0;
+      font-weight: 700;
+    }
+
     .feedback-correct { color: #087647; }
     .feedback-wrong { color: #b54738; }
-    .feedback-neutral { color: #64748b; }
+    .feedback-neutral { color: var(--muted); }
 
     .button-secondary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
       padding: 11px 15px;
       border-radius: 13px;
       white-space: nowrap;
     }
 
-    .tip-panel {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      padding: 17px 20px;
-      border-radius: 24px;
-    }
-
-    .tip-icon, .aid-icon { flex-shrink: 0; font-size: 1.3rem; }
-    .tip-title { margin: 0; font-size: 1.1rem; }
-    .tip-text { margin: 5px 0 0; line-height: 1.55; }
     .tip-options {
       display: grid;
       gap: 4px;
@@ -332,31 +370,26 @@
       padding: 14px 16px;
       border: 1px solid var(--line);
       border-radius: 18px;
-      background: #ffffff;
-      box-shadow: 0 4px 16px rgba(23,32,51,.05);
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(23, 32, 51, .05);
     }
 
-    .aid-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-    .aid-title { margin: 0; font-size: 1.25rem; }
-    .aid-subtitle { margin: 5px 0 0; line-height: 1.35; }
-
-    .aid-options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+    .auto-copy-label {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
-      margin-top: 16px;
+      font-size: .86rem;
     }
 
-    .aid-choice {
-      min-height: 40px;
-      padding: 8px;
-      border-radius: 12px;
+    .auto-copy-label input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--teal);
     }
 
-    .aid-choice.is-active {
-      background: #137a78 !important;
-      color: #fff !important;
-      border-color: #137a78 !important;
+    .aid-title {
+      margin: 0;
+      font-size: 1.25rem;
     }
 
     .position-box {
@@ -368,29 +401,39 @@
       background: #edf8f7;
     }
 
-    .position-label, .distance-label { margin: 0; font-size: .72rem; line-height: 1.2; }
-    .position-value { margin: 3px 0 0; color: #115f5d; font-size: 1.25rem; line-height: 1; }
-    .distance-label { margin-top: 10px; }
-    .distance-value { margin: 3px 0 0; color: #115f5d; font-size: .95rem; line-height: 1; }
-
-    .auto-copy-label {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 10px;
-      font-size: .86rem;
+    .position-label, .distance-label {
+      margin: 0;
+      font-size: .72rem;
+      line-height: 1.2;
     }
 
-    .auto-copy-label input { width: 16px; height: 16px; accent-color: var(--teal); }
-    .copy-button { margin-top: 9px; padding: 8px 12px; border-radius: 12px; }
+    .position-value {
+      margin: 3px 0 0;
+      color: #115f5d;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .distance-label { margin-top: 10px; }
+
+    .distance-value {
+      margin: 3px 0 0;
+      color: #115f5d;
+      font-size: .95rem;
+      line-height: 1;
+    }
+
+    .copy-button {
+      margin-top: 9px;
+      padding: 8px 12px;
+      color: var(--teal);
+      background: #d9f1ee;
+    }
 
     .scale {
       position: relative;
       width: 100%;
-      max-width: none;
       height: 470px;
-      margin: 0 auto;
       overflow: hidden;
       border: 1px solid #d6e5e2;
       border-radius: 24px;
@@ -412,30 +455,29 @@
       z-index: 2;
       width: 3px;
       border-radius: 10px;
-      transform: translateX(-50%);
       background: #64748b;
+      transform: translateX(-50%);
     }
 
     .scale-zero {
       position: absolute;
-      left: 24px;
       right: 24px;
+      left: 24px;
       z-index: 1;
       height: 2px;
       opacity: .9;
-      transform: translateY(50%);
       background: #64748b;
+      transform: translateY(50%);
     }
 
     .tick {
       position: absolute;
       left: calc(50% - 16px);
-      right: auto;
       z-index: 1;
       width: 32px;
       height: 2px;
-      transform: translateY(50%);
       background: #94a3b8;
+      transform: translateY(50%);
     }
 
     .tick-label {
@@ -443,9 +485,9 @@
       left: calc(50% + 18px);
       z-index: 3;
       padding: 2px 5px;
-      border-radius: 5px;
       color: #475569;
-      background: rgba(255,255,255,.9);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, .9);
       font-size: .7rem;
       font-weight: 700;
       line-height: 1;
@@ -457,8 +499,8 @@
       left: 50%;
       width: 6px;
       border-radius: 12px;
-      transform: translateX(-50%);
       background: repeating-linear-gradient(to bottom, #ef6b57 0 8px, transparent 8px 13px);
+      transform: translateX(-50%);
       transition: bottom .45s ease, height .45s ease;
     }
 
@@ -473,16 +515,16 @@
       height: 34px;
       color: white;
       border-radius: 50%;
-      box-shadow: 0 5px 12px rgba(20,47,60,.18);
+      box-shadow: 0 5px 12px rgba(20, 47, 60, .18);
       font-size: .78rem;
       font-weight: 700;
       transform: translate(-50%, 50%);
-      transition: bottom .45s cubic-bezier(.2,.8,.2,1);
+      transition: bottom .45s cubic-bezier(.2, .8, .2, 1);
       touch-action: none;
     }
 
-    .marker-start { background: #137a78; }
-    .marker-end { background: #ef6b57; }
+    .marker-start { background: var(--teal); }
+    .marker-end { background: var(--coral); }
 
     .elevator-box {
       position: absolute;
@@ -490,25 +532,13 @@
       z-index: 5;
       width: 38px;
       height: 54px;
-      border: 3px solid #172033;
+      border: 3px solid var(--ink);
       border-radius: 6px 6px 3px 3px;
       background: #f5cb4f;
-      box-shadow: inset 0 0 0 3px rgba(255,255,255,.35);
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .35);
       transform: translateY(50%);
-      transition: bottom .45s cubic-bezier(.2,.8,.2,1);
+      transition: bottom .45s cubic-bezier(.2, .8, .2, 1);
     }
-
-    .aid-description {
-      margin: 15px 0 0;
-      color: #475569;
-      text-align: center;
-      font-size: .86rem;
-      font-weight: 700;
-      line-height: 1.4;
-    }
-
-    .footer { padding-bottom: 24px; }
-    .footer-text { margin: 0; text-align: center; }
 
     .confetti-layer {
       position: absolute;
@@ -530,16 +560,25 @@
       transform: rotate(var(--rotation));
     }
 
+    .confetti.circle {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .confetti.ribbon {
+      width: 7px;
+      height: 22px;
+      border-radius: 999px;
+    }
+
     .confetti-layer.is-celebrating .confetti {
-      animation: confetti-fall 1.15s cubic-bezier(.16,.7,.27,1) forwards;
+      animation: confetti-fall 1.15s cubic-bezier(.16, .7, .27, 1) forwards;
       animation-delay: var(--delay);
     }
 
-    .confetti.circle { width: 12px; height: 12px; border-radius: 50%; }
-    .confetti.ribbon { width: 7px; height: 22px; border-radius: 999px; }
-
     @keyframes confetti-fall {
-      0% { opacity: 0; transform: translate3d(0,-20px,0) rotate(var(--rotation)); }
+      0% { opacity: 0; transform: translate3d(0, -20px, 0) rotate(var(--rotation)); }
       10% { opacity: 1; }
       100% { opacity: 0; transform: translate3d(var(--drift), 260px, 0) rotate(calc(var(--rotation) + 540deg)); }
     }
@@ -547,22 +586,45 @@
     @media (max-width: 1050px) {
       .main-layout { grid-template-columns: 240px minmax(0, 1fr); }
       .aid-panel { grid-column: 1 / -1; }
-      .aid-panel-inner { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 20px; align-items: start; }
-      .aid-options { max-width: 220px; }
+      .aid-panel-inner {
+        display: grid;
+        grid-template-columns: 270px minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+      }
     }
 
     @media (max-width: 720px) {
-      .page-padding { padding-left: 16px; padding-right: 16px; }
+      .page-padding {
+        padding-right: 16px;
+        padding-left: 16px;
+      }
+
       .header-wrap { padding-top: 18px; }
-      .header-banner { align-items: flex-start; flex-direction: column; padding: 20px; }
-      .main-layout { grid-template-columns: 1fr; padding-top: 16px; }
+
+      .header-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+      }
+
+      .main-layout {
+        grid-template-columns: 1fr;
+        padding-top: 16px;
+      }
+
       .level-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .operation-card { padding: 22px; }
-      .answer-row, .feedback-row { align-items: stretch; flex-direction: column; }
+
+      .answer-row, .feedback-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
       .button-main, .button-secondary { width: 100%; }
       .aid-panel { grid-column: auto; }
       .aid-panel-inner { display: block; }
-      .scale { max-width: none; height: 390px; }
+      .scale { height: 390px; }
     }
 
     @media (max-width: 430px) {
@@ -572,7 +634,11 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
     }
   </style>
   <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
@@ -583,28 +649,28 @@
    <header class="page-padding header-wrap">
     <div data-template-id="header-banner" class="canva-banner content-width header-banner">
      <div>
-      <p data-template-id="header-kicker" class="canva-text header-kicker"></p>
-      <h1 data-template-id="page-title" class="canva-text title-font page-title"></h1>
+      <p data-template-id="header-kicker" class="canva-text header-kicker">MATEMÀTIQUES · NOMBRES ENTERS</p>
+      <h1 data-template-id="page-title" class="canva-text title-font page-title">Operacions amb enters</h1>
      </div>
-     <div data-template-id="header-badge" class="canva-tag header-badge"><span aria-hidden="true">✦</span> <span data-template-id="header-badge-text" class="canva-text"></span>
+     <div data-template-id="header-badge" class="canva-tag header-badge"><span aria-hidden="true">✦</span> <span data-template-id="header-badge-text" class="canva-text">Practica pas a pas</span>
      </div>
     </div>
    </header>
    <main class="page-padding">
     <div class="content-width main-layout">
      <aside data-template-id="levels-panel" class="canva-panel panel">
-      <h2 data-template-id="levels-title" class="canva-text panel-heading"></h2>
-      <nav aria-label="Nivells de pràctica" class="level-list"><button type="button" data-level="1" data-template-id="level-1" class="canva-button level-button"></button> <button type="button" data-level="2" data-template-id="level-2" class="canva-button level-button"></button> <button type="button" data-level="3" data-template-id="level-3" class="canva-button level-button"></button> <button type="button" data-level="4" data-template-id="level-4" class="canva-button level-button"></button> <button type="button" data-level="5" data-template-id="level-5" class="canva-button level-button"></button> <button type="button" data-level="6" data-template-id="level-6" class="canva-button level-button"></button> <button type="button" data-level="challenge-1" data-template-id="challenge-1" class="canva-button level-button"></button> <button type="button" data-level="challenge-2" data-template-id="challenge-2" class="canva-button level-button"></button> <button type="button" data-level="challenge-3" data-template-id="challenge-3" class="canva-button level-button"></button>
+      <h2 data-template-id="levels-title" class="canva-text panel-heading">Tria un nivell</h2>
+      <nav aria-label="Nivells de pràctica" class="level-list"><button type="button" data-level="1" data-template-id="level-1" class="canva-button level-button">1 · Suma dos positius</button> <button type="button" data-level="2" data-template-id="level-2" class="canva-button level-button">2 · Suma dos negatius</button> <button type="button" data-level="3" data-template-id="level-3" class="canva-button level-button">3 · Suma signes diferents</button> <button type="button" data-level="4" data-template-id="level-4" class="canva-button level-button resta">4 · Resta dos positius</button> <button type="button" data-level="5" data-template-id="level-5" class="canva-button level-button resta">5 · Resta dos negatius</button> <button type="button" data-level="6" data-template-id="level-6" class="canva-button level-button resta">6 · Resta signes diferents</button> <button type="button" data-level="challenge-1" data-template-id="challenge-1" class="canva-button level-button repte">REPTE 1 · Sumes</button> <button type="button" data-level="challenge-2" data-template-id="challenge-2" class="canva-button level-button repte">REPTE 2 · Restes</button> <button type="button" data-level="challenge-3" data-template-id="challenge-3" class="canva-button level-button repte-final">REPTE 3 · Tot barrejat</button>
       </nav>
      </aside>
      <section aria-label="Exercici d'operacions">
       <div class="stat-grid">
-       <div data-template-id="score-card" class="canva-card card stat-card">
-        <p data-template-id="score-label" class="canva-text stat-label"></p>
+       <div data-template-id="score-card" class="canva-card card stat-card score-card">
+        <p data-template-id="score-label" class="canva-text stat-label">Encerts</p>
         <p id="score-value" class="stat-value" aria-live="polite">0</p>
        </div>
-       <div data-template-id="streak-card" class="canva-card card stat-card">
-        <p data-template-id="streak-label" class="canva-text stat-label"></p>
+       <div data-template-id="streak-card" class="canva-card card stat-card streak-card">
+        <p data-template-id="streak-label" class="canva-text stat-label">Ratxa</p>
         <p id="streak-value" class="stat-value" aria-live="polite">0</p>
        </div>
       </div>
@@ -612,44 +678,39 @@
        <div id="confetti-layer" class="confetti-layer" aria-hidden="true"><span class="confetti" style="--x:8%;--delay:0s;--drift:40px;--rotation:14deg;--confetti-color:#ef6b57"></span> <span class="confetti circle" style="--x:17%;--delay:.12s;--drift:-35px;--rotation:72deg;--confetti-color:#f5cb4f"></span> <span class="confetti ribbon" style="--x:27%;--delay:.04s;--drift:52px;--rotation:190deg;--confetti-color:#137a78"></span> <span class="confetti" style="--x:38%;--delay:.17s;--drift:-48px;--rotation:35deg;--confetti-color:#ef6b57"></span> <span class="confetti circle" style="--x:49%;--delay:.08s;--drift:28px;--rotation:240deg;--confetti-color:#137a78"></span> <span class="confetti ribbon" style="--x:59%;--delay:.2s;--drift:-26px;--rotation:85deg;--confetti-color:#f5cb4f"></span> <span class="confetti" style="--x:69%;--delay:.02s;--drift:42px;--rotation:150deg;--confetti-color:#ef6b57"></span> <span class="confetti circle" style="--x:79%;--delay:.14s;--drift:-42px;--rotation:6deg;--confetti-color:#137a78"></span> <span class="confetti ribbon" style="--x:89%;--delay:.09s;--drift:22px;--rotation:267deg;--confetti-color:#f5cb4f"></span>
        </div>
        <div class="operation-content">
-        <p data-template-id="current-level-label" class="canva-text current-label"></p>
+        <p data-template-id="current-level-label" class="canva-text current-label">Operació actual</p>
         <h2 id="current-level" class="title-font current-level">Suma dos nombres positius</h2>
-        <div class="signs-toggle-row"><button id="signs-choice" data-template-id="signs-choice" type="button" class="canva-button aid-choice simplify-button" aria-pressed="false"></button>
+        <div class="signs-toggle-row"><button id="signs-choice" data-template-id="signs-choice" type="button" class="canva-button simplify-button" aria-pressed="false">Fes clic per simplificar els signes</button>
         </div>
         <div class="equation-box">
          <p id="operation-display" class="title-font operation-display" aria-live="polite">(+4) + (+7)</p>
          <div id="simplified-operation" class="simplified-operation hidden" aria-live="polite"><span class="simplified-arrow" aria-hidden="true">↓</span>
-          <p id="simplified-display" class="title-font operation-display simplified-display"></p>
+          <p id="simplified-display" class="title-font operation-display simplified-display">+4 + 7</p>
          </div>
         </div>
-        <form id="answer-form" novalidate><label data-template-id="answer-label" for="answer-input" class="canva-text answer-label"></label>
-         <div class="answer-row"><input id="answer-input" class="answer-input" type="number" inputmode="numeric" autocomplete="off" required> <button data-template-id="check-button" type="submit" class="canva-button button-main"> <span aria-hidden="true">✓</span> <span data-template-id="check-button-text" class="canva-text"></span> </button>
+        <form id="answer-form" novalidate><label data-template-id="answer-label" for="answer-input" class="canva-text answer-label">Quin és el resultat?</label>
+         <div class="answer-row"><input id="answer-input" class="answer-input" type="number" inputmode="numeric" autocomplete="off" required aria-label="Resposta"> <button data-template-id="check-button" type="submit" class="canva-button button-main" style="background:#137a78;color:#ffffff"> <span aria-hidden="true">✓</span> <span data-template-id="check-button-text" class="canva-text">Comprova</span> </button>
          </div>
         </form>
         <div class="feedback-row">
-         <p id="feedback" class="feedback feedback-neutral" aria-live="polite"></p><button id="new-operation-button" data-template-id="new-operation-button" type="button" class="canva-button button-secondary"> <span aria-hidden="true">↻</span> <span data-template-id="new-operation-button-text" class="canva-text"></span> </button>
+         <p id="feedback" class="feedback feedback-neutral" aria-live="polite"></p><button id="new-operation-button" data-template-id="new-operation-button" type="button" class="canva-button button-secondary" style="background:#fce7c3;color:#7c4309"> <span aria-hidden="true">↻</span> <span data-template-id="new-operation-button-text" class="canva-text">Nova operació</span> </button>
         </div>
        </div>
       </article>
-      <div class="tip-options">
-       <label data-template-id="auto-copy-label" class="canva-text auto-copy-label"><input id="auto-copy-toggle" type="checkbox" checked> <span data-template-id="auto-copy-label-text" class="canva-text"></span></label> <label data-template-id="reset-simplify-label" class="canva-text auto-copy-label"><input id="reset-simplify-toggle" type="checkbox" checked> <span data-template-id="reset-simplify-label-text" class="canva-text"></span></label>
+      <div class="tip-options"><label data-template-id="auto-copy-label" class="canva-text auto-copy-label"> <input id="auto-copy-toggle" type="checkbox" checked> <span data-template-id="auto-copy-label-text" class="canva-text">Copiar automàticament en arrossegar</span> </label> <label data-template-id="reset-simplify-label" class="canva-text auto-copy-label"> <input id="reset-simplify-toggle" type="checkbox" checked> <span data-template-id="reset-simplify-label-text" class="canva-text">No simplificar en una nova operació</span> </label>
       </div>
      </section>
      <aside data-template-id="aid-panel" class="canva-panel panel aid-panel">
       <div class="aid-panel-inner">
        <div>
-        <div class="aid-header">
-         <div>
-          <h2 data-template-id="aid-title" class="canva-text aid-title"></h2>
-         </div>
-        </div>
+        <h2 data-template-id="aid-title" class="canva-text aid-title">Ajuda visual</h2>
        </div>
        <div id="visual-aid">
         <div class="position-box">
-         <p data-template-id="position-label" class="canva-text position-label"></p>
+         <p data-template-id="position-label" class="canva-text position-label">Posició del punt vermell</p>
          <p id="position-value" class="position-value" aria-live="polite">+0</p>
-         <p data-template-id="distance-label" class="canva-text distance-label"></p>
-         <p id="distance-value" class="distance-value" aria-live="polite">0</p><button id="copy-distance-button" data-template-id="copy-distance-button" type="button" class="canva-button button-secondary copy-button hidden"> <span aria-hidden="true">⎘</span> <span data-template-id="copy-distance-button-text" class="canva-text"></span> </button>
+         <p data-template-id="distance-label" class="canva-text distance-label">Distància entre els dos punts</p>
+         <p id="distance-value" class="distance-value" aria-live="polite">0</p><button id="copy-distance-button" data-template-id="copy-distance-button" type="button" class="canva-button button-secondary copy-button hidden"> <span aria-hidden="true">⎘</span> <span data-template-id="copy-distance-button-text" class="canva-text">Copia la posició</span> </button>
         </div>
         <div id="scale" class="scale" aria-label="Representació vertical de l'operació">
          <div class="scale-axis"></div>
@@ -662,7 +723,7 @@
          <div id="end-marker" class="marker marker-end">
           0
          </div>
-         <div id="elevator-box" class="elevator-box"></div>
+         <div id="elevator-box" class="elevator-box" aria-hidden="true"></div>
         </div>
        </div>
       </div>
@@ -686,13 +747,13 @@
     let activeLevel = "1";
     let score = 0;
     let streak = 0;
-    let aidMode = "elevator";
     let simplifySigns = false;
     let currentOperation = { first: 4, second: 7, symbol: "+", answer: 11 };
-    const resetSimplifyToggle = document.getElementById("reset-simplify-toggle");
     let visualAnswer = currentOperation.first;
     let celebrationTimer;
+    let draggingMarker = false;
 
+    const resetSimplifyToggle = document.getElementById("reset-simplify-toggle");
     const operationDisplay = document.getElementById("operation-display");
     const currentLevelDisplay = document.getElementById("current-level");
     const answerInput = document.getElementById("answer-input");
@@ -700,6 +761,10 @@
     const scoreValue = document.getElementById("score-value");
     const streakValue = document.getElementById("streak-value");
     const confettiLayer = document.getElementById("confetti-layer");
+    const scale = document.getElementById("scale");
+    const endMarker = document.getElementById("end-marker");
+    const autoCopyToggle = document.getElementById("auto-copy-toggle");
+    const copyDistanceButton = document.getElementById("copy-distance-button");
 
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -720,7 +785,9 @@
     }
 
     function makeOperation(level) {
-      let first, second, symbol;
+      let first;
+      let second;
+      let symbol;
 
       if (level === "1") [first, second, symbol] = [nonZeroPositive(), nonZeroPositive(), "+"];
       if (level === "2") [first, second, symbol] = [nonZeroNegative(), nonZeroNegative(), "+"];
@@ -733,9 +800,9 @@
       if (level === "challenge-3") return makeOperation(String(randomInt(1, 6)));
 
       return {
-        first,
-        second,
-        symbol,
+        first: first,
+        second: second,
+        symbol: symbol,
         answer: symbol === "+" ? first + second : first - second
       };
     }
@@ -749,7 +816,10 @@
     }
 
     function operationText() {
-      const { first, second, symbol } = currentOperation;
+      const first = currentOperation.first;
+      const second = currentOperation.second;
+      const symbol = currentOperation.symbol;
+
       if (!simplifySigns) {
         return signedOperand(first) + " " + symbol + " " + signedOperand(second);
       }
@@ -757,24 +827,33 @@
       const simplifiedSymbol = second < 0
         ? (symbol === "+" ? "−" : "+")
         : symbol;
+
       return signedNumber(first) + " " + simplifiedSymbol + " " + Math.abs(second);
     }
 
     function celebrate() {
       clearTimeout(celebrationTimer);
       confettiLayer.classList.remove("is-celebrating");
-      requestAnimationFrame(() => {
+
+      requestAnimationFrame(function () {
         confettiLayer.classList.add("is-celebrating");
       });
-      celebrationTimer = setTimeout(() => {
+
+      celebrationTimer = setTimeout(function () {
         confettiLayer.classList.remove("is-celebrating");
       }, 1450);
     }
 
     function getScaleBounds() {
-      const values = [currentOperation.first, currentOperation.second, currentOperation.answer, 0];
-      const minimum = Math.min(...values);
-      const maximum = Math.max(...values);
+      const values = [
+        currentOperation.first,
+        currentOperation.second,
+        currentOperation.answer,
+        0
+      ];
+
+      const minimum = Math.min.apply(null, values);
+      const maximum = Math.max.apply(null, values);
       const span = Math.max(12, maximum - minimum);
       const padding = Math.max(2, Math.ceil(span * 0.2));
 
@@ -784,31 +863,35 @@
       };
     }
 
+    function valueToPosition(value) {
+      const bounds = getScaleBounds();
+      const bounded = Math.max(bounds.min, Math.min(bounds.max, value));
+      return 7 + ((bounded - bounds.min) / (bounds.max - bounds.min)) * 86;
+    }
+
     function updateTicks() {
       const ticks = document.getElementById("ticks");
       const bounds = getScaleBounds();
-      ticks.replaceChildren();
 
-      const step = 1;
-      for (let value = bounds.min; value <= bounds.max; value += step) {
+      while (ticks.firstChild) {
+        ticks.removeChild(ticks.firstChild);
+      }
+
+      for (let value = bounds.min; value <= bounds.max; value += 1) {
         const bottom = valueToPosition(value);
         const tick = document.createElement("span");
         const label = document.createElement("span");
 
         tick.className = "tick";
         tick.style.bottom = bottom + "%";
+
         label.className = "tick-label";
         label.style.bottom = bottom + "%";
         label.textContent = value > 0 ? "+" + value : value;
 
-        ticks.append(tick, label);
+        ticks.appendChild(tick);
+        ticks.appendChild(label);
       }
-    }
-
-    function valueToPosition(value) {
-      const bounds = getScaleBounds();
-      const bounded = Math.max(bounds.min, Math.min(bounds.max, value));
-      return 7 + ((bounded - bounds.min) / (bounds.max - bounds.min)) * 86;
     }
 
     function updateVisualAid() {
@@ -818,7 +901,6 @@
       const endPosition = valueToPosition(end);
       const line = document.getElementById("path-line");
       const startMarker = document.getElementById("start-marker");
-      const endMarker = document.getElementById("end-marker");
       const elevator = document.getElementById("elevator-box");
 
       startMarker.style.bottom = startPosition + "%";
@@ -828,10 +910,11 @@
 
       line.style.bottom = Math.min(startPosition, endPosition) + "%";
       line.style.height = Math.max(4, Math.abs(endPosition - startPosition)) + "%";
+
       document.getElementById("zero-line").style.bottom = valueToPosition(0) + "%";
 
       elevator.style.bottom = startPosition + "%";
-      requestAnimationFrame(() => {
+      requestAnimationFrame(function () {
         elevator.style.bottom = endPosition + "%";
       });
 
@@ -839,16 +922,28 @@
       document.getElementById("distance-value").textContent = Math.abs(end - start);
     }
 
-    function newOperation(options = {}) {
-      const clearFeedback = options.clearFeedback !== false;
-      if (resetSimplifyToggle.checked) simplifySigns = false;
+    function updateAidButtons() {
+      const signsChoice = document.getElementById("signs-choice");
+      const simplifiedOperation = document.getElementById("simplified-operation");
+
+      signsChoice.classList.toggle("is-active", simplifySigns);
+      signsChoice.setAttribute("aria-pressed", String(simplifySigns));
+      simplifiedOperation.classList.toggle("hidden", !simplifySigns);
+    }
+
+    function newOperation(options) {
+      const settings = options || {};
+      const clearFeedback = settings.clearFeedback !== false;
+
+      if (resetSimplifyToggle.checked) {
+        simplifySigns = false;
+      }
+
       currentOperation = makeOperation(activeLevel);
       visualAnswer = currentOperation.first;
 
       operationDisplay.textContent = signedOperand(currentOperation.first) + " " + currentOperation.symbol + " " + signedOperand(currentOperation.second);
       document.getElementById("simplified-display").textContent = operationText();
-      updateAidButtons();
-
       currentLevelDisplay.textContent = levelNames[activeLevel];
       answerInput.value = "";
 
@@ -857,6 +952,7 @@
         feedback.className = "feedback feedback-neutral";
       }
 
+      updateAidButtons();
       updateTicks();
       updateVisualAid();
       answerInput.focus();
@@ -865,7 +961,7 @@
     function setActiveLevel(level) {
       activeLevel = level;
 
-      document.querySelectorAll("[data-level]").forEach(button => {
+      document.querySelectorAll("[data-level]").forEach(function (button) {
         const selected = button.dataset.level === level;
         button.classList.toggle("is-active", selected);
         button.setAttribute("aria-pressed", String(selected));
@@ -874,18 +970,22 @@
       newOperation();
     }
 
-    function updateAidButtons() {
-      const signsChoice = document.getElementById("signs-choice");
-      signsChoice.classList.toggle("is-active", simplifySigns);
-      signsChoice.setAttribute("aria-pressed", String(simplifySigns));
-      document.getElementById("simplified-operation").classList.toggle("hidden", !simplifySigns);
+    function markerValueFromPointer(event) {
+      const bounds = getScaleBounds();
+      const rect = scale.getBoundingClientRect();
+      const ratio = 1 - ((event.clientY - rect.top) / rect.height);
+      const raw = bounds.min + ratio * (bounds.max - bounds.min);
+
+      return Math.round(Math.max(bounds.min, Math.min(bounds.max, raw)));
     }
 
-    document.querySelectorAll("[data-level]").forEach(button => {
-      button.addEventListener("click", () => setActiveLevel(button.dataset.level));
+    document.querySelectorAll("[data-level]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        setActiveLevel(button.dataset.level);
+      });
     });
 
-    document.getElementById("answer-form").addEventListener("submit", event => {
+    document.getElementById("answer-form").addEventListener("submit", function (event) {
       event.preventDefault();
 
       if (answerInput.value.trim() === "") {
@@ -914,55 +1014,49 @@
       }
     });
 
-    document.getElementById("new-operation-button").addEventListener("click", () => newOperation());
+    document.getElementById("new-operation-button").addEventListener("click", function () {
+      newOperation();
+    });
 
-    const scale = document.getElementById("scale");
-    const endMarker = document.getElementById("end-marker");
-    const autoCopyToggle = document.getElementById("auto-copy-toggle");
-    const copyDistanceButton = document.getElementById("copy-distance-button");
-    let draggingMarker = false;
+    document.getElementById("signs-choice").addEventListener("click", function () {
+      simplifySigns = !simplifySigns;
+      document.getElementById("simplified-display").textContent = operationText();
+      updateAidButtons();
+    });
 
-    copyDistanceButton.addEventListener("click", () => {
+    copyDistanceButton.addEventListener("click", function () {
       answerInput.value = visualAnswer;
       answerInput.focus();
     });
 
-    autoCopyToggle.addEventListener("change", () => {
+    autoCopyToggle.addEventListener("change", function () {
       copyDistanceButton.classList.toggle("hidden", autoCopyToggle.checked);
     });
 
-    document.getElementById("signs-choice").addEventListener("click", () => {
-      simplifySigns = !simplifySigns;
-      updateAidButtons();
-      document.getElementById("simplified-display").textContent = operationText();
-    });
-
-    function markerValueFromPointer(event) {
-      const bounds = getScaleBounds();
-      const rect = scale.getBoundingClientRect();
-      const ratio = 1 - ((event.clientY - rect.top) / rect.height);
-      const raw = bounds.min + ratio * (bounds.max - bounds.min);
-      return Math.round(Math.max(bounds.min, Math.min(bounds.max, raw)));
-    }
-
-    endMarker.addEventListener("pointerdown", event => {
+    endMarker.addEventListener("pointerdown", function (event) {
       draggingMarker = true;
-      endMarker.setPointerCapture?.(event.pointerId);
+      endMarker.setPointerCapture(event.pointerId);
       endMarker.style.cursor = "grabbing";
       event.preventDefault();
     });
 
-    endMarker.addEventListener("pointermove", event => {
+    endMarker.addEventListener("pointermove", function (event) {
       if (!draggingMarker) return;
+
       visualAnswer = markerValueFromPointer(event);
-      if (autoCopyToggle.checked) answerInput.value = visualAnswer;
+
+      if (autoCopyToggle.checked) {
+        answerInput.value = visualAnswer;
+      }
+
       updateVisualAid();
     });
 
     function stopDragging(event) {
       if (!draggingMarker) return;
+
       draggingMarker = false;
-      endMarker.releasePointerCapture?.(event.pointerId);
+      endMarker.releasePointerCapture(event.pointerId);
       endMarker.style.cursor = "grab";
     }
 
