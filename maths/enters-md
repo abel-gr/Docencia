@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="ca">
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260921-05-147306f","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YACgEZulLoA,0","Arial Narrow":"YAGyDvJ_4Ts,0","Arial Rounded MT Bold":"YAFcfoaHu-s,0","Arial":"YAGyDvJ_4Ts,0","Avenir Next":"YAFcfmNq6UY,0","Baloo 2":"YADK30bC6HQ,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Broken Glyph":"YADZ-exUkv0,0","Canva Sans":"YAFdJjTk5UU,1","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAFcfvtOAUY,1","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","Courier Prime":"YAD1aFjegN8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAFdJpU7Kkk,0","Georgia":"YAGzXkO0pEM,0","Ghost Mono":"YAHQutsX00Q,0","Hanken Grotesk":"YAFcfhwp99E,0","Helvetica Neue":"YAFcf6CtJfI,0","Helvetica":"YAFcf6CtJfI,0","IBM Plex Mono":"YAFdJkmvhGI,0","Impact":"YAFcfnjI7Vk,0","Instrument Serif":"YAHFeOnZNEk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YADK3zbC6RM,0","JetBrains Mono":"YAFdJksXcAk,0","Josefin Sans":"YAFdJjvw9Ps,0","Lato":"YAFdJuFCnaw,0","Libre Baskerville":"YACgEUFdPdA,0","Lobster":"YAD8SnSjSFI,0","Lora":"YACgEXvxf8Q,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YAFdtQi73Xs,0","Nunito":"YAFdJoNRMmU,1","Oleo Script":"YACgEQQ14jI,0","Oswald":"YACgEQY10lw,0","Pacifico":"YADLjORQ1u4,0","Phantom Sans":"YAFdJvgJ5TU,0","Playfair Display":"YAFdJhem5V8,1","Plus Jakarta Sans":"YAGvf3_u0_Q,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YAFdJpYtCxE,1","Raleway":"YAFdJhmxbVQ,1","Roboto Slab":"YAFdJswIKAg,0","Rockwell":"YAFcfyVZnN0,0","Rye":"YACgEdQP21k,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Source Serif 4":"YACgEfdj394,0","Space Grotesk":"YADZ-dYEmhg,0","Space Mono":"YADW1-vpsoc,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Trebuchet MS":"YAFcfrglpVA,0","UV Display":"YAEdVfSSpYo,0","UV Sans":"YAFdJvgJ5TU,0","Ubuntu":"YACgERDU--Q,0","Verdana":"YAGzXTctYtQ,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YAD1aFjegN8,0","ui-sans-serif":"YACkoD1yZN0,0"}}');</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pràctica Matemàtica</title>
+  <style>
+    :root {
+      --ink: #17324d;
+      --paper: #fffaf0;
+      --coral: #ee6c4d;
+      --blue: #2f6690;
+      --mint: #d8f3dc;
+      --line: #c9d7e1;
+      --muted: #456278;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--paper);
+    }
+
+    body {
+      width: 100%;
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--paper);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid #f4a261;
+      outline-offset: 3px;
+    }
+
+    .math-app {
+      width: 100%;
+      min-height: calc(100 * min(var(--vh, 1vh), 1vh));
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 10% 8%, rgba(238, 108, 77, 0.14) 0 100px, transparent 101px),
+        radial-gradient(circle at 92% 92%, rgba(47, 102, 144, 0.12) 0 160px, transparent 161px),
+        var(--paper);
+    }
+
+    .math-app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.45;
+      background-image:
+        linear-gradient(rgba(47, 102, 144, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47, 102, 144, 0.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .content-shell {
+      position: relative;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .topline-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--coral);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 3px 8px rgba(23, 50, 77, 0.14);
+    }
+
+    .topline-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .topline-label {
+      margin: 0;
+      color: var(--blue);
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .display-font {
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      line-height: 1.06;
+    }
+
+    .subtitle {
+      max-width: 680px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .section-heading-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-heading-row h2 {
+      margin-bottom: 0;
+    }
+
+    .challenge-note {
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .category-button {
+      min-height: 92px;
+      padding: 16px;
+      border: 2px solid transparent;
+      border-radius: 16px;
+      text-align: left;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .category-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 20px rgba(23, 50, 77, 0.12);
+    }
+
+    .category-button.is-active {
+      border-color: var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+      transform: translate(-2px, -2px);
+    }
+
+    .category-coral {
+      color: #702a1c;
+      background: #f9d6ca;
+    }
+
+    .category-sky {
+      color: #174b6b;
+      background: #d6ebf7;
+    }
+
+    .category-lilac {
+      color: #49316f;
+      background: #e4dbf3;
+    }
+
+    .category-mint {
+      color: #17633d;
+      background: #d8f3dc;
+    }
+
+    .category-yellow {
+      color: #6e5010;
+      background: #ffe8a3;
+    }
+
+    .welcome-panel {
+      margin-top: 32px;
+      padding: 40px 24px;
+      border: 2px dashed #91bdd5;
+      border-radius: 24px;
+      text-align: center;
+      background: #e3f1fa;
+    }
+
+    .welcome-symbol {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      margin: 0 auto 12px;
+      color: var(--blue);
+      border: 2px solid var(--blue);
+      border-radius: 50%;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .welcome-panel h2 {
+      margin-bottom: 0;
+    }
+
+    .welcome-panel p {
+      max-width: 620px;
+      margin: 10px auto 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .practice-panel {
+      margin-top: 32px;
+    }
+
+    .practice-card {
+      overflow: hidden;
+      border: 2px solid var(--ink);
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: 10px 10px 0 rgba(23, 50, 77, 0.1);
+    }
+
+    .practice-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .active-category {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    .scoreboard {
+      display: flex;
+      gap: 18px;
+      color: #e3f1fa;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .scoreboard strong {
+      color: #fff;
+    }
+
+    .practice-content {
+      padding: 36px;
+    }
+
+    .calculate-label {
+      margin-bottom: 12px;
+      color: var(--blue);
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .question {
+      margin-bottom: 0;
+      color: var(--ink);
+      font-size: clamp(38px, 7vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .answer-form {
+      max-width: 560px;
+      margin-top: 32px;
+    }
+
+    .answer-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .answer-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .answer-input {
+      width: 100%;
+      min-width: 0;
+      padding: 12px 16px;
+      color: var(--ink);
+      border: 2px solid #91bdd5;
+      border-radius: 12px;
+      background: #fffdf8;
+      font-size: 20px;
+      font-weight: bold;
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    .answer-input::-webkit-outer-spin-button,
+    .answer-input::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+
+    .action-button {
+      padding: 12px 24px;
+      border: 0;
+      border-radius: 12px;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      font-weight: 700;
+      transition: filter 0.18s ease, transform 0.18s ease;
+    }
+
+    .action-button:hover:not(:disabled) {
+      filter: brightness(0.91);
+      transform: translateY(-1px);
+    }
+
+    .check-button {
+      flex: 0 0 auto;
+      background: var(--coral);
+    }
+
+    .next-button {
+      background: var(--blue);
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border: 1px solid;
+      border-radius: 12px;
+      font-family: Arial, sans-serif;
+      font-weight: 600;
+    }
+
+    .feedback-correct {
+      color: #17633d;
+      border-color: #75b798;
+      background: #d8f3dc;
+    }
+
+    .feedback-wrong {
+      color: #8d2a1c;
+      border-color: #ee9b87;
+      background: #ffe0d7;
+    }
+
+    .feedback-neutral {
+      color: #24516f;
+      border-color: #91bdd5;
+      background: #e3f1fa;
+    }
+
+    .practice-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid #dce5eb;
+    }
+
+    .hint-text {
+      margin: 0;
+      color: #587288;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .page-footer {
+      padding-top: 0;
+      padding-bottom: 28px;
+    }
+
+    .page-footer p {
+      margin-bottom: 0;
+      color: #587288;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .reveal {
+      animation: reveal 0.55s ease both;
+    }
+
+    .delay-one {
+      animation-delay: 0.08s;
+    }
+
+    .delay-two {
+      animation-delay: 0.16s;
+    }
+
+    .delay-three {
+      animation-delay: 0.24s;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 800px) {
+      .category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .content-shell {
+        padding: 24px 16px 36px;
+      }
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .practice-card {
+        box-shadow: 6px 6px 0 rgba(23, 50, 77, 0.1);
+      }
+
+      .practice-content {
+        padding: 28px 20px;
+      }
+
+      .answer-row {
+        flex-direction: column;
+      }
+
+      .check-button,
+      .next-button {
+        width: 100%;
+      }
+
+      .practice-footer {
+        align-items: stretch;
+      }
+
+      .scoreboard {
+        gap: 12px;
+      }
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+ </head>
+ <body data-template-id="__page-root">
+  <div class="math-app">
+   <header class="content-shell">
+    <div class="topline reveal">
+     <div class="topline-mark" aria-hidden="true">
+      =
+     </div>
+     <div class="topline-rule"></div>
+     <p class="topline-label">Matemàtiques</p>
+    </div>
+    <div class="reveal delay-one">
+     <h1 data-template-id="page-title" class="canva-text display-font"></h1>
+     <p data-template-id="page-subtitle" class="canva-text subtitle"></p>
+    </div>
+   </header>
+   <main class="content-shell" style="padding-top: 3px;">
+    <section aria-labelledby="categories-heading" class="reveal delay-two">
+     <div class="section-heading-row">
+      <h2 id="categories-heading" data-template-id="categories-title" class="canva-text display-font"></h2>
+      <p data-template-id="challenge-note" class="canva-text challenge-note"></p>
+     </div>
+     <div class="category-grid"><button type="button" data-category="natural-multiply" data-template-id="category-natural-multiply" class="canva-button category-button category-coral" aria-pressed="false"></button> <button type="button" data-category="natural-divide" data-template-id="category-natural-divide" class="canva-button category-button category-sky" aria-pressed="false"></button> <button type="button" data-category="integer-multiply" data-template-id="category-integer-multiply" class="canva-button category-button category-lilac" aria-pressed="false"></button> <button type="button" data-category="integer-divide" data-template-id="category-integer-divide" class="canva-button category-button category-mint" aria-pressed="false"></button> <button type="button" data-category="challenge" data-template-id="category-challenge" class="canva-button category-button category-yellow" aria-pressed="false"></button>
+     </div>
+    </section>
+    <section id="welcome-panel" data-template-id="welcome-panel" class="canva-panel welcome-panel reveal delay-three">
+     <div class="welcome-symbol" aria-hidden="true">
+      ?
+     </div>
+     <h2 data-template-id="welcome-title" class="canva-text display-font"></h2>
+     <p data-template-id="welcome-text" class="canva-text"></p>
+    </section>
+    <section id="practice-panel" class="practice-panel hidden" aria-live="polite">
+     <div class="practice-card">
+      <div class="practice-topbar">
+       <p id="active-category" class="active-category"></p>
+       <div class="scoreboard" aria-label="Resultats"><span><strong id="correct-count">0</strong> encerts</span> <span><strong id="attempt-count">0</strong> resolts</span>
+       </div>
+      </div>
+      <div class="practice-content">
+       <p class="calculate-label">Calcula</p>
+       <p id="question-text" class="question display-font" aria-label="Operació matemàtica"></p>
+       <form id="answer-form" class="answer-form"><label for="answer-input" data-template-id="answer-label" class="canva-text answer-label"></label>
+        <div class="answer-row"><input id="answer-input" class="answer-input" type="number" inputmode="numeric" autocomplete="off" required> <button data-template-id="check-button" class="canva-button action-button check-button" type="submit"></button>
+        </div>
+       </form>
+       <div id="feedback" class="feedback hidden" role="status"></div>
+       <div class="practice-footer">
+        <p id="hint-text" class="hint-text">Escriu el resultat i comprova la resposta.</p><button id="next-button" data-template-id="next-button" class="canva-button action-button next-button" type="button"></button>
+       </div>
+      </div>
+     </div>
+    </section>
+   </main>
+   <footer class="content-shell page-footer">
+    <p data-template-id="footer-text" class="canva-text"></p>
+   </footer>
+  </div>
+  <script>
+    const categoryLabels = {
+      "natural-multiply": "Multiplicacions de naturals",
+      "natural-divide": "Divisions de naturals",
+      "integer-multiply": "Multiplicacions d'enters",
+      "integer-divide": "Divisions d'enters",
+      "challenge": "Repte mixt d'enters"
+    };
+
+    let activeCategory = null;
+    let currentAnswer = null;
+    let correctCount = 0;
+    let attemptCount = 0;
+    let answered = false;
+    let nextQuestionTimer = null;
+
+    const welcomePanel = document.getElementById("welcome-panel");
+    const practicePanel = document.getElementById("practice-panel");
+    const questionText = document.getElementById("question-text");
+    const activeCategoryText = document.getElementById("active-category");
+    const answerInput = document.getElementById("answer-input");
+    const feedback = document.getElementById("feedback");
+    const correctCountText = document.getElementById("correct-count");
+    const attemptCountText = document.getElementById("attempt-count");
+    const hintText = document.getElementById("hint-text");
+    const checkButton = document.querySelector('[data-template-id="check-button"]');
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function randomNonZeroInteger(minAbs, maxAbs) {
+      const value = randomInt(minAbs, maxAbs);
+      return Math.random() < 0.5 ? value : -value;
+    }
+
+    function formatOperand(number) {
+      return number < 0 ? "(-" + Math.abs(number) + ")" : String(number);
+    }
+
+    function makeQuestion(category) {
+      let a;
+      let b;
+      let quotient;
+      let dividend;
+
+      if (category === "natural-multiply") {
+        a = randomInt(2, 12);
+        b = randomInt(2, 12);
+        return { display: a + " · " + b, answer: a * b };
+      }
+
+      if (category === "natural-divide") {
+        b = randomInt(2, 12);
+        quotient = randomInt(2, 12);
+        dividend = b * quotient;
+        return { display: dividend + " ÷ " + b, answer: quotient };
+      }
+
+      if (category === "integer-multiply") {
+        a = randomNonZeroInteger(2, 12);
+        b = randomNonZeroInteger(2, 12);
+        return { display: formatOperand(a) + " · " + formatOperand(b), answer: a * b };
+      }
+
+      if (category === "integer-divide") {
+        b = randomNonZeroInteger(2, 12);
+        quotient = randomNonZeroInteger(2, 12);
+        dividend = b * quotient;
+        return { display: formatOperand(dividend) + " ÷ " + formatOperand(b), answer: quotient };
+      }
+
+      if (Math.random() < 0.5) {
+        a = randomNonZeroInteger(2, 12);
+        b = randomNonZeroInteger(2, 12);
+        return { display: formatOperand(a) + " · " + formatOperand(b), answer: a * b };
+      }
+
+      b = randomNonZeroInteger(2, 12);
+      quotient = randomNonZeroInteger(2, 12);
+      dividend = b * quotient;
+      return { display: formatOperand(dividend) + " ÷ " + formatOperand(b), answer: quotient };
+    }
+
+    function setFeedback(message, type) {
+      feedback.textContent = message;
+      feedback.className = "feedback " + type;
+    }
+
+    function clearNextQuestionTimer() {
+      if (nextQuestionTimer) {
+        window.clearTimeout(nextQuestionTimer);
+        nextQuestionTimer = null;
+      }
+    }
+
+    function newQuestion() {
+      if (!activeCategory) {
+        return;
+      }
+
+      clearNextQuestionTimer();
+
+      const question = makeQuestion(activeCategory);
+      currentAnswer = question.answer;
+      answered = false;
+
+      questionText.textContent = question.display + " = ?";
+      answerInput.value = "";
+      answerInput.disabled = false;
+      checkButton.disabled = false;
+      feedback.className = "feedback hidden";
+      hintText.textContent = "Escriu el resultat i comprova la resposta.";
+      answerInput.focus();
+    }
+
+    function selectCategory(category) {
+      activeCategory = category;
+      welcomePanel.classList.add("hidden");
+      practicePanel.classList.remove("hidden");
+      activeCategoryText.textContent = categoryLabels[category];
+
+      document.querySelectorAll("[data-category]").forEach(function(button) {
+        const selected = button.dataset.category === category;
+        button.classList.toggle("is-active", selected);
+        button.setAttribute("aria-pressed", String(selected));
+      });
+
+      newQuestion();
+    }
+
+    document.querySelectorAll("[data-category]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        selectCategory(button.dataset.category);
+      });
+    });
+
+    document.getElementById("answer-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      if (answered || !activeCategory) {
+        return;
+      }
+
+      if (answerInput.value.trim() === "") {
+        setFeedback("Escriu un resultat abans de comprovar.", "feedback-neutral");
+        answerInput.focus();
+        return;
+      }
+
+      const suppliedAnswer = Number(answerInput.value);
+      attemptCount += 1;
+      attemptCountText.textContent = attemptCount;
+
+      if (suppliedAnswer === currentAnswer) {
+        correctCount += 1;
+        correctCountText.textContent = correctCount;
+        answered = true;
+        answerInput.disabled = true;
+        checkButton.disabled = true;
+        setFeedback("Molt bé! La resposta és correcta. Nova operació...", "feedback-correct");
+        hintText.textContent = "Preparant la pregunta següent.";
+
+        nextQuestionTimer = window.setTimeout(function() {
+          newQuestion();
+        }, 1150);
+      } else {
+        setFeedback("Encara no. Revisa els signes i torna-ho a intentar.", "feedback-wrong");
+        answerInput.select();
+      }
+    });
+
+    document.getElementById("next-button").addEventListener("click", newQuestion);
+  </script>
+ </body>
+</html>
