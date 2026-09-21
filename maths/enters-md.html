@@ -499,8 +499,8 @@
       }
     }
   </style>
-  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
  </head>
  <body data-template-id="__page-root">
   <div class="math-app">
@@ -523,7 +523,8 @@
       <h2 id="categories-heading" data-template-id="categories-title" class="canva-text display-font"></h2>
       <p data-template-id="challenge-note" class="canva-text challenge-note"></p>
      </div>
-     <div class="category-grid"><button type="button" data-category="natural-multiply" data-template-id="category-natural-multiply" class="canva-button category-button category-coral" aria-pressed="false"></button> <button type="button" data-category="natural-divide" data-template-id="category-natural-divide" class="canva-button category-button category-sky" aria-pressed="false"></button> <button type="button" data-category="integer-multiply" data-template-id="category-integer-multiply" class="canva-button category-button category-lilac" aria-pressed="false"></button> <button type="button" data-category="integer-divide" data-template-id="category-integer-divide" class="canva-button category-button category-mint" aria-pressed="false"></button> <button type="button" data-category="challenge" data-template-id="category-challenge" class="canva-button category-button category-yellow" aria-pressed="false"></button>
+     <div class="category-grid">
+      <button type="button" data-category="natural-multiply" data-template-id="category-natural-multiply" class="canva-button category-button category-coral" aria-pressed="false"></button> <button type="button" data-category="natural-divide" data-template-id="category-natural-divide" class="canva-button category-button category-sky" aria-pressed="false"></button> <button type="button" data-category="integer-multiply" data-template-id="category-integer-multiply" class="canva-button category-button category-lilac" aria-pressed="false"></button> <button type="button" data-category="integer-divide" data-template-id="category-integer-divide" class="canva-button category-button category-mint" aria-pressed="false"></button> <button type="button" data-category="challenge" data-template-id="category-challenge" class="canva-button category-button category-yellow" aria-pressed="false"></button>
      </div>
     </section>
     <section id="welcome-panel" data-template-id="welcome-panel" class="canva-panel welcome-panel reveal delay-three">
@@ -537,14 +538,17 @@
      <div class="practice-card">
       <div class="practice-topbar">
        <p id="active-category" class="active-category"></p>
-       <div class="scoreboard" aria-label="Resultats"><span><strong id="correct-count">0</strong> encerts</span> <span><strong id="attempt-count">0</strong> resolts</span>
+       <div class="scoreboard" aria-label="Resultats">
+        <span><strong id="correct-count">0</strong> encerts</span> <span><strong id="attempt-count">0</strong> resolts</span>
        </div>
       </div>
       <div class="practice-content">
        <p class="calculate-label">Calcula</p>
        <p id="question-text" class="question display-font" aria-label="Operació matemàtica"></p>
-       <form id="answer-form" class="answer-form"><label for="answer-input" data-template-id="answer-label" class="canva-text answer-label"></label>
-        <div class="answer-row"><input id="answer-input" class="answer-input" type="number" inputmode="numeric" autocomplete="off" required> <button data-template-id="check-button" class="canva-button action-button check-button" type="submit"></button>
+       <form id="answer-form" class="answer-form">
+        <label for="answer-input" data-template-id="answer-label" class="canva-text answer-label"></label>
+        <div class="answer-row">
+         <input id="answer-input" class="answer-input" type="number" inputmode="numeric" autocomplete="off" required> <button data-template-id="check-button" class="canva-button action-button check-button" type="submit"></button>
         </div>
        </form>
        <div id="feedback" class="feedback hidden" role="status"></div>
